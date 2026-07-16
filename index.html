@@ -39,9 +39,7 @@
         })();
     </script>
 
-    <!-- ====== REST OF YOUR FULL CSS AND HTML (same as before) ====== -->
     <style>
-        /* ... (full CSS from previous version) ... */
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
             --text-lo: rgba(255, 255, 255, 0.65);
@@ -574,6 +572,23 @@
         .icon-btn svg {
             width: 17px;
             height: 17px;
+        }
+
+        /* Install button highlight */
+        .icon-btn.install-btn {
+            color: rgba(255, 255, 255, 0.5);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .icon-btn.install-btn:hover {
+            color: #6bcbff;
+            border-color: rgba(107, 203, 255, 0.3);
+            background: rgba(107, 203, 255, 0.08);
+        }
+        .icon-btn.install-btn.visible {
+            display: flex;
+        }
+        .icon-btn.install-btn.hidden {
+            display: none;
         }
 
         /* ---- Ambient Popover ---- */
@@ -1280,6 +1295,15 @@
 
     <!-- ---- control bar ---- -->
     <div class="control-bar">
+        <!-- Install Button (hidden by default) -->
+        <button class="icon-btn install-btn hidden" id="installBtn" title="Install App">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+        </button>
+
         <!-- Todo Button -->
         <button class="icon-btn" id="todoToggle" title="Todo list">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1328,7 +1352,7 @@
         </button>
     </div>
 
-       <script>
+    <script>
         (function() {
             'use strict';
 
@@ -1355,6 +1379,7 @@
             const setCustomTime = document.getElementById('setCustomTime');
             const savePresetBtn = document.getElementById('savePresetBtn');
             const wakeIndicator = document.getElementById('wakeIndicator');
+            const installBtn = document.getElementById('installBtn');
 
             // History elements
             const historyToggle = document.getElementById('historyToggle');
@@ -1391,6 +1416,98 @@
             const fileLabel = document.getElementById('fileLabel');
             const customStatus = document.getElementById('customStatus');
             const clearCustomBtn = document.getElementById('clearCustomBtn');
+
+            // ---- Install Button ----
+            let deferredPrompt = null;
+            let isAppInstalled = false;
+
+            // Check if already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                isAppInstalled = true;
+                installBtn.classList.add('hidden');
+            }
+
+            // Listen for beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!isAppInstalled) {
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('visible');
+                }
+            });
+
+            // Listen for successful installation
+            window.addEventListener('appinstalled', () => {
+                isAppInstalled = true;
+                installBtn.classList.add('hidden');
+                installBtn.classList.remove('visible');
+                deferredPrompt = null;
+                // Show a subtle notification
+                stateLabel.textContent = '✅ App installed!';
+                setTimeout(() => {
+                    if (stateLabel.textContent === '✅ App installed!') {
+                        updateStateLabel();
+                    }
+                }, 3000);
+            });
+
+            // Install button click
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    try {
+                        const result = await deferredPrompt.prompt();
+                        if (result.outcome === 'accepted') {
+                            isAppInstalled = true;
+                            installBtn.classList.add('hidden');
+                            installBtn.classList.remove('visible');
+                            stateLabel.textContent = '✅ Installing...';
+                        } else {
+                            stateLabel.textContent = '❌ Installation cancelled';
+                            setTimeout(() => {
+                                if (stateLabel.textContent === '❌ Installation cancelled') {
+                                    updateStateLabel();
+                                }
+                            }, 2000);
+                        }
+                    } catch (_) {
+                        // fallback
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({
+                                    title: 'FOCUS Timer',
+                                    text: 'Check out this focus timer app!',
+                                    url: window.location.href
+                                });
+                            } catch (_2) {}
+                        }
+                    }
+                } else {
+                    // Fallback: share or suggest manual install
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: 'FOCUS Timer',
+                                text: 'Check out this focus timer app!',
+                                url: window.location.href
+                            });
+                        } catch (_) {}
+                    } else {
+                        stateLabel.textContent = '📱 Use "Add to Home Screen"';
+                        setTimeout(() => {
+                            if (stateLabel.textContent === '📱 Use "Add to Home Screen"') {
+                                updateStateLabel();
+                            }
+                        }, 3000);
+                    }
+                }
+            });
+
+            // Hide install button if already in standalone mode
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.classList.add('hidden');
+                installBtn.classList.remove('visible');
+            }
 
             // ---- state ----
             let mode = 'stopwatch';
@@ -1471,7 +1588,6 @@
                 const total = getTotalTimeForDay(getTodayKey());
                 todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
 
-                // Update stats in panel
                 totalSessionsStat.textContent = sessions.length;
                 const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
                 totalTimeStat.textContent = formatDuration(totalAllTime);
@@ -1483,7 +1599,6 @@
                     sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
                     return;
                 }
-                // Show latest first
                 const sorted = [...sessions].reverse().slice(0, 50);
                 let html = '';
                 sorted.forEach(s => {
@@ -1511,7 +1626,6 @@
                     timestamp: Date.now()
                 });
                 saveSessions();
-                // Show a subtle notification
                 const label = stateLabel;
                 label.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
                 setTimeout(() => {
@@ -2069,7 +2183,6 @@
                         lastTickSecond = currentSecond;
                     }
                     updateStateLabel();
-                    // Check if stopwatch reached threshold while running
                     if (elapsedMs >= STOPWATCH_THRESHOLD_MS && !sessionRecorded) {
                         recordSession('stopwatch', elapsedMs);
                         sessionRecorded = true;
@@ -2829,8 +2942,10 @@
             console.log('📋 Todo list saved to localStorage · Double‑click a todo to edit');
             console.log('💾 Save named timer presets with the 💾 button');
             console.log('🎯 Sessions: 20min stopwatch / 5min timer auto-record · H for history');
+            console.log('📲 Install button appears when browser supports PWA installation');
 
         })();
     </script>
+
 </body>
 </html>
