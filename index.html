@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FOCUS · by pushpraj</title>
     
-    <!-- ---- Favicon & PWA Icons ---- -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%231a1c20'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-size='56' font-weight='bold' text-anchor='middle' fill='%23ffffff'%3EF%3C/text%3E%3C/svg%3E" />
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Ccircle cx='90' cy='90' r='82' fill='%231a1c20'/%3E%3Ctext x='90' y='124' font-family='Arial, sans-serif' font-size='100' font-weight='bold' text-anchor='middle' fill='%23ffffff'%3EF%3C/text%3E%3C/svg%3E" />
+    <!-- ---- Favicon & PWA Icons (using your Google Drive image) ---- -->
+    <!-- File ID: 1cbICmliAAK4-8PkWkr6RQOWTQuhZALfB -->
+    <link rel="icon" type="image/png" href="https://drive.google.com/uc?export=view&id=1cbICmliAAK4-8PkWkr6RQOWTQuhZALfB" />
+    <link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1cbICmliAAK4-8PkWkr6RQOWTQuhZALfB" />
     <link rel="manifest" id="manifestLink" />
     <script>
-        // Generate manifest with the same SVG icon for PWA
+        // Generate manifest with your Google Drive image for PWA
         (function() {
+            const imageUrl = "https://drive.google.com/uc?export=view&id=1cbICmliAAK4-8PkWkr6RQOWTQuhZALfB";
             const manifest = {
                 name: "FOCUS Timer",
                 short_name: "FOCUS",
@@ -22,14 +24,14 @@
                 theme_color: "#0a0c10",
                 icons: [
                     {
-                        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Ccircle cx='96' cy='96' r='86' fill='%231a1c20'/%3E%3Ctext x='96' y='132' font-family='Arial, sans-serif' font-size='108' font-weight='bold' text-anchor='middle' fill='%23ffffff'%3EF%3C/text%3E%3C/svg%3E",
+                        src: imageUrl,
                         sizes: "192x192",
-                        type: "image/svg+xml"
+                        type: "image/png"
                     },
                     {
-                        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='230' fill='%231a1c20'/%3E%3Ctext x='256' y='352' font-family='Arial, sans-serif' font-size='288' font-weight='bold' text-anchor='middle' fill='%23ffffff'%3EF%3C/text%3E%3C/svg%3E",
+                        src: imageUrl,
                         sizes: "512x512",
-                        type: "image/svg+xml"
+                        type: "image/png"
                     }
                 ]
             };
@@ -40,6 +42,7 @@
     </script>
 
     <style>
+        /* ... (full CSS from previous version) ... */
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
             --text-lo: rgba(255, 255, 255, 0.65);
