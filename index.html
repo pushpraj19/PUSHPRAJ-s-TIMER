@@ -4,13 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FOCUS · by pushpraj</title>
-    
+
     <!-- ---- Favicon & PWA Icons (local files) ---- -->
     <link rel="icon" type="image/png" href="logo.png" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" id="manifestLink" />
     <script>
-        // Generate manifest with local logo.png
         (function() {
             const manifest = {
                 name: "FOCUS Timer",
@@ -21,16 +20,8 @@
                 background_color: "#0a0c10",
                 theme_color: "#0a0c10",
                 icons: [
-                    {
-                        src: "logo.png",
-                        sizes: "192x192",
-                        type: "image/png"
-                    },
-                    {
-                        src: "logo.png",
-                        sizes: "512x512",
-                        type: "image/png"
-                    }
+                    { src: "logo.png", sizes: "192x192", type: "image/png" },
+                    { src: "logo.png", sizes: "512x512", type: "image/png" }
                 ]
             };
             const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
@@ -140,6 +131,7 @@
             flex-direction: column;
             align-items: flex-end;
             gap: 4px;
+            position: relative;
         }
 
         .info-row {
@@ -193,6 +185,41 @@
             color: var(--text-lo);
             text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
             font-variant-numeric: tabular-nums;
+        }
+
+        /* Install button in top-right */
+        .install-top {
+            position: absolute;
+            top: -6px;
+            right: 0;
+            z-index: 10;
+        }
+        .install-top .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 0;
+        }
+        .install-top .icon-btn.visible {
+            display: flex;
+        }
+        .install-top .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #6bcbff;
+            border-color: rgba(107, 203, 255, 0.3);
+        }
+        .install-top .icon-btn svg {
+            width: 16px;
+            height: 16px;
         }
 
         /* ---- stage ---- */
@@ -392,7 +419,7 @@
         /* ---- Session history panel ---- */
         .session-panel {
             position: fixed;
-            bottom: 140px;
+            bottom: 160px;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
             z-index: 6;
@@ -504,6 +531,70 @@
             color: var(--text-hi);
         }
 
+        /* ---- Start/Reset row above control bar ---- */
+        .action-row {
+            position: fixed;
+            bottom: 88px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 6px;
+        }
+
+        .btn-start {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 12px 40px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: 100px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .btn-start:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.4);
+        }
+        .btn-start:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .btn-reset-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+        .btn-reset-icon:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .btn-reset-icon:active {
+            transform: scale(0.94);
+        }
+        .btn-reset-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
         /* ---- control bar ---- */
         .control-bar {
             position: fixed;
@@ -514,7 +605,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px;
+            padding: 10px 14px;
             border-radius: 22px;
             background: var(--glass);
             border: 1px solid var(--glass-border);
@@ -523,78 +614,38 @@
             box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
         }
 
-        .btn {
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            padding: 12px 28px;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.16);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
-            min-width: 76px;
-        }
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.26);
-            transform: translateY(-1px);
-        }
-        .btn:active {
-            transform: translateY(0) scale(0.97);
-        }
-
         .icon-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.06);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.75);
+            color: rgba(255, 255, 255, 0.6);
             flex-shrink: 0;
             position: relative;
         }
         .icon-btn:hover {
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.14);
             color: #fff;
         }
         .icon-btn.on {
             color: #fff;
-            background: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.20);
         }
         .icon-btn svg {
-            width: 17px;
-            height: 17px;
-        }
-
-        /* Install button highlight */
-        .icon-btn.install-btn {
-            color: rgba(255, 255, 255, 0.5);
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-        .icon-btn.install-btn:hover {
-            color: #6bcbff;
-            border-color: rgba(107, 203, 255, 0.3);
-            background: rgba(107, 203, 255, 0.08);
-        }
-        .icon-btn.install-btn.visible {
-            display: flex;
-        }
-        .icon-btn.install-btn.hidden {
-            display: none;
+            width: 16px;
+            height: 16px;
         }
 
         /* ---- Ambient Popover ---- */
         .ambient-popover {
             position: fixed;
-            bottom: 92px;
+            bottom: 150px;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
             z-index: 6;
@@ -646,7 +697,7 @@
         /* ---- Todo Panel ---- */
         .todo-panel {
             position: fixed;
-            bottom: 140px;
+            bottom: 160px;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
             z-index: 6;
@@ -817,7 +868,7 @@
         /* ---- scene picker popover (existing) ---- */
         .scene-picker {
             position: fixed;
-            bottom: 92px;
+            bottom: 150px;
             left: 50%;
             transform: translateX(-50%) translateY(10px);
             z-index: 6;
@@ -1020,28 +1071,47 @@
             .running-time {
                 font-size: 12px;
             }
+            .install-top .icon-btn {
+                width: 28px;
+                height: 28px;
+            }
+            .install-top .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .action-row {
+                bottom: 78px;
+                gap: 8px;
+            }
+            .btn-start {
+                font-size: 13px;
+                padding: 10px 30px;
+                min-width: 80px;
+            }
+            .btn-reset-icon {
+                width: 38px;
+                height: 38px;
+            }
+            .btn-reset-icon svg {
+                width: 16px;
+                height: 16px;
+            }
             .control-bar {
-                padding: 8px;
+                padding: 8px 12px;
                 gap: 6px;
-                bottom: 18px;
+                bottom: 20px;
                 border-radius: 18px;
             }
-            .btn {
-                padding: 10px 16px;
-                font-size: 12px;
-                min-width: 54px;
-            }
             .icon-btn {
-                width: 36px;
-                height: 36px;
-                border-radius: 12px;
+                width: 34px;
+                height: 34px;
             }
             .icon-btn svg {
                 width: 14px;
                 height: 14px;
             }
             .scene-picker {
-                bottom: 72px;
+                bottom: 130px;
                 padding: 10px 12px 12px 12px;
                 min-width: unset;
                 width: calc(100vw - 28px);
@@ -1052,7 +1122,7 @@
                 border-radius: 10px;
             }
             .ambient-popover {
-                bottom: 72px;
+                bottom: 130px;
                 padding: 8px 12px;
                 gap: 6px;
                 max-width: calc(100vw - 24px);
@@ -1085,29 +1155,37 @@
             }
             .session-panel {
                 width: calc(100vw - 32px);
-                bottom: 130px;
+                bottom: 140px;
                 max-height: 50vh;
             }
             .todo-panel {
                 width: calc(100vw - 32px);
-                bottom: 130px;
+                bottom: 140px;
                 max-height: 50vh;
             }
         }
 
         @media (max-width: 380px) {
+            .action-row {
+                bottom: 72px;
+                gap: 6px;
+            }
+            .btn-start {
+                font-size: 12px;
+                padding: 8px 22px;
+                min-width: 68px;
+            }
+            .btn-reset-icon {
+                width: 34px;
+                height: 34px;
+            }
             .control-bar {
                 gap: 4px;
-                padding: 6px;
-            }
-            .btn {
-                padding: 8px 12px;
-                font-size: 11px;
-                min-width: 44px;
+                padding: 6px 10px;
             }
             .icon-btn {
-                width: 32px;
-                height: 32px;
+                width: 30px;
+                height: 30px;
             }
             .timer {
                 font-size: clamp(56px, 14vw, 85px);
@@ -1126,7 +1204,7 @@
         .wake-indicator {
             display: none;
             position: fixed;
-            bottom: 82px;
+            bottom: 150px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 4;
@@ -1179,6 +1257,15 @@
             <span class="logo-sub">by pushpraj</span>
         </div>
         <div class="top-right">
+            <div class="install-top">
+                <button class="icon-btn hidden" id="installBtn" title="Install App">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
             <div class="info-row">
                 <div class="weather loading" id="weatherDisplay">⛅ <span class="temp">--°</span></div>
                 <div class="today-total" id="todayTotal">🎯 <span class="highlight">0m</span></div>
@@ -1222,6 +1309,17 @@
 
     <!-- Wake Lock indicator -->
     <div class="wake-indicator" id="wakeIndicator">⚡ screen awake</div>
+
+    <!-- ---- Action Row (Start + Reset above control bar) ---- -->
+    <div class="action-row">
+        <button class="btn-start" id="startPauseBtn">Start</button>
+        <button class="btn-reset-icon" id="resetBtn" title="Reset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+        </button>
+    </div>
 
     <!-- ---- Session history panel ---- -->
     <div class="session-panel" id="sessionPanel">
@@ -1295,15 +1393,6 @@
 
     <!-- ---- control bar ---- -->
     <div class="control-bar">
-        <!-- Install Button (hidden by default) -->
-        <button class="icon-btn install-btn hidden" id="installBtn" title="Install App">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-        </button>
-
         <!-- Todo Button -->
         <button class="icon-btn" id="todoToggle" title="Todo list">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1339,15 +1428,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
                 <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-            </svg>
-        </button>
-
-        <button class="btn" id="startPauseBtn">Start</button>
-
-        <button class="icon-btn" id="resetBtn" title="Reset">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="1 4 1 10 7 10"/>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
             </svg>
         </button>
     </div>
@@ -1421,13 +1501,12 @@
             let deferredPrompt = null;
             let isAppInstalled = false;
 
-            // Check if already installed
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 isAppInstalled = true;
+                installBtn.classList.remove('visible');
                 installBtn.classList.add('hidden');
             }
 
-            // Listen for beforeinstallprompt
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -1437,13 +1516,11 @@
                 }
             });
 
-            // Listen for successful installation
             window.addEventListener('appinstalled', () => {
                 isAppInstalled = true;
-                installBtn.classList.add('hidden');
                 installBtn.classList.remove('visible');
+                installBtn.classList.add('hidden');
                 deferredPrompt = null;
-                // Show a subtle notification
                 stateLabel.textContent = '✅ App installed!';
                 setTimeout(() => {
                     if (stateLabel.textContent === '✅ App installed!') {
@@ -1452,7 +1529,6 @@
                 }, 3000);
             });
 
-            // Install button click
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
                     try {
@@ -1471,7 +1547,6 @@
                             }, 2000);
                         }
                     } catch (_) {
-                        // fallback
                         if (navigator.share) {
                             try {
                                 await navigator.share({
@@ -1483,7 +1558,6 @@
                         }
                     }
                 } else {
-                    // Fallback: share or suggest manual install
                     if (navigator.share) {
                         try {
                             await navigator.share({
@@ -1503,7 +1577,6 @@
                 }
             });
 
-            // Hide install button if already in standalone mode
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 installBtn.classList.add('hidden');
                 installBtn.classList.remove('visible');
@@ -1526,8 +1599,8 @@
             let sessions = [];
             let sessionRecorded = false;
 
-            const STOPWATCH_THRESHOLD_MS = 20 * 60 * 1000; // 20 minutes
-            const TIMER_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+            const STOPWATCH_THRESHOLD_MS = 20 * 60 * 1000;
+            const TIMER_THRESHOLD_MS = 5 * 60 * 1000;
 
             function loadSessions() {
                 try {
@@ -1587,7 +1660,6 @@
             function updateSessionDisplay() {
                 const total = getTotalTimeForDay(getTodayKey());
                 todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
-
                 totalSessionsStat.textContent = sessions.length;
                 const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
                 totalTimeStat.textContent = formatDuration(totalAllTime);
@@ -1619,23 +1691,16 @@
 
             function recordSession(mode, durationMs) {
                 const today = getTodayKey();
-                sessions.push({
-                    date: today,
-                    mode: mode,
-                    durationMs: durationMs,
-                    timestamp: Date.now()
-                });
+                sessions.push({ date: today, mode: mode, durationMs: durationMs, timestamp: Date.now() });
                 saveSessions();
-                const label = stateLabel;
-                label.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
+                stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
                 setTimeout(() => {
-                    if (label.textContent.includes('Session saved')) {
+                    if (stateLabel.textContent.includes('Session saved')) {
                         updateStateLabel();
                     }
                 }, 2500);
             }
 
-            // ---- timer controls visibility ----
             function updateTimerControlsVisibility() {
                 if (mode === 'timer') {
                     timerControls.classList.add('visible');
@@ -2942,7 +3007,7 @@
             console.log('📋 Todo list saved to localStorage · Double‑click a todo to edit');
             console.log('💾 Save named timer presets with the 💾 button');
             console.log('🎯 Sessions: 20min stopwatch / 5min timer auto-record · H for history');
-            console.log('📲 Install button appears when browser supports PWA installation');
+            console.log('📲 Install button in top‑right corner');
 
         })();
     </script>
