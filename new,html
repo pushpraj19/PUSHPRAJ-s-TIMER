@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FOCUS · by pushpraj</title>
+
+    <!-- ---- Favicon & PWA Icons (local files) ---- -->
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="manifest" id="manifestLink" />
+    <script>
+        (function() {
+            const manifest = {
+                name: "FOCUS Timer",
+                short_name: "FOCUS",
+                description: "Focus timer with stopwatch, timer, scenic backgrounds, and session tracking.",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#0a0c10",
+                theme_color: "#0a0c10",
+                icons: [
+                    { src: "logo.png", sizes: "192x192", type: "image/png" },
+                    { src: "logo.png", sizes: "512x512", type: "image/png" }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            document.getElementById('manifestLink').href = url;
+        })();
+    </script>
+
+    <style>
+        :root {
+            --text-hi: rgba(255, 255, 255, 0.96);
+            --text-lo: rgba(255, 255, 255, 0.65);
+            --glass: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --accent: rgba(255, 255, 255, 0.22);
+            --accent-active: rgba(255, 255, 255, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', "SF Pro Display", "Segoe UI", sans-serif;
+        }
+
+        body {
+            position: relative;
+        }
+
+        /* ---- scenic background, crossfading ---- */
+        .scene {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+            z-index: -3;
+        }
+        .scene.active {
+            opacity: 1;
+        }
+        .scene.custom-bg {
+            transition: opacity 0.8s ease;
+        }
+
+        .scene-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(10, 12, 16, 0.38) 0%,
+                    rgba(10, 12, 16, 0.12) 30%,
+                    rgba(10, 12, 16, 0.28) 68%,
+                    rgba(10, 12, 16, 0.55) 100%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ---- top bar ---- */
+        .top-bar {
+            position: fixed;
+            top: 20px;
+            left: 26px;
+            right: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 5;
+            color: var(--text-hi);
+        }
+
+        .logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: clamp(36px, 6vw, 76px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+            line-height: 1.1;
+        }
+        .logo-sub {
+            font-weight: 400;
+            font-size: 0.32em;
+            opacity: 0.8;
+            letter-spacing: 0.15em;
+            margin-top: -4px;
+            text-transform: lowercase;
+        }
+
+        .top-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            line-height: 1.4;
+        }
+
+        /* Install button – now part of flow */
+        .install-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2px;
+        }
+        .install-top .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 0;
+        }
+        .install-top .icon-btn.visible {
+            display: flex;
+        }
+        .install-top .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #6bcbff;
+            border-color: rgba(107, 203, 255, 0.3);
+        }
+        .install-top .icon-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .weather {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            min-height: 22px;
+        }
+        .weather .temp {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+        .weather .condition {
+            font-weight: 400;
+            color: var(--text-lo);
+        }
+
+        .today-total {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            min-height: 22px;
+            white-space: nowrap;
+        }
+        .today-total .highlight {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        .clock {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+        .running-time {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---- stage ---- */
+        .stage {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        /* ---- mode toggle ---- */
+        .mode-toggle {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .mode-btn {
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: clamp(11px, 1.2vw, 14px);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 6px 20px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
+            font-family: inherit;
+        }
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .mode-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .timer {
+            font-size: clamp(80px, 16vw, 200px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--text-hi);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45), 0 0 60px rgba(255, 255, 255, 0.08);
+            line-height: 1;
+            user-select: none;
+            transition: transform 0.6s cubic-bezier(.4, 0, .2, 1);
+        }
+        .timer.running {
+            animation: breathe 4.5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        /* ---- timer controls (presets + custom) ---- */
+        .timer-controls {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            margin-top: -4px;
+        }
+        .timer-controls.visible {
+            display: flex;
+        }
+
+        .preset-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: clamp(10px, 0.9vw, 12px);
+            font-weight: 500;
+            padding: 5px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.03em;
+        }
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .preset-btn.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .preset-btn.saved-preset {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .preset-btn.saved-preset .delete-preset {
+            opacity: 0.4;
+            font-size: 10px;
+            margin-left: 2px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .preset-btn.saved-preset .delete-preset:hover {
+            opacity: 1;
+        }
+
+        .custom-time-input {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .custom-time-input input {
+            width: 60px;
+            padding: 4px 8px;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: clamp(11px, 0.9vw, 13px);
+            font-weight: 500;
+            font-family: inherit;
+            text-align: center;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .custom-time-input input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .custom-time-input input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .custom-time-input input[type="number"]::-webkit-inner-spin-button,
+        .custom-time-input input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .custom-time-input input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .custom-time-input .set-btn {
+            border: none;
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: clamp(10px, 0.8vw, 12px);
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+        }
+        .custom-time-input .set-btn:hover {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+        }
+
+        .state-label {
+            margin-top: -4px;
+            font-size: clamp(12px, 1.1vw, 15px);
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-lo);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+            min-height: 20px;
+        }
+
+        /* ---- Session history panel ---- */
+        .session-panel {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            max-height: 55vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-hi);
+        }
+        .session-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .session-panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+        .session-panel .header .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .session-panel .header .close-btn:hover {
+            color: var(--text-hi);
+        }
+        .session-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 35vh;
+        }
+        .session-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 12px;
+            color: var(--text-lo);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .session-list li .session-date {
+            font-weight: 500;
+            color: var(--text-hi);
+        }
+        .session-list li .session-duration {
+            font-weight: 500;
+            color: var(--text-hi);
+        }
+        .session-list li .session-mode {
+            font-size: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 10px;
+            border-radius: 100px;
+        }
+        .session-list li .session-mode.stopwatch {
+            color: #6bcbff;
+        }
+        .session-list li .session-mode.timer {
+            color: #ffd93d;
+        }
+        .session-empty {
+            color: var(--text-lo);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.6;
+        }
+
+        .session-panel .footer-stats {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-lo);
+        }
+        .session-panel .footer-stats .stat-value {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        /* ---- Action Row (Start + Reset above control bar) ---- */
+        .action-row {
+            position: fixed;
+            bottom: clamp(110px, 14vh, 150px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: clamp(14px, 1.6vw, 22px);
+            padding: 0 6px;
+        }
+
+        .btn-start {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            color: #fff;
+            font-size: clamp(17px, 1.7vw, 24px);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: clamp(16px, 1.6vw, 22px) clamp(40px, 4.5vw, 60px);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: clamp(110px, 13vw, 170px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+        .btn-start:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .btn-start:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .btn-reset-icon {
+            width: clamp(48px, 4.5vw, 60px);
+            height: clamp(48px, 4.5vw, 60px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+        .btn-reset-icon:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .btn-reset-icon:active {
+            transform: scale(0.94);
+        }
+        .btn-reset-icon svg {
+            width: clamp(20px, 1.8vw, 26px);
+            height: clamp(20px, 1.8vw, 26px);
+        }
+
+        /* ---- control bar ---- */
+        .control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 16px);
+            padding: clamp(8px, 0.8vw, 14px) clamp(12px, 1.2vw, 20px);
+            border-radius: 22px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-btn {
+            width: clamp(36px, 3.5vw, 46px);
+            height: clamp(36px, 3.5vw, 46px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+        }
+        .icon-btn.on {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.20);
+        }
+        .icon-btn svg {
+            width: clamp(14px, 1.3vw, 18px);
+            height: clamp(14px, 1.3vw, 18px);
+        }
+
+        /* ---- Ambient Popover ---- */
+        .ambient-popover {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
+        }
+        .ambient-popover.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .ambient-btn-option {
+            border: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+        }
+        .ambient-btn-option:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .ambient-btn-option.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ---- Todo Panel ---- */
+        .todo-panel {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            max-height: 55vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-hi);
+        }
+        .todo-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .todo-panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+        .todo-panel .header .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .todo-panel .header .close-btn:hover {
+            color: var(--text-hi);
+        }
+        .todo-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .todo-input-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .todo-input-row input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .todo-input-row input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .todo-input-row .add-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .todo-input-row .add-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 35vh;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .todo-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+            font-size: 13px;
+            word-break: break-word;
+        }
+        .todo-list li:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .todo-list li .checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .todo-list li .checkbox.checked {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: var(--text-hi);
+        }
+        .todo-list li .checkbox.checked::after {
+            content: "✓";
+            color: var(--text-hi);
+            font-size: 14px;
+        }
+        .todo-list li .task-text {
+            flex: 1;
+            color: var(--text-hi);
+            transition: opacity 0.2s;
+            cursor: text;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .todo-list li .task-text.done {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+        .todo-list li .task-text.editing {
+            background: rgba(255, 255, 255, 0.08);
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .todo-list li .delete-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .todo-list li .delete-btn:hover {
+            color: #ff6b6b;
+        }
+        .todo-empty {
+            color: var(--text-lo);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.6;
+        }
+
+        /* ---- scene picker popover (existing) ---- */
+        .scene-picker {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 14px 14px 14px;
+            border-radius: 18px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: 280px;
+            max-width: 92vw;
+        }
+        .scene-picker.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .scene-picker .thumbs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .scene-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            opacity: 0.75;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .scene-thumb:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        .scene-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            opacity: 1;
+        }
+        .scene-thumb.custom-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.7);
+            border-style: dashed;
+        }
+        .scene-thumb.custom-thumb:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .scene-thumb.custom-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        /* ---- custom bg panel ---- */
+        .custom-panel {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+            margin-top: 2px;
+        }
+        .custom-panel.open {
+            display: flex;
+        }
+
+        .custom-panel .input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.2s;
+            min-width: 0;
+        }
+        .custom-panel input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .custom-panel input[type="text"]:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-panel .file-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel .file-label {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .custom-panel .file-label:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .custom-panel .file-label input[type="file"] {
+            display: none;
+        }
+        .custom-panel .apply-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .custom-panel .apply-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .custom-panel .apply-btn:active {
+            transform: scale(0.96);
+        }
+
+        .custom-panel .status-msg {
+            font-size: 11px;
+            color: var(--text-lo);
+            text-align: center;
+            min-height: 18px;
+            margin-top: 2px;
+        }
+        .custom-panel .status-msg.error {
+            color: #ffa59e;
+        }
+        .custom-panel .status-msg.success {
+            color: #9ed9b0;
+        }
+
+        ::selection {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---- responsive ---- */
+        @media (max-width: 480px) {
+            .top-bar {
+                top: 14px;
+                left: 16px;
+                right: 16px;
+            }
+            .logo {
+                font-size: clamp(28px, 5vw, 42px);
+            }
+            .logo-sub {
+                font-size: 0.3em;
+                margin-top: -3px;
+            }
+            .action-row {
+                bottom: clamp(85px, 12vh, 100px);
+                gap: 10px;
+            }
+            .btn-start {
+                font-size: 15px;
+                padding: 12px 28px;
+                min-width: 80px;
+            }
+            .btn-reset-icon {
+                width: 40px;
+                height: 40px;
+            }
+            .btn-reset-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+            .control-bar {
+                padding: 8px 12px;
+                gap: 6px;
+                bottom: 20px;
+                border-radius: 18px;
+            }
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+            }
+            .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .scene-picker {
+                bottom: clamp(120px, 14vh, 140px);
+                padding: 10px 12px 12px 12px;
+                min-width: unset;
+                width: calc(100vw - 28px);
+            }
+            .scene-thumb {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+            .ambient-popover {
+                bottom: clamp(120px, 14vh, 140px);
+                padding: 8px 12px;
+                gap: 6px;
+                max-width: calc(100vw - 24px);
+            }
+            .ambient-btn-option {
+                font-size: 10px;
+                padding: 5px 12px;
+            }
+            .timer {
+                font-size: clamp(72px, 16vw, 110px);
+            }
+            .state-label {
+                font-size: 11px;
+            }
+            .mode-btn {
+                font-size: 11px;
+                padding: 5px 16px;
+            }
+            .preset-btn {
+                font-size: 10px;
+                padding: 4px 12px;
+            }
+            .custom-time-input input {
+                width: 50px;
+                font-size: 11px;
+            }
+            .custom-time-input .set-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .session-panel {
+                width: calc(100vw - 32px);
+                bottom: clamp(120px, 14vh, 140px);
+                max-height: 50vh;
+            }
+            .todo-panel {
+                width: calc(100vw - 32px);
+                bottom: clamp(120px, 14vh, 140px);
+                max-height: 50vh;
+            }
+            .install-top .icon-btn {
+                width: 28px;
+                height: 28px;
+            }
+            .install-top .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .weather {
+                font-size: 12px;
+                min-height: 18px;
+            }
+            .today-total {
+                font-size: 12px;
+                min-height: 18px;
+            }
+            .clock {
+                font-size: 12px;
+            }
+            .running-time {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .action-row {
+                bottom: clamp(75px, 10vh, 85px);
+                gap: 8px;
+            }
+            .btn-start {
+                font-size: 13px;
+                padding: 10px 20px;
+                min-width: 68px;
+            }
+            .btn-reset-icon {
+                width: 36px;
+                height: 36px;
+            }
+            .btn-reset-icon svg {
+                width: 16px;
+                height: 16px;
+            }
+            .control-bar {
+                gap: 4px;
+                padding: 6px 10px;
+            }
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+            }
+            .timer {
+                font-size: clamp(56px, 14vw, 85px);
+            }
+            .scene-thumb {
+                width: 34px;
+                height: 34px;
+            }
+            .mode-btn {
+                font-size: 10px;
+                padding: 4px 12px;
+            }
+        }
+
+        /* Wake Lock indicator */
+        .wake-indicator {
+            display: none;
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+        .wake-indicator.active {
+            display: block;
+        }
+
+        /* scrollbar styling */
+        .todo-list::-webkit-scrollbar,
+        .session-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .todo-list::-webkit-scrollbar-track,
+        .session-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .todo-list::-webkit-scrollbar-thumb,
+        .session-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ---- scenes (presets) ---- -->
+    <div class="scene active" id="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');"></div>
+    <div class="scene" id="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene custom-bg" id="scene-custom" style="display:none; background-image:none;"></div>
+
+    <div class="scene-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- ---- top bar ---- -->
+    <div class="top-bar">
+        <div class="logo">
+            FOCUS
+            <span class="logo-sub">by pushpraj</span>
+        </div>
+        <div class="top-right">
+            <!-- Install Button at very top -->
+            <div class="install-top">
+                <button class="icon-btn hidden" id="installBtn" title="Install App">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Weather + Today's total -->
+            <div class="info-row">
+                <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
+                <div class="today-total" id="todayTotal">🎯 <span class="highlight">0m</span></div>
+            </div>
+
+            <!-- Date -->
+            <div class="clock" id="clock">--:--</div>
+
+            <!-- Current time with seconds -->
+            <div class="running-time" id="runningTime">--:--:--</div>
+        </div>
+    </div>
+
+    <!-- ---- stage ---- -->
+    <div class="stage">
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" id="modeToggle">
+            <button class="mode-btn active" data-mode="stopwatch">Stopwatch</button>
+            <button class="mode-btn" data-mode="timer">Timer</button>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="timer" id="timerDisplay">00:00.00</div>
+
+        <!-- Timer Controls (presets + custom) -->
+        <div class="timer-controls" id="timerControls">
+            <div class="preset-row">
+                <button class="preset-btn" data-seconds="300">5m</button>
+                <button class="preset-btn" data-seconds="900">15m</button>
+                <button class="preset-btn active" data-seconds="1500">25m</button>
+                <button class="preset-btn" data-seconds="3600">60m</button>
+            </div>
+            <div class="preset-row" id="savedPresets"></div>
+            <div class="custom-time-input">
+                <input type="number" id="customMinutes" min="1" max="999" placeholder="mm" />
+                <span style="color:rgba(255,255,255,0.3); font-size:11px;">:</span>
+                <input type="number" id="customSeconds" min="0" max="59" placeholder="ss" />
+                <button class="set-btn" id="setCustomTime">Set</button>
+                <button class="set-btn" id="savePresetBtn" title="Save as named preset">💾</button>
+            </div>
+        </div>
+
+        <div class="state-label" id="stateLabel">Ready</div>
+    </div>
+
+    <!-- Wake Lock indicator -->
+    <div class="wake-indicator" id="wakeIndicator">⚡ screen awake</div>
+
+    <!-- ---- Action Row (Start + Reset above control bar) ---- -->
+    <div class="action-row">
+        <button class="btn-start" id="startPauseBtn">Start</button>
+        <button class="btn-reset-icon" id="resetBtn" title="Reset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ---- Session history panel ---- -->
+    <div class="session-panel" id="sessionPanel">
+        <div class="header">
+            <span>📊 Session History</span>
+            <button class="close-btn" id="closeSessionBtn">✕</button>
+        </div>
+        <ul class="session-list" id="sessionList">
+            <li class="session-empty">No sessions yet. Start focusing!</li>
+        </ul>
+        <div class="footer-stats">
+            <span>Total sessions: <span class="stat-value" id="totalSessionsStat">0</span></span>
+            <span>Total time: <span class="stat-value" id="totalTimeStat">0m</span></span>
+        </div>
+    </div>
+
+    <!-- ---- ambient popover ---- -->
+    <div class="ambient-popover" id="ambientPopover">
+        <button class="ambient-btn-option active" data-sound="none">🔇 None</button>
+        <button class="ambient-btn-option" data-sound="forest">🌲 Forest</button>
+        <button class="ambient-btn-option" data-sound="waves">🌊 Waves</button>
+        <button class="ambient-btn-option" data-sound="waterfall">💧 Waterfall</button>
+        <button class="ambient-btn-option" data-sound="cafe">☕ Cafe</button>
+        <button class="ambient-btn-option" data-sound="night">🌙 Night</button>
+    </div>
+
+    <!-- ---- scene picker ---- -->
+    <div class="scene-picker" id="scenePicker">
+        <div class="thumbs">
+            <div class="scene-thumb active" data-scene="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');" title="Default"></div>
+            <div class="scene-thumb" data-scene="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=200&auto=format&fit=crop');" title="Forest"></div>
+            <div class="scene-thumb" data-scene="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=200&auto=format&fit=crop');" title="Lake"></div>
+            <div class="scene-thumb" data-scene="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=200&auto=format&fit=crop');" title="Cafe"></div>
+            <div class="scene-thumb" data-scene="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=200&auto=format&fit=crop');" title="Ocean"></div>
+            <div class="scene-thumb" data-scene="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=200&auto=format&fit=crop');" title="Night"></div>
+            <div class="scene-thumb" data-scene="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=200&auto=format&fit=crop');" title="City"></div>
+            <div class="scene-thumb custom-thumb" id="customThumb" title="Custom background">+</div>
+        </div>
+
+        <div class="custom-panel" id="customPanel">
+            <div class="input-row">
+                <input type="text" id="customUrlInput" placeholder="Image URL …" spellcheck="false" />
+                <button class="apply-btn" id="applyUrlBtn">Apply</button>
+            </div>
+            <div class="file-row">
+                <label class="file-label" id="fileLabel">
+                    📁 Upload photo
+                    <input type="file" id="fileInput" accept="image/*" />
+                </label>
+                <span style="font-size:11px; color:var(--text-lo);">or</span>
+                <button class="apply-btn" id="clearCustomBtn">Reset preset</button>
+            </div>
+            <div class="status-msg" id="customStatus"></div>
+        </div>
+    </div>
+
+    <!-- ---- Todo Panel ---- -->
+    <div class="todo-panel" id="todoPanel">
+        <div class="header">
+            <span>📋 Todo</span>
+            <button class="close-btn" id="closeTodoBtn">✕</button>
+        </div>
+        <div class="todo-input-row">
+            <input type="text" id="todoInput" placeholder="Add a task…" />
+            <button class="add-btn" id="addTodoBtn">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList">
+            <li class="todo-empty">No tasks yet. Add one above!</li>
+        </ul>
+    </div>
+
+    <!-- ---- control bar ---- -->
+    <div class="control-bar">
+        <!-- Todo Button -->
+        <button class="icon-btn" id="todoToggle" title="Todo list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </button>
+
+        <!-- History Button -->
+        <button class="icon-btn" id="historyToggle" title="Session History">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="sceneToggle" title="Change scene">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="soundToggle" title="Toggle soft ticking">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 5 6 9H2v6h4l5 4V5z"/>
+                <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="ambientToggle" title="Ambient sounds">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+            </svg>
+        </button>
+    </div>
+
+
+</body>
+</html>
