@@ -2166,20 +2166,6 @@
                 stateLabel.textContent = text;
             }
 
-            function updateStateLabel() {
-                if (running) {
-                    setLabel('Running');
-                } else if (mode === 'timer' && remainingMs <= 0) {
-                    setLabel('Complete 🎯');
-                } else if (mode === 'stopwatch' && elapsedMs === 0) {
-                    setLabel('Ready');
-                } else if (mode === 'timer' && remainingMs === initialMs) {
-                    setLabel('Ready');
-                } else {
-                    setLabel('Paused');
-                }
-            }
-
             // ---- tick sound ----
             function playTick() {
                 if (!soundOn) return;
