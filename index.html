@@ -1609,7 +1609,6 @@
 
             // ---- session tracking ----
             let sessions = [];
-            let sessionRecorded = false;
 
             // ---- 🔥 MINIMUM SESSION DURATION: 10 MINUTES (600,000 ms) ----
             const MIN_SESSION_MS = 10 * 60 * 1000;
@@ -2260,23 +2259,21 @@
                         lastTickSecond = currentSecond;
                     }
                     updateStateLabel();
-                    if (elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
-                        recordSession('stopwatch', elapsedMs);
-                        sessionRecorded = true;
-                    }
                 } else {
                     remainingMs -= 10;
                     if (remainingMs <= 0) {
                         remainingMs = 0;
                         updateDisplay();
-                        pause();
-                        setLabel('Complete 🎯');
+                        // Finish timer – record if >= 10 min
+                        running = false;
+                        startPauseBtn.textContent = 'Start';
                         timerDisplay.classList.remove('running');
-                        playTick();
+                        clearInterval(intervalId);
                         releaseWakeLock();
-                        if (initialMs >= MIN_SESSION_MS && !sessionRecorded) {
+                        setLabel('Complete 🎯');
+                        playTick();
+                        if (initialMs >= MIN_SESSION_MS) {
                             recordSession('timer', initialMs);
-                            sessionRecorded = true;
                         }
                         return;
                     }
@@ -2297,7 +2294,6 @@
                     updateDisplay();
                 }
                 running = true;
-                sessionRecorded = false;
                 startPauseBtn.textContent = 'Pause';
                 timerDisplay.classList.add('running');
                 lastTickSecond = -1;
@@ -2316,18 +2312,23 @@
                 clearInterval(intervalId);
                 updateStateLabel();
                 releaseWakeLock();
-                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
+                // Record stopwatch session if >= 10 min
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
                     recordSession('stopwatch', elapsedMs);
-                    sessionRecorded = true;
                 }
             }
 
             function reset() {
-                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
-                    recordSession('stopwatch', elapsedMs);
-                    sessionRecorded = true;
+                // If stopwatch is running and >= 10 min, record before clearing
+                if (running) {
+                    pause(); // pause records if eligible, then clears interval
+                } else {
+                    // not running – if stopwatch has time >= 10 min, record now
+                    if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                        recordSession('stopwatch', elapsedMs);
+                    }
                 }
-                pause();
+                // Reset values
                 if (mode === 'stopwatch') {
                     elapsedMs = 0;
                 } else {
@@ -2337,17 +2338,18 @@
                 updateDisplay();
                 updateStateLabel();
                 releaseWakeLock();
-                sessionRecorded = false;
             }
 
             // ---- mode switching ----
             function setMode(newMode) {
                 if (newMode === mode) return;
-                if (mode === 'stopwatch' && running && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
+                // If running, pause first (which records stopwatch if eligible)
+                if (running) pause();
+                // If not running, but stopwatch has time >= 10 min, record now
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
                     recordSession('stopwatch', elapsedMs);
-                    sessionRecorded = true;
                 }
-                pause();
+                // Switch mode
                 mode = newMode;
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
@@ -2366,7 +2368,6 @@
                 presetBtns.forEach(b => b.classList.remove('active'));
                 document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
                 document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
-                sessionRecorded = false;
             }
 
             // ---- preset timer buttons ----
@@ -2384,7 +2385,6 @@
                     updateStateLabel();
                     customMinutes.value = '';
                     customSeconds.value = '';
-                    sessionRecorded = false;
                 });
             });
 
@@ -2419,7 +2419,6 @@
                 customStatus.className = 'status-msg success';
                 setTimeout(() => { customStatus.textContent = '';
                     customStatus.className = 'status-msg'; }, 1500);
-                sessionRecorded = false;
             });
             customMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
             customSeconds.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
@@ -2472,7 +2471,6 @@
                         updateStateLabel();
                         customMinutes.value = '';
                         customSeconds.value = '';
-                        sessionRecorded = false;
                     });
                 });
 
