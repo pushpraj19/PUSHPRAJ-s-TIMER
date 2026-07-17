@@ -1611,8 +1611,8 @@
             let sessions = [];
             let sessionRecorded = false;
 
-            const STOPWATCH_THRESHOLD_MS = 20 * 60 * 1000;
-            const TIMER_THRESHOLD_MS = 5 * 60 * 1000;
+            // ---- 🔥 MINIMUM SESSION DURATION: 10 MINUTES (600,000 ms) ----
+            const MIN_SESSION_MS = 10 * 60 * 1000;
 
             function loadSessions() {
                 try {
@@ -1691,12 +1691,12 @@
                     const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
                     const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
                     html += `
-                        <li>
-                            <span class="session-date">${dateStr}</span>
-                            <span class="session-duration">${formatDuration(s.durationMs)}</span>
-                            <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
-                        </li>
-                    `;
+                            <li>
+                                <span class="session-date">${dateStr}</span>
+                                <span class="session-duration">${formatDuration(s.durationMs)}</span>
+                                <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
+                            </li>
+                        `;
                 });
                 sessionList.innerHTML = html;
             }
@@ -2260,7 +2260,7 @@
                         lastTickSecond = currentSecond;
                     }
                     updateStateLabel();
-                    if (elapsedMs >= STOPWATCH_THRESHOLD_MS && !sessionRecorded) {
+                    if (elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
                         recordSession('stopwatch', elapsedMs);
                         sessionRecorded = true;
                     }
@@ -2274,7 +2274,7 @@
                         timerDisplay.classList.remove('running');
                         playTick();
                         releaseWakeLock();
-                        if (initialMs >= TIMER_THRESHOLD_MS && !sessionRecorded) {
+                        if (initialMs >= MIN_SESSION_MS && !sessionRecorded) {
                             recordSession('timer', initialMs);
                             sessionRecorded = true;
                         }
@@ -2316,14 +2316,14 @@
                 clearInterval(intervalId);
                 updateStateLabel();
                 releaseWakeLock();
-                if (mode === 'stopwatch' && elapsedMs >= STOPWATCH_THRESHOLD_MS && !sessionRecorded) {
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
                     recordSession('stopwatch', elapsedMs);
                     sessionRecorded = true;
                 }
             }
 
             function reset() {
-                if (mode === 'stopwatch' && elapsedMs >= STOPWATCH_THRESHOLD_MS && !sessionRecorded) {
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
                     recordSession('stopwatch', elapsedMs);
                     sessionRecorded = true;
                 }
@@ -2343,7 +2343,7 @@
             // ---- mode switching ----
             function setMode(newMode) {
                 if (newMode === mode) return;
-                if (mode === 'stopwatch' && running && elapsedMs >= STOPWATCH_THRESHOLD_MS && !sessionRecorded) {
+                if (mode === 'stopwatch' && running && elapsedMs >= MIN_SESSION_MS && !sessionRecorded) {
                     recordSession('stopwatch', elapsedMs);
                     sessionRecorded = true;
                 }
@@ -2449,11 +2449,11 @@
                 presets.forEach((p, index) => {
                     const active = (p.seconds === initialMs / 1000 && mode === 'timer') ? 'active' : '';
                     html += `
-                        <button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}" data-index="${index}">
-                            ${escapeHtml(p.name)}
-                            <span class="delete-preset" data-index="${index}">✕</span>
-                        </button>
-                    `;
+                            <button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}" data-index="${index}">
+                                ${escapeHtml(p.name)}
+                                <span class="delete-preset" data-index="${index}">✕</span>
+                            </button>
+                        `;
                 });
                 savedPresetsContainer.innerHTML = html;
 
@@ -2826,12 +2826,12 @@
                     const checked = todo.completed ? 'checked' : '';
                     const doneClass = todo.completed ? 'done' : '';
                     html += `
-                        <li>
-                            <div class="checkbox ${checked}" data-id="${todo.id}"></div>
-                            <span class="task-text ${doneClass}" data-id="${todo.id}">${escapeHtml(todo.text)}</span>
-                            <button class="delete-btn" data-id="${todo.id}">✕</button>
-                        </li>
-                    `;
+                            <li>
+                                <div class="checkbox ${checked}" data-id="${todo.id}"></div>
+                                <span class="task-text ${doneClass}" data-id="${todo.id}">${escapeHtml(todo.text)}</span>
+                                <button class="delete-btn" data-id="${todo.id}">✕</button>
+                            </li>
+                        `;
                 });
                 todoList.innerHTML = html;
 
@@ -3018,7 +3018,7 @@
             console.log('⏱️ Focus Timer · Space to start/stop · M to toggle mode · A for ambient');
             console.log('📋 Todo list saved to localStorage · Double‑click a todo to edit');
             console.log('💾 Save named timer presets with the 💾 button');
-            console.log('🎯 Sessions: 20min stopwatch / 5min timer auto-record · H for history');
+            console.log('🎯 Sessions: 10min minimum · H for history');
             console.log('📲 Install button in top‑right corner');
 
         })();
