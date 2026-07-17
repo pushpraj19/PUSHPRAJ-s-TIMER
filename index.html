@@ -2264,7 +2264,7 @@
                     if (remainingMs <= 0) {
                         remainingMs = 0;
                         updateDisplay();
-                        // Finish timer – record if >= 10 min
+                        // Timer finished – record if >= 10 min
                         running = false;
                         startPauseBtn.textContent = 'Start';
                         timerDisplay.classList.remove('running');
@@ -2312,22 +2312,19 @@
                 clearInterval(intervalId);
                 updateStateLabel();
                 releaseWakeLock();
-                // Record stopwatch session if >= 10 min
-                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
-                    recordSession('stopwatch', elapsedMs);
-                }
+                // ✅ No session recording on pause – we only record on reset, mode switch, or timer completion.
             }
 
             function reset() {
-                // If stopwatch is running and >= 10 min, record before clearing
-                if (running) {
-                    pause(); // pause records if eligible, then clears interval
-                } else {
-                    // not running – if stopwatch has time >= 10 min, record now
-                    if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
-                        recordSession('stopwatch', elapsedMs);
-                    }
+                // If stopwatch is running, pause first (no record yet)
+                if (running) pause();
+
+                // Record stopwatch session only if >= 10 min (only when resetting)
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                    recordSession('stopwatch', elapsedMs);
                 }
+                // For timer: do not record on reset (only on completion)
+
                 // Reset values
                 if (mode === 'stopwatch') {
                     elapsedMs = 0;
@@ -2343,13 +2340,15 @@
             // ---- mode switching ----
             function setMode(newMode) {
                 if (newMode === mode) return;
-                // If running, pause first (which records stopwatch if eligible)
+                // Pause if running
                 if (running) pause();
-                // If not running, but stopwatch has time >= 10 min, record now
+
+                // If switching away from stopwatch, record if >= 10 min
                 if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
                     recordSession('stopwatch', elapsedMs);
                 }
-                // Switch mode
+                // Switching from timer: no record unless timer completed (already handled)
+
                 mode = newMode;
                 document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                 document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
