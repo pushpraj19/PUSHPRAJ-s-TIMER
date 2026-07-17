@@ -1018,48 +1018,6 @@
         .custom-panel .status-msg.success {
             color: #9ed9b0;
         }
-        /* ---- back button styles ---- */
-.back-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    color: var(--text-lo);
-    font-size: clamp(14px, 1.2vw, 18px);
-    font-weight: 500;
-    background: rgba(255, 255, 255, 0.06);
-    padding: 6px 14px 6px 10px;
-    border-radius: 100px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    flex-shrink: 0;
-}
-.back-btn:hover {
-    background: rgba(255, 255, 255, 0.14);
-    color: var(--text-hi);
-    border-color: rgba(255, 255, 255, 0.25);
-}
-.back-btn svg {
-    width: 18px;
-    height: 18px;
-}
-.back-btn span {
-    display: inline-block;
-}
-
-/* responsive tweak for small screens */
-@media (max-width: 480px) {
-    .back-btn {
-        font-size: 12px;
-        padding: 4px 10px 4px 8px;
-    }
-    .back-btn svg {
-        width: 14px;
-        height: 14px;
-    }
-}
 
         ::selection {
             background: rgba(255, 255, 255, 0.3);
@@ -1276,48 +1234,24 @@
     <div class="scene-overlay"></div>
     <div class="vignette"></div>
 
-<!-- ---- top bar ---- -->
-<div class="top-bar">
-    <!-- LEFT SIDE: Back button + Logo -->
-    <div style="display: flex; align-items: center; gap: 8px;">
-        <a href="/" class="back-btn" title="Go back to home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
-            </svg>
-            <span>Back</span>
-        </a>
+    <!-- ---- top bar ---- -->
+    <div class="top-bar">
         <div class="logo">
             FOCUS
             <span class="logo-sub">by pushpraj</span>
         </div>
-    </div>
+        <div class="top-right">
+            <!-- Install Button at very top -->
+            <div class="install-top">
+                <button class="icon-btn hidden" id="installBtn" title="Install App">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
 
-    <!-- RIGHT SIDE: UNCHANGED – keep your existing code exactly as it is -->
-    <div class="top-right">
-        <!-- Install Button at very top -->
-        <div class="install-top">
-            <button class="icon-btn hidden" id="installBtn" title="Install App">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Weather + Today's total -->
-        <div class="info-row">
-            <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
-            <div class="today-total" id="todayTotal">🎯 <span class="highlight">0m</span></div>
-        </div>
-
-        <!-- Date -->
-        <div class="clock" id="clock">--:--</div>
-
-        <!-- Current time with seconds -->
-        <div class="running-time" id="runningTime">--:--:--</div>
-    </div>
-</div>
             <!-- Weather + Today's total -->
             <div class="info-row">
                 <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
