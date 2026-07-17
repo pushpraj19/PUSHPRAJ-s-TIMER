@@ -1,1 +1,3004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FOCUS · by pushpraj</title>
 
+   
+           
+
+    <style>
+        :root {
+            --text-hi: rgba(255, 255, 255, 0.96);
+            --text-lo: rgba(255, 255, 255, 0.65);
+            --glass: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --accent: rgba(255, 255, 255, 0.22);
+            --accent-active: rgba(255, 255, 255, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', "SF Pro Display", "Segoe UI", sans-serif;
+        }
+
+        body {
+            position: relative;
+        }
+
+        /* ---- scenic background, crossfading ---- */
+        .scene {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+            z-index: -3;
+        }
+        .scene.active {
+            opacity: 1;
+        }
+        .scene.custom-bg {
+            transition: opacity 0.8s ease;
+        }
+
+        .scene-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(10, 12, 16, 0.38) 0%,
+                    rgba(10, 12, 16, 0.12) 30%,
+                    rgba(10, 12, 16, 0.28) 68%,
+                    rgba(10, 12, 16, 0.55) 100%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ---- top bar ---- */
+        .top-bar {
+            position: fixed;
+            top: 20px;
+            left: 26px;
+            right: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 5;
+            color: var(--text-hi);
+        }
+
+        .logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: clamp(36px, 6vw, 76px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+            line-height: 1.1;
+        }
+        .logo-sub {
+            font-weight: 400;
+            font-size: 0.32em;
+            opacity: 0.8;
+            letter-spacing: 0.15em;
+            margin-top: -4px;
+            text-transform: lowercase;
+        }
+
+        .top-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            line-height: 1.4;
+        }
+
+        /* Install button – now part of flow */
+        .install-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2px;
+        }
+        .install-top .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 0;
+        }
+        .install-top .icon-btn.visible {
+            display: flex;
+        }
+        .install-top .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #6bcbff;
+            border-color: rgba(107, 203, 255, 0.3);
+        }
+        .install-top .icon-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .weather {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            min-height: 22px;
+        }
+        .weather .temp {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+        .weather .condition {
+            font-weight: 400;
+            color: var(--text-lo);
+        }
+
+        .today-total {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            min-height: 22px;
+            white-space: nowrap;
+        }
+        .today-total .highlight {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        .clock {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+        .running-time {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---- stage ---- */
+        .stage {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+        }
+
+        /* ---- mode toggle ---- */
+        .mode-toggle {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .mode-btn {
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: clamp(11px, 1.2vw, 14px);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 6px 20px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
+            font-family: inherit;
+        }
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .mode-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .timer {
+            font-size: clamp(80px, 16vw, 200px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--text-hi);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45), 0 0 60px rgba(255, 255, 255, 0.08);
+            line-height: 1;
+            user-select: none;
+            transition: transform 0.6s cubic-bezier(.4, 0, .2, 1);
+        }
+        .timer.running {
+            animation: breathe 4.5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        /* ---- timer controls (presets + custom) ---- */
+        .timer-controls {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            margin-top: -4px;
+        }
+        .timer-controls.visible {
+            display: flex;
+        }
+
+        .preset-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .preset-btn {
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: clamp(10px, 0.9vw, 12px);
+            font-weight: 500;
+            padding: 5px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.03em;
+        }
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .preset-btn.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .preset-btn.saved-preset {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .preset-btn.saved-preset .delete-preset {
+            opacity: 0.4;
+            font-size: 10px;
+            margin-left: 2px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .preset-btn.saved-preset .delete-preset:hover {
+            opacity: 1;
+        }
+
+        .custom-time-input {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .custom-time-input input {
+            width: 60px;
+            padding: 4px 8px;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: clamp(11px, 0.9vw, 13px);
+            font-weight: 500;
+            font-family: inherit;
+            text-align: center;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .custom-time-input input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .custom-time-input input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .custom-time-input input[type="number"]::-webkit-inner-spin-button,
+        .custom-time-input input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .custom-time-input input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .custom-time-input .set-btn {
+            border: none;
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: clamp(10px, 0.8vw, 12px);
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+        }
+        .custom-time-input .set-btn:hover {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+        }
+
+        .state-label {
+            margin-top: -4px;
+            font-size: clamp(12px, 1.1vw, 15px);
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-lo);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+            min-height: 20px;
+        }
+
+        /* ---- Session history panel ---- */
+        .session-panel {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            max-height: 55vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-hi);
+        }
+        .session-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .session-panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+        .session-panel .header .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .session-panel .header .close-btn:hover {
+            color: var(--text-hi);
+        }
+        .session-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 35vh;
+        }
+        .session-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 12px;
+            color: var(--text-lo);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .session-list li .session-date {
+            font-weight: 500;
+            color: var(--text-hi);
+        }
+        .session-list li .session-duration {
+            font-weight: 500;
+            color: var(--text-hi);
+        }
+        .session-list li .session-mode {
+            font-size: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 10px;
+            border-radius: 100px;
+        }
+        .session-list li .session-mode.stopwatch {
+            color: #6bcbff;
+        }
+        .session-list li .session-mode.timer {
+            color: #ffd93d;
+        }
+        .session-empty {
+            color: var(--text-lo);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.6;
+        }
+
+        .session-panel .footer-stats {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-lo);
+        }
+        .session-panel .footer-stats .stat-value {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        /* ---- Action Row (Start + Reset above control bar) ---- */
+        .action-row {
+            position: fixed;
+            bottom: clamp(110px, 14vh, 150px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: clamp(14px, 1.6vw, 22px);
+            padding: 0 6px;
+        }
+
+        .btn-start {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            color: #fff;
+            font-size: clamp(17px, 1.7vw, 24px);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: clamp(16px, 1.6vw, 22px) clamp(40px, 4.5vw, 60px);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: clamp(110px, 13vw, 170px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+        .btn-start:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .btn-start:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .btn-reset-icon {
+            width: clamp(48px, 4.5vw, 60px);
+            height: clamp(48px, 4.5vw, 60px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+        .btn-reset-icon:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .btn-reset-icon:active {
+            transform: scale(0.94);
+        }
+        .btn-reset-icon svg {
+            width: clamp(20px, 1.8vw, 26px);
+            height: clamp(20px, 1.8vw, 26px);
+        }
+
+        /* ---- control bar ---- */
+        .control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 16px);
+            padding: clamp(8px, 0.8vw, 14px) clamp(12px, 1.2vw, 20px);
+            border-radius: 22px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-btn {
+            width: clamp(36px, 3.5vw, 46px);
+            height: clamp(36px, 3.5vw, 46px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+        }
+        .icon-btn.on {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.20);
+        }
+        .icon-btn svg {
+            width: clamp(14px, 1.3vw, 18px);
+            height: clamp(14px, 1.3vw, 18px);
+        }
+
+        /* ---- Ambient Popover ---- */
+        .ambient-popover {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            display: flex;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
+        }
+        .ambient-popover.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .ambient-btn-option {
+            border: none;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+        }
+        .ambient-btn-option:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .ambient-btn-option.active {
+            background: rgba(255, 255, 255, 0.20);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ---- Todo Panel ---- */
+        .todo-panel {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            width: 400px;
+            max-width: calc(100vw - 32px);
+            max-height: 55vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-hi);
+        }
+        .todo-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .todo-panel .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+        .todo-panel .header .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .todo-panel .header .close-btn:hover {
+            color: var(--text-hi);
+        }
+        .todo-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .todo-input-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .todo-input-row input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .todo-input-row input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .todo-input-row .add-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .todo-input-row .add-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 35vh;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .todo-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+            font-size: 13px;
+            word-break: break-word;
+        }
+        .todo-list li:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .todo-list li .checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .todo-list li .checkbox.checked {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: var(--text-hi);
+        }
+        .todo-list li .checkbox.checked::after {
+            content: "✓";
+            color: var(--text-hi);
+            font-size: 14px;
+        }
+        .todo-list li .task-text {
+            flex: 1;
+            color: var(--text-hi);
+            transition: opacity 0.2s;
+            cursor: text;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .todo-list li .task-text.done {
+            opacity: 0.4;
+            text-decoration: line-through;
+        }
+        .todo-list li .task-text.editing {
+            background: rgba(255, 255, 255, 0.08);
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .todo-list li .delete-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .todo-list li .delete-btn:hover {
+            color: #ff6b6b;
+        }
+        .todo-empty {
+            color: var(--text-lo);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.6;
+        }
+
+        /* ---- scene picker popover (existing) ---- */
+        .scene-picker {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 14px 14px 14px;
+            border-radius: 18px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: 280px;
+            max-width: 92vw;
+        }
+        .scene-picker.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .scene-picker .thumbs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .scene-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            opacity: 0.75;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .scene-thumb:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        .scene-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            opacity: 1;
+        }
+        .scene-thumb.custom-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.7);
+            border-style: dashed;
+        }
+        .scene-thumb.custom-thumb:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .scene-thumb.custom-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        /* ---- custom bg panel ---- */
+        .custom-panel {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+            margin-top: 2px;
+        }
+        .custom-panel.open {
+            display: flex;
+        }
+
+        .custom-panel .input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.2s;
+            min-width: 0;
+        }
+        .custom-panel input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .custom-panel input[type="text"]:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-panel .file-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel .file-label {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .custom-panel .file-label:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .custom-panel .file-label input[type="file"] {
+            display: none;
+        }
+        .custom-panel .apply-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .custom-panel .apply-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .custom-panel .apply-btn:active {
+            transform: scale(0.96);
+        }
+
+        .custom-panel .status-msg {
+            font-size: 11px;
+            color: var(--text-lo);
+            text-align: center;
+            min-height: 18px;
+            margin-top: 2px;
+        }
+        .custom-panel .status-msg.error {
+            color: #ffa59e;
+        }
+        .custom-panel .status-msg.success {
+            color: #9ed9b0;
+        }
+
+        ::selection {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---- responsive ---- */
+        @media (max-width: 480px) {
+            .top-bar {
+                top: 14px;
+                left: 16px;
+                right: 16px;
+            }
+            .logo {
+                font-size: clamp(28px, 5vw, 42px);
+            }
+            .logo-sub {
+                font-size: 0.3em;
+                margin-top: -3px;
+            }
+            .action-row {
+                bottom: clamp(85px, 12vh, 100px);
+                gap: 10px;
+            }
+            .btn-start {
+                font-size: 15px;
+                padding: 12px 28px;
+                min-width: 80px;
+            }
+            .btn-reset-icon {
+                width: 40px;
+                height: 40px;
+            }
+            .btn-reset-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+            .control-bar {
+                padding: 8px 12px;
+                gap: 6px;
+                bottom: 20px;
+                border-radius: 18px;
+            }
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+            }
+            .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .scene-picker {
+                bottom: clamp(120px, 14vh, 140px);
+                padding: 10px 12px 12px 12px;
+                min-width: unset;
+                width: calc(100vw - 28px);
+            }
+            .scene-thumb {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+            .ambient-popover {
+                bottom: clamp(120px, 14vh, 140px);
+                padding: 8px 12px;
+                gap: 6px;
+                max-width: calc(100vw - 24px);
+            }
+            .ambient-btn-option {
+                font-size: 10px;
+                padding: 5px 12px;
+            }
+            .timer {
+                font-size: clamp(72px, 16vw, 110px);
+            }
+            .state-label {
+                font-size: 11px;
+            }
+            .mode-btn {
+                font-size: 11px;
+                padding: 5px 16px;
+            }
+            .preset-btn {
+                font-size: 10px;
+                padding: 4px 12px;
+            }
+            .custom-time-input input {
+                width: 50px;
+                font-size: 11px;
+            }
+            .custom-time-input .set-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .session-panel {
+                width: calc(100vw - 32px);
+                bottom: clamp(120px, 14vh, 140px);
+                max-height: 50vh;
+            }
+            .todo-panel {
+                width: calc(100vw - 32px);
+                bottom: clamp(120px, 14vh, 140px);
+                max-height: 50vh;
+            }
+            .install-top .icon-btn {
+                width: 28px;
+                height: 28px;
+            }
+            .install-top .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .weather {
+                font-size: 12px;
+                min-height: 18px;
+            }
+            .today-total {
+                font-size: 12px;
+                min-height: 18px;
+            }
+            .clock {
+                font-size: 12px;
+            }
+            .running-time {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .action-row {
+                bottom: clamp(75px, 10vh, 85px);
+                gap: 8px;
+            }
+            .btn-start {
+                font-size: 13px;
+                padding: 10px 20px;
+                min-width: 68px;
+            }
+            .btn-reset-icon {
+                width: 36px;
+                height: 36px;
+            }
+            .btn-reset-icon svg {
+                width: 16px;
+                height: 16px;
+            }
+            .control-bar {
+                gap: 4px;
+                padding: 6px 10px;
+            }
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+            }
+            .timer {
+                font-size: clamp(56px, 14vw, 85px);
+            }
+            .scene-thumb {
+                width: 34px;
+                height: 34px;
+            }
+            .mode-btn {
+                font-size: 10px;
+                padding: 4px 12px;
+            }
+        }
+
+        /* Wake Lock indicator */
+        .wake-indicator {
+            display: none;
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+        .wake-indicator.active {
+            display: block;
+        }
+
+        /* scrollbar styling */
+        .todo-list::-webkit-scrollbar,
+        .session-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .todo-list::-webkit-scrollbar-track,
+        .session-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .todo-list::-webkit-scrollbar-thumb,
+        .session-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ---- scenes (presets) ---- -->
+    <div class="scene active" id="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');"></div>
+    <div class="scene" id="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene custom-bg" id="scene-custom" style="display:none; background-image:none;"></div>
+
+    <div class="scene-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- ---- top bar ---- -->
+    <div class="top-bar">
+        <div class="logo">
+            FOCUS
+            <span class="logo-sub">by pushpraj</span>
+        </div>
+        <div class="top-right">
+            <!-- Install Button at very top -->
+            <div class="install-top">
+                <button class="icon-btn hidden" id="installBtn" title="Install App">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Weather + Today's total -->
+            <div class="info-row">
+                <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
+                <div class="today-total" id="todayTotal">🎯 <span class="highlight">0m</span></div>
+            </div>
+
+            <!-- Date -->
+            <div class="clock" id="clock">--:--</div>
+
+            <!-- Current time with seconds -->
+            <div class="running-time" id="runningTime">--:--:--</div>
+        </div>
+    </div>
+
+    <!-- ---- stage ---- -->
+    <div class="stage">
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" id="modeToggle">
+            <button class="mode-btn active" data-mode="stopwatch">Stopwatch</button>
+            <button class="mode-btn" data-mode="timer">Timer</button>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="timer" id="timerDisplay">00:00.00</div>
+
+        <!-- Timer Controls (presets + custom) -->
+        <div class="timer-controls" id="timerControls">
+            <div class="preset-row">
+                <button class="preset-btn" data-seconds="300">5m</button>
+                <button class="preset-btn" data-seconds="900">15m</button>
+                <button class="preset-btn active" data-seconds="1500">25m</button>
+                <button class="preset-btn" data-seconds="3600">60m</button>
+            </div>
+            <div class="preset-row" id="savedPresets"></div>
+            <div class="custom-time-input">
+                <input type="number" id="customMinutes" min="1" max="999" placeholder="mm" />
+                <span style="color:rgba(255,255,255,0.3); font-size:11px;">:</span>
+                <input type="number" id="customSeconds" min="0" max="59" placeholder="ss" />
+                <button class="set-btn" id="setCustomTime">Set</button>
+                <button class="set-btn" id="savePresetBtn" title="Save as named preset">💾</button>
+            </div>
+        </div>
+
+        <div class="state-label" id="stateLabel">Ready</div>
+    </div>
+
+    <!-- Wake Lock indicator -->
+    <div class="wake-indicator" id="wakeIndicator">⚡ screen awake</div>
+
+    <!-- ---- Action Row (Start + Reset above control bar) ---- -->
+    <div class="action-row">
+        <button class="btn-start" id="startPauseBtn">Start</button>
+        <button class="btn-reset-icon" id="resetBtn" title="Reset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ---- Session history panel ---- -->
+    <div class="session-panel" id="sessionPanel">
+        <div class="header">
+            <span>📊 Session History</span>
+            <button class="close-btn" id="closeSessionBtn">✕</button>
+        </div>
+        <ul class="session-list" id="sessionList">
+            <li class="session-empty">No sessions yet. Start focusing!</li>
+        </ul>
+        <div class="footer-stats">
+            <span>Total sessions: <span class="stat-value" id="totalSessionsStat">0</span></span>
+            <span>Total time: <span class="stat-value" id="totalTimeStat">0m</span></span>
+        </div>
+    </div>
+
+    <!-- ---- ambient popover ---- -->
+    <div class="ambient-popover" id="ambientPopover">
+        <button class="ambient-btn-option active" data-sound="none">🔇 None</button>
+        <button class="ambient-btn-option" data-sound="forest">🌲 Forest</button>
+        <button class="ambient-btn-option" data-sound="waves">🌊 Waves</button>
+        <button class="ambient-btn-option" data-sound="waterfall">💧 Waterfall</button>
+        <button class="ambient-btn-option" data-sound="cafe">☕ Cafe</button>
+        <button class="ambient-btn-option" data-sound="night">🌙 Night</button>
+    </div>
+
+    <!-- ---- scene picker ---- -->
+    <div class="scene-picker" id="scenePicker">
+        <div class="thumbs">
+            <div class="scene-thumb active" data-scene="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');" title="Default"></div>
+            <div class="scene-thumb" data-scene="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=200&auto=format&fit=crop');" title="Forest"></div>
+            <div class="scene-thumb" data-scene="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=200&auto=format&fit=crop');" title="Lake"></div>
+            <div class="scene-thumb" data-scene="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=200&auto=format&fit=crop');" title="Cafe"></div>
+            <div class="scene-thumb" data-scene="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=200&auto=format&fit=crop');" title="Ocean"></div>
+            <div class="scene-thumb" data-scene="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=200&auto=format&fit=crop');" title="Night"></div>
+            <div class="scene-thumb" data-scene="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=200&auto=format&fit=crop');" title="City"></div>
+            <div class="scene-thumb custom-thumb" id="customThumb" title="Custom background">+</div>
+        </div>
+
+        <div class="custom-panel" id="customPanel">
+            <div class="input-row">
+                <input type="text" id="customUrlInput" placeholder="Image URL …" spellcheck="false" />
+                <button class="apply-btn" id="applyUrlBtn">Apply</button>
+            </div>
+            <div class="file-row">
+                <label class="file-label" id="fileLabel">
+                    📁 Upload photo
+                    <input type="file" id="fileInput" accept="image/*" />
+                </label>
+                <span style="font-size:11px; color:var(--text-lo);">or</span>
+                <button class="apply-btn" id="clearCustomBtn">Reset preset</button>
+            </div>
+            <div class="status-msg" id="customStatus"></div>
+        </div>
+    </div>
+
+    <!-- ---- Todo Panel ---- -->
+    <div class="todo-panel" id="todoPanel">
+        <div class="header">
+            <span>📋 Todo</span>
+            <button class="close-btn" id="closeTodoBtn">✕</button>
+        </div>
+        <div class="todo-input-row">
+            <input type="text" id="todoInput" placeholder="Add a task…" />
+            <button class="add-btn" id="addTodoBtn">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList">
+            <li class="todo-empty">No tasks yet. Add one above!</li>
+        </ul>
+    </div>
+
+    <!-- ---- control bar ---- -->
+    <div class="control-bar">
+        <!-- Todo Button -->
+        <button class="icon-btn" id="todoToggle" title="Todo list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </button>
+
+        <!-- History Button -->
+        <button class="icon-btn" id="historyToggle" title="Session History">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="sceneToggle" title="Change scene">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="soundToggle" title="Toggle soft ticking">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 5 6 9H2v6h4l5 4V5z"/>
+                <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+            </svg>
+        </button>
+
+        <button class="icon-btn" id="ambientToggle" title="Ambient sounds">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+            </svg>
+        </button>
+    </div>
+    <script>
+        (function() {
+            'use strict';
+
+            // ---- DOM refs ----
+            const timerDisplay = document.getElementById('timerDisplay');
+            const stateLabel = document.getElementById('stateLabel');
+            const startPauseBtn = document.getElementById('startPauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const soundToggle = document.getElementById('soundToggle');
+            const sceneToggle = document.getElementById('sceneToggle');
+            const ambientToggle = document.getElementById('ambientToggle');
+            const ambientPopover = document.getElementById('ambientPopover');
+            const scenePicker = document.getElementById('scenePicker');
+            const clockEl = document.getElementById('clock');
+            const runningTimeEl = document.getElementById('runningTime');
+            const weatherDisplay = document.getElementById('weatherDisplay');
+            const todayTotal = document.getElementById('todayTotal');
+            const modeToggle = document.getElementById('modeToggle');
+            const timerControls = document.getElementById('timerControls');
+            const presetBtns = document.querySelectorAll('.preset-btn:not(.saved-preset)');
+            const savedPresetsContainer = document.getElementById('savedPresets');
+            const customMinutes = document.getElementById('customMinutes');
+            const customSeconds = document.getElementById('customSeconds');
+            const setCustomTime = document.getElementById('setCustomTime');
+            const savePresetBtn = document.getElementById('savePresetBtn');
+            const wakeIndicator = document.getElementById('wakeIndicator');
+            const installBtn = document.getElementById('installBtn');
+
+            // History elements
+            const historyToggle = document.getElementById('historyToggle');
+            const sessionPanel = document.getElementById('sessionPanel');
+            const sessionList = document.getElementById('sessionList');
+            const totalSessionsStat = document.getElementById('totalSessionsStat');
+            const totalTimeStat = document.getElementById('totalTimeStat');
+            const closeSessionBtn = document.getElementById('closeSessionBtn');
+
+            // Todo elements
+            const todoPanel = document.getElementById('todoPanel');
+            const todoToggle = document.getElementById('todoToggle');
+            const closeTodoBtn = document.getElementById('closeTodoBtn');
+            const todoInput = document.getElementById('todoInput');
+            const addTodoBtn = document.getElementById('addTodoBtn');
+            const todoList = document.getElementById('todoList');
+
+            // scene elements
+            const sceneRain = document.getElementById('scene-rain');
+            const sceneForest = document.getElementById('scene-forest');
+            const sceneLake = document.getElementById('scene-lake');
+            const sceneCafe = document.getElementById('scene-cafe');
+            const sceneOcean = document.getElementById('scene-ocean');
+            const sceneNight = document.getElementById('scene-night');
+            const sceneCity = document.getElementById('scene-city');
+            const sceneCustom = document.getElementById('scene-custom');
+
+            const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
+            const customThumb = document.getElementById('customThumb');
+            const customPanel = document.getElementById('customPanel');
+            const customUrlInput = document.getElementById('customUrlInput');
+            const applyUrlBtn = document.getElementById('applyUrlBtn');
+            const fileInput = document.getElementById('fileInput');
+            const fileLabel = document.getElementById('fileLabel');
+            const customStatus = document.getElementById('customStatus');
+            const clearCustomBtn = document.getElementById('clearCustomBtn');
+
+            // ---- Install Button ----
+            let deferredPrompt = null;
+            let isAppInstalled = false;
+
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                isAppInstalled = true;
+                installBtn.classList.remove('visible');
+                installBtn.classList.add('hidden');
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!isAppInstalled) {
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('visible');
+                }
+            });
+
+            window.addEventListener('appinstalled', () => {
+                isAppInstalled = true;
+                installBtn.classList.remove('visible');
+                installBtn.classList.add('hidden');
+                deferredPrompt = null;
+                stateLabel.textContent = '✅ App installed!';
+                setTimeout(() => {
+                    if (stateLabel.textContent === '✅ App installed!') {
+                        updateStateLabel();
+                    }
+                }, 3000);
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    try {
+                        const result = await deferredPrompt.prompt();
+                        if (result.outcome === 'accepted') {
+                            isAppInstalled = true;
+                            installBtn.classList.add('hidden');
+                            installBtn.classList.remove('visible');
+                            stateLabel.textContent = '✅ Installing...';
+                        } else {
+                            stateLabel.textContent = '❌ Installation cancelled';
+                            setTimeout(() => {
+                                if (stateLabel.textContent === '❌ Installation cancelled') {
+                                    updateStateLabel();
+                                }
+                            }, 2000);
+                        }
+                    } catch (_) {
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({
+                                    title: 'FOCUS Timer',
+                                    text: 'Check out this focus timer app!',
+                                    url: window.location.href
+                                });
+                            } catch (_2) {}
+                        }
+                    }
+                } else {
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: 'FOCUS Timer',
+                                text: 'Check out this focus timer app!',
+                                url: window.location.href
+                            });
+                        } catch (_) {}
+                    } else {
+                        stateLabel.textContent = '📱 Use "Add to Home Screen"';
+                        setTimeout(() => {
+                            if (stateLabel.textContent === '📱 Use "Add to Home Screen"') {
+                                updateStateLabel();
+                            }
+                        }, 3000);
+                    }
+                }
+            });
+
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.classList.add('hidden');
+                installBtn.classList.remove('visible');
+            }
+
+            // ---- state ----
+            let mode = 'stopwatch';
+            let elapsedMs = 0;
+            let remainingMs = 1500 * 1000;
+            let initialMs = 1500 * 1000;
+            let running = false;
+            let intervalId = null;
+            let soundOn = false;
+            let audioCtx = null;
+            let lastTickSecond = -1;
+            let wakeLock = null;
+            let wakeLockActive = false;
+
+            // ---- session tracking ----
+            let sessions = [];
+
+            // ---- 🔥 MINIMUM SESSION DURATION: 10 MINUTES (600,000 ms) ----
+            const MIN_SESSION_MS = 10 * 60 * 1000;
+
+            function loadSessions() {
+                try {
+                    const data = localStorage.getItem('focusSessions');
+                    if (data) {
+                        sessions = JSON.parse(data);
+                    } else {
+                        sessions = [];
+                    }
+                } catch (_) {
+                    sessions = [];
+                }
+                updateSessionDisplay();
+            }
+
+            function saveSessions() {
+                try {
+                    localStorage.setItem('focusSessions', JSON.stringify(sessions));
+                } catch (_) {}
+                updateSessionDisplay();
+            }
+
+            function getTodayKey() {
+                return new Date().toISOString().split('T')[0];
+            }
+
+            function getTotalTimeForDay(dateKey) {
+                return sessions.filter(s => s.date === dateKey).reduce((sum, s) => sum + s.durationMs, 0);
+            }
+
+            function formatDuration(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSec / 60);
+                const seconds = totalSec % 60;
+                if (minutes >= 60) {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    return `${hours}h ${mins}m`;
+                }
+                if (minutes > 0) {
+                    return `${minutes}m ${seconds}s`;
+                }
+                return `${seconds}s`;
+            }
+
+            function formatDurationShort(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSec / 60);
+                if (minutes >= 60) {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    return `${hours}h ${mins}m`;
+                }
+                return `${minutes}m`;
+            }
+
+            function updateSessionDisplay() {
+                const total = getTotalTimeForDay(getTodayKey());
+                todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
+                totalSessionsStat.textContent = sessions.length;
+                const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
+                totalTimeStat.textContent = formatDuration(totalAllTime);
+                renderSessionList();
+            }
+
+            function renderSessionList() {
+                if (sessions.length === 0) {
+                    sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
+                    return;
+                }
+                const sorted = [...sessions].reverse().slice(0, 50);
+                let html = '';
+                sorted.forEach(s => {
+                    const dateObj = new Date(s.date + 'T00:00:00');
+                    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
+                    const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
+                    html += `
+                            <li>
+                                <span class="session-date">${dateStr}</span>
+                                <span class="session-duration">${formatDuration(s.durationMs)}</span>
+                                <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
+                            </li>
+                        `;
+                });
+                sessionList.innerHTML = html;
+            }
+
+            function recordSession(mode, durationMs) {
+                const today = getTodayKey();
+                sessions.push({ date: today, mode: mode, durationMs: durationMs, timestamp: Date.now() });
+                saveSessions();
+                stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
+                setTimeout(() => {
+                    if (stateLabel.textContent.includes('Session saved')) {
+                        updateStateLabel();
+                    }
+                }, 2500);
+            }
+
+            function updateTimerControlsVisibility() {
+                if (mode === 'timer') {
+                    timerControls.classList.add('visible');
+                } else {
+                    timerControls.classList.remove('visible');
+                }
+            }
+
+            // ---- Ambient sounds ----
+            const Ambient = {
+                context: null,
+                nodes: [],
+                currentType: 'none',
+                isPlaying: false,
+
+                init() {
+                    try {
+                        this.context = new(window.AudioContext || window.webkitAudioContext)();
+                    } catch (_) {}
+                },
+
+                createNoiseBuffer(duration) {
+                    if (!this.context) return null;
+                    const bufferSize = Math.floor(this.context.sampleRate * duration);
+                    const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    return buffer;
+                },
+
+                createPinkBuffer(duration) {
+                    if (!this.context) return null;
+                    const bufferSize = Math.floor(this.context.sampleRate * duration);
+                    const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    let b0 = 0,
+                        b1 = 0,
+                        b2 = 0,
+                        b3 = 0,
+                        b4 = 0,
+                        b5 = 0,
+                        b6 = 0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        b0 = 0.99886 * b0 + white * 0.0555179;
+                        b1 = 0.99332 * b1 + white * 0.0750759;
+                        b2 = 0.96900 * b2 + white * 0.1538520;
+                        b3 = 0.86650 * b3 + white * 0.3104856;
+                        b4 = 0.55000 * b4 + white * 0.5329522;
+                        b5 = -0.7616 * b5 - white * 0.0168980;
+                        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                        data[i] *= 0.11;
+                        b6 = white * 0.115926;
+                    }
+                    return buffer;
+                },
+
+                createForest() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(4);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer;
+                    source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 500;
+                    filter.Q.value = 0.8;
+                    const gain = this.context.createGain();
+                    gain.gain.value = 0.15;
+                    source.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.context.destination);
+                    source.start();
+                    nodes.push(source, filter, gain);
+
+                    const birdPatterns = [
+                        { freq: 3000, duration: 0.15, delay: 0.5, bend: 800 },
+                        { freq: 4200, duration: 0.1, delay: 1.2, bend: 600 },
+                        { freq: 2500, duration: 0.2, delay: 2.0, bend: 1000 },
+                        { freq: 5000, duration: 0.08, delay: 2.8, bend: 400 },
+                        { freq: 3500, duration: 0.12, delay: 3.5, bend: 700 },
+                        { freq: 2800, duration: 0.18, delay: 4.2, bend: 900 },
+                        { freq: 4500, duration: 0.09, delay: 5.0, bend: 500 },
+                        { freq: 3200, duration: 0.14, delay: 5.8, bend: 750 },
+                    ];
+                    birdPatterns.forEach((p, idx) => {
+                        const osc = this.context.createOscillator();
+                        osc.type = 'sine';
+                        osc.frequency.value = p.freq;
+                        const oscGain = this.context.createGain();
+                        oscGain.gain.setValueAtTime(0, this.context.currentTime + p.delay);
+                        oscGain.gain.linearRampToValueAtTime(0.04, this.context.currentTime + p.delay + 0.01);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + p.delay + p
+                            .duration);
+                        const bendTime = this.context.currentTime + p.delay + p.duration * 0.3;
+                        osc.frequency.setValueAtTime(p.freq, this.context.currentTime + p.delay);
+                        osc.frequency.linearRampToValueAtTime(p.freq + p.bend, bendTime);
+                        osc.frequency.linearRampToValueAtTime(p.freq + p.bend * 0.6, this.context.currentTime + p
+                            .delay + p.duration);
+                        osc.connect(oscGain);
+                        oscGain.connect(this.context.destination);
+                        osc.start(this.context.currentTime + p.delay);
+                        osc.stop(this.context.currentTime + p.delay + p.duration + 0.05);
+                        nodes.push(osc, oscGain);
+                        if (idx % 2 === 0) {
+                            const osc2 = this.context.createOscillator();
+                            osc2.type = 'sine';
+                            const freq2 = p.freq * 0.7 + Math.random() * 300;
+                            osc2.frequency.value = freq2;
+                            const oscGain2 = this.context.createGain();
+                            const delay2 = p.delay + 0.3 + Math.random() * 0.5;
+                            oscGain2.gain.setValueAtTime(0, this.context.currentTime + delay2);
+                            oscGain2.gain.linearRampToValueAtTime(0.025, this.context.currentTime + delay2 + 0.01);
+                            oscGain2.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + delay2 + p
+                                .duration * 0.7);
+                            osc2.frequency.setValueAtTime(freq2, this.context.currentTime + delay2);
+                            osc2.frequency.linearRampToValueAtTime(freq2 + p.bend * 0.5, this.context.currentTime +
+                                delay2 + p.duration * 0.4);
+                            osc2.connect(oscGain2);
+                            oscGain2.connect(this.context.destination);
+                            osc2.start(this.context.currentTime + delay2);
+                            osc2.stop(this.context.currentTime + delay2 + p.duration * 0.7 + 0.05);
+                            nodes.push(osc2, oscGain2);
+                        }
+                    });
+                    return nodes;
+                },
+
+                createWaves() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(6);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer;
+                    source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 250;
+                    filter.Q.value = 1;
+                    const lfo = this.context.createOscillator();
+                    lfo.frequency.value = 0.12;
+                    const lfoGain = this.context.createGain();
+                    lfoGain.gain.value = 0.08;
+                    const gain = this.context.createGain();
+                    gain.gain.value = 0.2;
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(gain.gain);
+                    source.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.context.destination);
+                    lfo.start();
+                    source.start();
+                    nodes.push(source, filter, lfo, lfoGain, gain);
+                    const buffer2 = this.createNoiseBuffer(3);
+                    const source2 = this.context.createBufferSource();
+                    source2.buffer = buffer2;
+                    source2.loop = true;
+                    const filter2 = this.context.createBiquadFilter();
+                    filter2.type = 'bandpass';
+                    filter2.frequency.value = 800;
+                    filter2.Q.value = 0.5;
+                    const gain2 = this.context.createGain();
+                    gain2.gain.value = 0.06;
+                    source2.connect(filter2);
+                    filter2.connect(gain2);
+                    gain2.connect(this.context.destination);
+                    source2.start();
+                    nodes.push(source2, filter2, gain2);
+                    return nodes;
+                },
+
+                createWaterfall() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(5);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer;
+                    source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 800;
+                    filter.Q.value = 1.2;
+                    const lfo = this.context.createOscillator();
+                    lfo.frequency.value = 0.4;
+                    const lfoGain = this.context.createGain();
+                    lfoGain.gain.value = 150;
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(filter.frequency);
+                    const gain = this.context.createGain();
+                    gain.gain.value = 0.3;
+                    source.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.context.destination);
+                    lfo.start();
+                    source.start();
+                    nodes.push(source, filter, lfo, lfoGain, gain);
+                    const buffer2 = this.createNoiseBuffer(3);
+                    const source2 = this.context.createBufferSource();
+                    source2.buffer = buffer2;
+                    source2.loop = true;
+                    const filter2 = this.context.createBiquadFilter();
+                    filter2.type = 'highpass';
+                    filter2.frequency.value = 2000;
+                    const gain2 = this.context.createGain();
+                    gain2.gain.value = 0.05;
+                    source2.connect(filter2);
+                    filter2.connect(gain2);
+                    gain2.connect(this.context.destination);
+                    source2.start();
+                    nodes.push(source2, filter2, gain2);
+                    return nodes;
+                },
+
+                createCafe() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(4);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer;
+                    source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 250;
+                    filter.Q.value = 0.8;
+                    const gain = this.context.createGain();
+                    gain.gain.value = 0.2;
+                    source.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.context.destination);
+                    source.start();
+                    nodes.push(source, filter, gain);
+                    for (let i = 0; i < 15; i++) {
+                        const chatterSource = this.context.createBufferSource();
+                        const chatterBuffer = this.createNoiseBuffer(0.1 + Math.random() * 0.15);
+                        if (!chatterBuffer) continue;
+                        chatterSource.buffer = chatterBuffer;
+                        const chatterFilter = this.context.createBiquadFilter();
+                        chatterFilter.type = 'bandpass';
+                        chatterFilter.frequency.value = 600 + Math.random() * 1200;
+                        chatterFilter.Q.value = 1.5;
+                        const chatterGain = this.context.createGain();
+                        chatterGain.gain.value = 0.02 + Math.random() * 0.03;
+                        chatterSource.connect(chatterFilter);
+                        chatterFilter.connect(chatterGain);
+                        chatterGain.connect(this.context.destination);
+                        const startTime = this.context.currentTime + Math.random() * 8;
+                        chatterSource.start(startTime);
+                        chatterSource.stop(startTime + 0.12 + Math.random() * 0.1);
+                        nodes.push(chatterSource, chatterFilter, chatterGain);
+                    }
+                    return nodes;
+                },
+
+                createNight() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(4);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer;
+                    source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 150;
+                    filter.Q.value = 0.6;
+                    const gain = this.context.createGain();
+                    gain.gain.value = 0.1;
+                    source.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.context.destination);
+                    source.start();
+                    nodes.push(source, filter, gain);
+
+                    for (let i = 0; i < 12; i++) {
+                        const osc = this.context.createOscillator();
+                        osc.type = 'sine';
+                        const baseFreq = 4000 + Math.random() * 2000;
+                        osc.frequency.value = baseFreq;
+                        const oscGain = this.context.createGain();
+                        oscGain.gain.setValueAtTime(0, this.context.currentTime + i * 0.4 + Math.random() * 0.5);
+                        oscGain.gain.linearRampToValueAtTime(0.02 + Math.random() * 0.015, this.context.currentTime + i *
+                            0.4 + 0.02 + Math.random() * 0.1);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + i * 0.4 + 0.2 +
+                            Math.random() * 0.15);
+                        const lfo = this.context.createOscillator();
+                        lfo.frequency.value = 5 + Math.random() * 10;
+                        const lfoGain = this.context.createGain();
+                        lfoGain.gain.value = 200 + Math.random() * 300;
+                        lfo.connect(lfoGain);
+                        lfoGain.connect(osc.frequency);
+                        osc.connect(oscGain);
+                        oscGain.connect(this.context.destination);
+                        osc.start(this.context.currentTime + i * 0.4 + Math.random() * 0.5);
+                        osc.stop(this.context.currentTime + i * 0.4 + 0.3 + Math.random() * 0.15);
+                        lfo.start(this.context.currentTime + i * 0.4 + Math.random() * 0.5);
+                        lfo.stop(this.context.currentTime + i * 0.4 + 0.3 + Math.random() * 0.15);
+                        nodes.push(osc, oscGain, lfo, lfoGain);
+                    }
+                    return nodes;
+                },
+
+                start(type) {
+                    this.stop();
+                    if (type === 'none' || !this.context) {
+                        this.currentType = 'none';
+                        this.isPlaying = false;
+                        return;
+                    }
+                    try {
+                        let nodes = [];
+                        switch (type) {
+                            case 'forest':
+                                nodes = this.createForest();
+                                break;
+                            case 'waves':
+                                nodes = this.createWaves();
+                                break;
+                            case 'waterfall':
+                                nodes = this.createWaterfall();
+                                break;
+                            case 'cafe':
+                                nodes = this.createCafe();
+                                break;
+                            case 'night':
+                                nodes = this.createNight();
+                                break;
+                            default:
+                                return;
+                        }
+                        this.nodes = nodes;
+                        this.currentType = type;
+                        this.isPlaying = true;
+                        if (this.context && this.context.state === 'suspended') {
+                            this.context.resume();
+                        }
+                    } catch (_) {
+                        this.currentType = 'none';
+                        this.isPlaying = false;
+                    }
+                },
+
+                stop() {
+                    try {
+                        this.nodes.forEach(node => {
+                            try {
+                                if (node.stop) node.stop();
+                                if (node.disconnect) node.disconnect();
+                            } catch (_) {}
+                        });
+                        this.nodes = [];
+                    } catch (_) {}
+                    this.currentType = 'none';
+                    this.isPlaying = false;
+                },
+
+                toggle(type) {
+                    if (!this.context) this.init();
+                    if (this.currentType === type) {
+                        this.stop();
+                        return;
+                    }
+                    this.start(type);
+                }
+            };
+
+            // ---- ambient popover ----
+            ambientToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ambientPopover.classList.toggle('open');
+                scenePicker.classList.remove('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!ambientPopover.contains(e.target) && e.target !== ambientToggle) {
+                    ambientPopover.classList.remove('open');
+                }
+            });
+
+            ambientPopover.querySelectorAll('.ambient-btn-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sound = btn.dataset.sound;
+                    ambientPopover.querySelectorAll('.ambient-btn-option').forEach(b => b.classList.remove(
+                    'active'));
+                    btn.classList.add('active');
+                    Ambient.toggle(sound);
+                    if (sound !== 'none') {
+                        ambientToggle.classList.add('on');
+                    } else {
+                        ambientToggle.classList.remove('on');
+                    }
+                    ambientPopover.classList.remove('open');
+                });
+            });
+
+            // ---- clock ----
+            function updateClock() {
+                const now = new Date();
+                const dateOptions = { month: 'short', day: '2-digit', year: 'numeric' };
+                const dateStr = now.toLocaleString('en-US', dateOptions);
+                clockEl.textContent = dateStr;
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                const timeStr = now.toLocaleString('en-US', timeOptions);
+                runningTimeEl.textContent = timeStr;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ---- weather ----
+            async function fetchWeather() {
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        if (!navigator.geolocation) reject('Geolocation not supported');
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+                    });
+                    const { latitude, longitude } = pos.coords;
+                    const url =
+                        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
+                    const resp = await fetch(url);
+                    const data = await resp.json();
+                    if (data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        let tempStr = temp.toString();
+                        if (tempStr.startsWith('+')) tempStr = tempStr.substring(1);
+                        weatherDisplay.innerHTML = `⛅ <span class="temp">${tempStr}°</span>`;
+                        weatherDisplay.classList.remove('loading');
+                    }
+                } catch (_) {
+                    try {
+                        const resp = await fetch('https://wttr.in/?format=%t&lang=en');
+                        const text = await resp.text();
+                        const match = text.match(/([+-]?\d+°C)/);
+                        if (match) {
+                            const tempNum = parseFloat(match[1]);
+                            weatherDisplay.innerHTML = `⛅ <span class="temp">${tempNum}°</span>`;
+                            weatherDisplay.classList.remove('loading');
+                        } else {
+                            throw new Error('No temp');
+                        }
+                    } catch (_2) {
+                        weatherDisplay.innerHTML = `⛅ <span class="temp">--°</span>`;
+                        weatherDisplay.classList.remove('loading');
+                    }
+                }
+            }
+            fetchWeather();
+            setInterval(fetchWeather, 600000);
+
+            // ---- format ----
+            function formatTime(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSec / 60);
+                const seconds = totalSec % 60;
+                const centiseconds = Math.floor((ms % 1000) / 10);
+                return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+            }
+
+            function getDisplayTime() {
+                if (mode === 'stopwatch') return formatTime(elapsedMs);
+                return formatTime(remainingMs);
+            }
+
+            function updateDisplay() {
+                timerDisplay.textContent = getDisplayTime();
+            }
+
+            function setLabel(text) {
+                stateLabel.textContent = text;
+            }
+
+            function updateStateLabel() {
+                if (running) {
+                    setLabel('Running');
+                } else if (mode === 'timer' && remainingMs <= 0) {
+                    setLabel('Complete 🎯');
+                } else if (mode === 'stopwatch' && elapsedMs === 0) {
+                    setLabel('Ready');
+                } else if (mode === 'timer' && remainingMs === initialMs) {
+                    setLabel('Ready');
+                } else {
+                    setLabel('Paused');
+                }
+            }
+
+            // ---- tick sound ----
+            function playTick() {
+                if (!soundOn) return;
+                try {
+                    if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.005);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.09);
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                } catch (_) {}
+            }
+
+            // ---- Wake Lock ----
+            async function requestWakeLock() {
+                try {
+                    if ('wakeLock' in navigator && !wakeLockActive) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        wakeLockActive = true;
+                        wakeIndicator.classList.add('active');
+                        wakeLock.addEventListener('release', () => {
+                            wakeLockActive = false;
+                            wakeIndicator.classList.remove('active');
+                        });
+                    }
+                } catch (_) {}
+            }
+
+            function releaseWakeLock() {
+                try {
+                    if (wakeLock) {
+                        wakeLock.release();
+                        wakeLock = null;
+                        wakeLockActive = false;
+                        wakeIndicator.classList.remove('active');
+                    }
+                } catch (_) {}
+            }
+
+            // ---- core timer logic ----
+            function tick() {
+                if (mode === 'stopwatch') {
+                    elapsedMs += 10;
+                    updateDisplay();
+                    const currentSecond = Math.floor(elapsedMs / 1000);
+                    if (currentSecond !== lastTickSecond) {
+                        playTick();
+                        lastTickSecond = currentSecond;
+                    }
+                    updateStateLabel();
+                } else {
+                    remainingMs -= 10;
+                    if (remainingMs <= 0) {
+                        remainingMs = 0;
+                        updateDisplay();
+                        // Timer finished – record if >= 10 min
+                        running = false;
+                        startPauseBtn.textContent = 'Start';
+                        timerDisplay.classList.remove('running');
+                        clearInterval(intervalId);
+                        releaseWakeLock();
+                        setLabel('Complete 🎯');
+                        playTick();
+                        if (initialMs >= MIN_SESSION_MS) {
+                            recordSession('timer', initialMs);
+                        }
+                        return;
+                    }
+                    updateDisplay();
+                    const currentSecond = Math.floor(remainingMs / 1000);
+                    if (currentSecond !== lastTickSecond) {
+                        playTick();
+                        lastTickSecond = currentSecond;
+                    }
+                    updateStateLabel();
+                }
+            }
+
+            function start() {
+                if (running) return;
+                if (mode === 'timer' && remainingMs <= 0) {
+                    remainingMs = initialMs;
+                    updateDisplay();
+                }
+                running = true;
+                startPauseBtn.textContent = 'Pause';
+                timerDisplay.classList.add('running');
+                lastTickSecond = -1;
+                intervalId = setInterval(tick, 10);
+                updateStateLabel();
+                requestWakeLock();
+                if (Ambient.context && Ambient.context.state === 'suspended') {
+                    Ambient.context.resume();
+                }
+            }
+
+            function pause() {
+                running = false;
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                clearInterval(intervalId);
+                updateStateLabel();
+                releaseWakeLock();
+                // ✅ No session recording on pause – we only record on reset, mode switch, or timer completion.
+            }
+
+            function reset() {
+                // If stopwatch is running, pause first (no record yet)
+                if (running) pause();
+
+                // Record stopwatch session only if >= 10 min (only when resetting)
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                    recordSession('stopwatch', elapsedMs);
+                }
+                // For timer: do not record on reset (only on completion)
+
+                // Reset values
+                if (mode === 'stopwatch') {
+                    elapsedMs = 0;
+                } else {
+                    remainingMs = initialMs;
+                }
+                lastTickSecond = -1;
+                updateDisplay();
+                updateStateLabel();
+                releaseWakeLock();
+            }
+
+            // ---- mode switching ----
+            function setMode(newMode) {
+                if (newMode === mode) return;
+                // Pause if running
+                if (running) pause();
+
+                // If switching away from stopwatch, record if >= 10 min
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                    recordSession('stopwatch', elapsedMs);
+                }
+                // Switching from timer: no record unless timer completed (already handled)
+
+                mode = newMode;
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+                updateTimerControlsVisibility();
+                if (mode === 'stopwatch') {
+                    elapsedMs = 0;
+                } else {
+                    if (initialMs <= 0) initialMs = 1500 * 1000;
+                    remainingMs = initialMs;
+                }
+                lastTickSecond = -1;
+                updateDisplay();
+                updateStateLabel();
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                presetBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
+                document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+            }
+
+            // ---- preset timer buttons ----
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (mode !== 'timer') return;
+                    if (running) pause();
+                    const seconds = parseInt(btn.dataset.seconds);
+                    initialMs = seconds * 1000;
+                    remainingMs = initialMs;
+                    presetBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                    updateDisplay();
+                    updateStateLabel();
+                    customMinutes.value = '';
+                    customSeconds.value = '';
+                });
+            });
+
+            // ---- custom time set ----
+            setCustomTime.addEventListener('click', () => {
+                if (mode !== 'timer') return;
+                const mins = parseInt(customMinutes.value) || 0;
+                const secs = parseInt(customSeconds.value) || 0;
+                if (mins === 0 && secs === 0) {
+                    customStatus.textContent = 'Enter a valid time.';
+                    customStatus.className = 'status-msg error';
+                    setTimeout(() => { customStatus.textContent = '';
+                        customStatus.className = 'status-msg'; }, 2000);
+                    return;
+                }
+                const totalSecs = (mins * 60) + secs;
+                if (totalSecs <= 0 || totalSecs > 35999) {
+                    customStatus.textContent = 'Time must be between 1s and 999:59.';
+                    customStatus.className = 'status-msg error';
+                    setTimeout(() => { customStatus.textContent = '';
+                        customStatus.className = 'status-msg'; }, 2000);
+                    return;
+                }
+                if (running) pause();
+                initialMs = totalSecs * 1000;
+                remainingMs = initialMs;
+                presetBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                updateDisplay();
+                updateStateLabel();
+                customStatus.textContent = '✓ Time set!';
+                customStatus.className = 'status-msg success';
+                setTimeout(() => { customStatus.textContent = '';
+                    customStatus.className = 'status-msg'; }, 1500);
+            });
+            customMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
+            customSeconds.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
+
+            // ---- saved presets ----
+            function loadSavedPresets() {
+                try {
+                    const data = localStorage.getItem('focusPresets');
+                    if (data) return JSON.parse(data);
+                } catch (_) {}
+                return [];
+            }
+
+            function saveSavedPresets(presets) {
+                try {
+                    localStorage.setItem('focusPresets', JSON.stringify(presets));
+                } catch (_) {}
+            }
+
+            function renderSavedPresets() {
+                const presets = loadSavedPresets();
+                if (presets.length === 0) {
+                    savedPresetsContainer.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                presets.forEach((p, index) => {
+                    const active = (p.seconds === initialMs / 1000 && mode === 'timer') ? 'active' : '';
+                    html += `
+                            <button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}" data-index="${index}">
+                                ${escapeHtml(p.name)}
+                                <span class="delete-preset" data-index="${index}">✕</span>
+                            </button>
+                        `;
+                });
+                savedPresetsContainer.innerHTML = html;
+
+                savedPresetsContainer.querySelectorAll('.preset-btn.saved-preset').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('delete-preset')) return;
+                        if (mode !== 'timer') return;
+                        if (running) pause();
+                        const seconds = parseInt(btn.dataset.seconds);
+                        initialMs = seconds * 1000;
+                        remainingMs = initialMs;
+                        presetBtns.forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        updateDisplay();
+                        updateStateLabel();
+                        customMinutes.value = '';
+                        customSeconds.value = '';
+                    });
+                });
+
+                savedPresetsContainer.querySelectorAll('.delete-preset').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const index = parseInt(el.dataset.index);
+                        const presets = loadSavedPresets();
+                        presets.splice(index, 1);
+                        saveSavedPresets(presets);
+                        renderSavedPresets();
+                    });
+                });
+            }
+
+            savePresetBtn.addEventListener('click', () => {
+                if (mode !== 'timer') {
+                    customStatus.textContent = 'Switch to Timer mode first.';
+                    customStatus.className = 'status-msg error';
+                    setTimeout(() => { customStatus.textContent = '';
+                        customStatus.className = 'status-msg'; }, 2000);
+                    return;
+                }
+                const totalSecs = Math.floor(initialMs / 1000);
+                if (totalSecs <= 0) {
+                    customStatus.textContent = 'Set a valid time first.';
+                    customStatus.className = 'status-msg error';
+                    setTimeout(() => { customStatus.textContent = '';
+                        customStatus.className = 'status-msg'; }, 2000);
+                    return;
+                }
+                const name = prompt('Name this preset:', 'Focus');
+                if (name === null) return;
+                const cleanName = name.trim() || 'Untitled';
+                const presets = loadSavedPresets();
+                const existing = presets.find(p => p.name === cleanName);
+                if (existing) {
+                    if (!confirm(`A preset named "${cleanName}" already exists. Replace it?`)) return;
+                    existing.seconds = totalSecs;
+                } else {
+                    presets.push({ name: cleanName, seconds: totalSecs });
+                }
+                saveSavedPresets(presets);
+                renderSavedPresets();
+                customStatus.textContent = `✓ "${cleanName}" saved!`;
+                customStatus.className = 'status-msg success';
+                setTimeout(() => { customStatus.textContent = '';
+                    customStatus.className = 'status-msg'; }, 2000);
+            });
+
+            // ---- mode toggle click ----
+            modeToggle.addEventListener('click', (e) => {
+                const btn = e.target.closest('.mode-btn');
+                if (!btn) return;
+                setMode(btn.dataset.mode);
+                renderSavedPresets();
+            });
+
+            // ---- start/pause/reset ----
+            startPauseBtn.addEventListener('click', () => running ? pause() : start());
+            resetBtn.addEventListener('click', reset);
+
+            // ---- sound toggle ----
+            soundToggle.addEventListener('click', () => {
+                soundOn = !soundOn;
+                soundToggle.classList.toggle('on', soundOn);
+                if (soundOn && !audioCtx) {
+                    try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (_) {}
+                }
+            });
+
+            // ---- scene picker toggle ----
+            sceneToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                scenePicker.classList.toggle('open');
+                ambientPopover.classList.remove('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!scenePicker.contains(e.target) && e.target !== sceneToggle) {
+                    scenePicker.classList.remove('open');
+                }
+            });
+
+            // ---- scene persistence ----
+            function saveSceneState(sceneId, customUrl) {
+                const state = { sceneId, customUrl: customUrl || null };
+                try { localStorage.setItem('sceneState', JSON.stringify(state)); } catch (_) {}
+            }
+
+            function loadSceneState() {
+                try {
+                    const raw = localStorage.getItem('sceneState');
+                    if (raw) return JSON.parse(raw);
+                } catch (_) {}
+                return null;
+            }
+
+            // ---- scene switching ----
+            function activateScene(sceneId) {
+                document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                sceneCustom.style.display = 'none';
+                sceneCustom.classList.remove('active');
+                let target = document.getElementById(sceneId);
+                if (target) {
+                    target.classList.add('active');
+                    target.style.display = '';
+                }
+                thumbs.forEach(t => t.classList.remove('active'));
+                const thumb = document.querySelector(`.scene-thumb[data-scene="${sceneId}"]`);
+                if (thumb) thumb.classList.add('active');
+                customThumb.classList.remove('active');
+                customPanel.classList.remove('open');
+                customStatus.textContent = '';
+                customStatus.className = 'status-msg';
+                saveSceneState(sceneId, null);
+            }
+
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const sceneId = thumb.dataset.scene;
+                    activateScene(sceneId);
+                    scenePicker.classList.remove('open');
+                });
+            });
+
+            // ---- custom background ----
+            function applyCustomBackground(url) {
+                if (!url || url.trim() === '') {
+                    customStatus.textContent = 'Please enter a valid URL.';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                const clean = url.trim();
+                try { new URL(clean); } catch (_) {
+                    customStatus.textContent = 'Invalid URL. Include http:// or https://';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                sceneCustom.style.display = '';
+                sceneCustom.style.backgroundImage = `url('${clean}')`;
+                sceneCustom.classList.add('active');
+                thumbs.forEach(t => t.classList.remove('active'));
+                customThumb.classList.add('active');
+                customStatus.textContent = '✓ Background applied!';
+                customStatus.className = 'status-msg success';
+                sceneCustom.dataset.customUrl = clean;
+                saveSceneState('scene-custom', clean);
+            }
+
+            function handleFileUpload(file) {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    customStatus.textContent = 'Please select an image file.';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                    sceneCustom.style.display = '';
+                    sceneCustom.style.backgroundImage = `url('${dataUrl}')`;
+                    sceneCustom.classList.add('active');
+                    thumbs.forEach(t => t.classList.remove('active'));
+                    customThumb.classList.add('active');
+                    customStatus.textContent = '✓ Photo uploaded!';
+                    customStatus.className = 'status-msg success';
+                    sceneCustom.dataset.customUrl = dataUrl;
+                    customUrlInput.value = '';
+                    saveSceneState('scene-custom', dataUrl);
+                };
+                reader.onerror = () => {
+                    customStatus.textContent = 'Error reading file.';
+                    customStatus.className = 'status-msg error';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function restoreScene() {
+                const saved = loadSceneState();
+                if (!saved) return false;
+                if (saved.sceneId === 'scene-custom' && saved.customUrl) {
+                    applyCustomBackground(saved.customUrl);
+                    return true;
+                } else if (saved.sceneId && document.getElementById(saved.sceneId)) {
+                    activateScene(saved.sceneId);
+                    return true;
+                }
+                return false;
+            }
+
+            customThumb.addEventListener('click', () => {
+                const isOpen = customPanel.classList.toggle('open');
+                if (isOpen) {
+                    thumbs.forEach(t => t.classList.remove('active'));
+                    customThumb.classList.add('active');
+                    if (!sceneCustom.classList.contains('active')) {
+                        if (sceneCustom.dataset.customUrl) {
+                            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                            sceneCustom.style.display = '';
+                            sceneCustom.style.backgroundImage = `url('${sceneCustom.dataset.customUrl}')`;
+                            sceneCustom.classList.add('active');
+                            customStatus.textContent = '✓ Using saved background.';
+                            customStatus.className = 'status-msg success';
+                        } else {
+                            customStatus.textContent = 'Paste a URL or upload a photo.';
+                            customStatus.className = 'status-msg';
+                        }
+                    }
+                } else {
+                    if (!document.querySelector('.scene.active')) {
+                        activateScene('scene-rain');
+                    }
+                }
+            });
+
+            applyUrlBtn.addEventListener('click', () => {
+                const url = customUrlInput.value.trim();
+                if (url) applyCustomBackground(url);
+                else {
+                    customStatus.textContent = 'Enter an image URL first.';
+                    customStatus.className = 'status-msg error';
+                }
+            });
+            customUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyUrlBtn.click(); });
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleFileUpload(file);
+                fileInput.value = '';
+            });
+            clearCustomBtn.addEventListener('click', () => {
+                sceneCustom.style.display = 'none';
+                sceneCustom.classList.remove('active');
+                sceneCustom.dataset.customUrl = '';
+                customUrlInput.value = '';
+                customStatus.textContent = 'Reset to preset scene.';
+                customStatus.className = 'status-msg';
+                activateScene('scene-rain');
+                customThumb.classList.remove('active');
+                customPanel.classList.remove('open');
+                saveSceneState('scene-rain', null);
+            });
+
+            // ---- Session panel toggle (History button) ----
+            function toggleSessionPanel() {
+                sessionPanel.classList.toggle('open');
+                if (sessionPanel.classList.contains('open')) {
+                    renderSessionList();
+                    totalSessionsStat.textContent = sessions.length;
+                    const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
+                    totalTimeStat.textContent = formatDuration(totalAllTime);
+                }
+            }
+
+            historyToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleSessionPanel();
+            });
+
+            closeSessionBtn.addEventListener('click', () => {
+                sessionPanel.classList.remove('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (sessionPanel.classList.contains('open') &&
+                    !sessionPanel.contains(e.target) &&
+                    e.target !== historyToggle) {
+                    sessionPanel.classList.remove('open');
+                }
+            });
+
+            // ---- Todo list ----
+            let todos = [];
+
+            function loadTodos() {
+                try {
+                    const data = localStorage.getItem('focusTodos');
+                    if (data) {
+                        todos = JSON.parse(data);
+                    } else {
+                        todos = [];
+                    }
+                } catch (_) {
+                    todos = [];
+                }
+                renderTodos();
+            }
+
+            function saveTodos() {
+                try {
+                    localStorage.setItem('focusTodos', JSON.stringify(todos));
+                } catch (_) {}
+            }
+
+            function addTodo() {
+                const text = todoInput.value.trim();
+                if (!text) return;
+                todos.push({
+                    id: Date.now() + Math.random(),
+                    text: text,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                });
+                todoInput.value = '';
+                saveTodos();
+                renderTodos();
+                if (!todoPanel.classList.contains('open')) {
+                    todoPanel.classList.add('open');
+                }
+            }
+
+            function toggleTodo(id) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    saveTodos();
+                    renderTodos();
+                    if (!todoPanel.classList.contains('open')) {
+                        todoPanel.classList.add('open');
+                    }
+                }
+            }
+
+            function deleteTodo(id) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTodos();
+                if (!todoPanel.classList.contains('open')) {
+                    todoPanel.classList.add('open');
+                }
+            }
+
+            function editTodo(id, newText) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) {
+                    todo.text = newText.trim() || todo.text;
+                    saveTodos();
+                    renderTodos();
+                }
+            }
+
+            function renderTodos() {
+                if (todos.length === 0) {
+                    todoList.innerHTML = '<li class="todo-empty">No tasks yet. Add one above!</li>';
+                    return;
+                }
+                let html = '';
+                todos.forEach(todo => {
+                    const checked = todo.completed ? 'checked' : '';
+                    const doneClass = todo.completed ? 'done' : '';
+                    html += `
+                            <li>
+                                <div class="checkbox ${checked}" data-id="${todo.id}"></div>
+                                <span class="task-text ${doneClass}" data-id="${todo.id}">${escapeHtml(todo.text)}</span>
+                                <button class="delete-btn" data-id="${todo.id}">✕</button>
+                            </li>
+                        `;
+                });
+                todoList.innerHTML = html;
+
+                todoList.querySelectorAll('.checkbox').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseFloat(el.dataset.id);
+                        toggleTodo(id);
+                    });
+                });
+
+                todoList.querySelectorAll('.delete-btn').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseFloat(el.dataset.id);
+                        deleteTodo(id);
+                    });
+                });
+
+                todoList.querySelectorAll('.task-text').forEach(el => {
+                    el.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        const id = parseFloat(el.dataset.id);
+                        const currentText = el.textContent;
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = currentText;
+                        input.className = 'task-text editing';
+                        input.dataset.id = id;
+                        el.replaceWith(input);
+                        input.focus();
+                        input.select();
+
+                        const finishEdit = () => {
+                            const newText = input.value.trim() || currentText;
+                            const parent = input.parentNode;
+                            const newSpan = document.createElement('span');
+                            newSpan.className = 'task-text';
+                            newSpan.dataset.id = id;
+                            newSpan.textContent = newText;
+                            input.replaceWith(newSpan);
+                            newSpan.addEventListener('dblclick', (e2) => {
+                                e2.stopPropagation();
+                                const id2 = parseFloat(newSpan.dataset.id);
+                                const currentText2 = newSpan.textContent;
+                                const input2 = document.createElement('input');
+                                input2.type = 'text';
+                                input2.value = currentText2;
+                                input2.className = 'task-text editing';
+                                input2.dataset.id = id2;
+                                newSpan.replaceWith(input2);
+                                input2.focus();
+                                input2.select();
+                                const finishEdit2 = () => {
+                                    const newText2 = input2.value.trim() || currentText2;
+                                    const parent2 = input2.parentNode;
+                                    const newSpan2 = document.createElement('span');
+                                    newSpan2.className = 'task-text';
+                                    newSpan2.dataset.id = id2;
+                                    newSpan2.textContent = newText2;
+                                    input2.replaceWith(newSpan2);
+                                    editTodo(id2, newText2);
+                                    newSpan2.addEventListener('dblclick', arguments.callee);
+                                };
+                                input2.addEventListener('blur', finishEdit2);
+                                input2.addEventListener('keydown', (e3) => {
+                                    if (e3.key === 'Enter') {
+                                        e3.preventDefault();
+                                        input2.blur();
+                                    }
+                                    if (e3.key === 'Escape') {
+                                        input2.value = currentText2;
+                                        input2.blur();
+                                    }
+                                });
+                            });
+                            editTodo(id, newText);
+                        };
+
+                        input.addEventListener('blur', finishEdit);
+                        input.addEventListener('keydown', (e2) => {
+                            if (e2.key === 'Enter') {
+                                e2.preventDefault();
+                                input.blur();
+                            }
+                            if (e2.key === 'Escape') {
+                                input.value = currentText;
+                                input.blur();
+                            }
+                        });
+                    });
+                });
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ---- Todo panel toggle ----
+            function toggleTodoPanel() {
+                todoPanel.classList.toggle('open');
+                if (todoPanel.classList.contains('open')) {
+                    todoInput.focus();
+                }
+            }
+
+            todoToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleTodoPanel();
+            });
+
+            closeTodoBtn.addEventListener('click', () => {
+                todoPanel.classList.remove('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (todoPanel.classList.contains('open') &&
+                    !todoPanel.contains(e.target) &&
+                    e.target !== todoToggle) {
+                    todoPanel.classList.remove('open');
+                }
+            });
+
+            addTodoBtn.addEventListener('click', addTodo);
+            todoInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    addTodo();
+                }
+            });
+
+            // ---- keyboard shortcuts ----
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    running ? pause() : start();
+                }
+                if (e.code === 'KeyR') {
+                    reset();
+                }
+                if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) {
+                    e.preventDefault();
+                    soundToggle.click();
+                }
+                if (e.code === 'KeyB') {
+                    sceneToggle.click();
+                }
+                if (e.code === 'KeyM') {
+                    const btns = document.querySelectorAll('.mode-btn');
+                    const active = document.querySelector('.mode-btn.active');
+                    const idx = Array.from(btns).indexOf(active);
+                    const next = (idx + 1) % btns.length;
+                    setMode(btns[next].dataset.mode);
+                    renderSavedPresets();
+                }
+                if (e.code === 'KeyA' && !e.metaKey && !e.ctrlKey) {
+                    e.preventDefault();
+                    ambientToggle.click();
+                }
+                if (e.code === 'KeyH' && !e.metaKey && !e.ctrlKey) {
+                    e.preventDefault();
+                    toggleSessionPanel();
+                }
+            });
+
+            // ---- init ----
+            loadSessions();
+            updateTimerControlsVisibility();
+
+            loadTodos();
+            renderSavedPresets();
+
+            document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
+
+            updateDisplay();
+            setLabel('Ready');
+
+            if (!restoreScene()) {
+                activateScene('scene-rain');
+            }
+
+            console.log('⏱️ Focus Timer · Space to start/stop · M to toggle mode · A for ambient');
+            console.log('📋 Todo list saved to localStorage · Double‑click a todo to edit');
+            console.log('💾 Save named timer presets with the 💾 button');
+            console.log('🎯 Sessions: 10min minimum · H for history');
+            console.log('📲 Install button in top‑right corner');
+
+        })();
+    </script>
+
+
+</body>
+</html>
