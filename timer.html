@@ -233,6 +233,8 @@
             justify-content: center;
             gap: 12px;
             padding: 20px;
+            padding-bottom: clamp(110px, 15vh, 160px);
+            box-sizing: border-box;
         }
 
         /* ---- mode toggle ---- */
@@ -1202,7 +1204,9 @@
             </div>
             <div class="preset-row" id="savedPresets"></div>
             <div class="custom-time-input">
-                <input type="number" id="customMinutes" min="1" max="999" placeholder="mm" />
+                <input type="number" id="customHours" min="0" max="99" placeholder="hh" />
+                <span style="color:rgba(255,255,255,0.3); font-size:11px;">:</span>
+                <input type="number" id="customMinutes" min="0" max="59" placeholder="mm" />
                 <span style="color:rgba(255,255,255,0.3); font-size:11px;">:</span>
                 <input type="number" id="customSeconds" min="0" max="59" placeholder="ss" />
                 <button class="set-btn" id="setCustomTime">Set</button>
@@ -1344,6 +1348,7 @@
             const timerControls = document.getElementById('timerControls');
             const presetBtns = document.querySelectorAll('.preset-btn:not(.saved-preset)');
             const savedPresetsContainer = document.getElementById('savedPresets');
+            const customHours = document.getElementById('customHours');
             const customMinutes = document.getElementById('customMinutes');
             const customSeconds = document.getElementById('customSeconds');
             const setCustomTime = document.getElementById('setCustomTime');
@@ -2375,6 +2380,7 @@
                     document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
                     updateDisplay();
                     updateStateLabel();
+                    customHours.value = '';
                     customMinutes.value = '';
                     customSeconds.value = '';
                 });
@@ -2383,18 +2389,19 @@
             // ---- custom time set ----
             setCustomTime.addEventListener('click', () => {
                 if (mode !== 'timer') return;
+                const hrs = parseInt(customHours.value) || 0;
                 const mins = parseInt(customMinutes.value) || 0;
                 const secs = parseInt(customSeconds.value) || 0;
-                if (mins === 0 && secs === 0) {
+                if (hrs === 0 && mins === 0 && secs === 0) {
                     customStatus.textContent = 'Enter a valid time.';
                     customStatus.className = 'status-msg error';
                     setTimeout(() => { customStatus.textContent = '';
                         customStatus.className = 'status-msg'; }, 2000);
                     return;
                 }
-                const totalSecs = (mins * 60) + secs;
-                if (totalSecs <= 0 || totalSecs > 35999) {
-                    customStatus.textContent = 'Time must be between 1s and 999:59.';
+                const totalSecs = (hrs * 3600) + (mins * 60) + secs;
+                if (totalSecs <= 0 || totalSecs > 359999) {
+                    customStatus.textContent = 'Time must be between 1s and 99:59:59.';
                     customStatus.className = 'status-msg error';
                     setTimeout(() => { customStatus.textContent = '';
                         customStatus.className = 'status-msg'; }, 2000);
@@ -2412,6 +2419,7 @@
                 setTimeout(() => { customStatus.textContent = '';
                     customStatus.className = 'status-msg'; }, 1500);
             });
+            customHours.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
             customMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
             customSeconds.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
 
@@ -2469,6 +2477,7 @@
                         btn.classList.add('active');
                         updateDisplay();
                         updateStateLabel();
+                        customHours.value = '';
                         customMinutes.value = '';
                         customSeconds.value = '';
                     });
