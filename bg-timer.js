@@ -20,14 +20,14 @@
         return s.accumulatedMs + (Date.now() - s.startTimestamp);
     }
 
-    function formatTime(ms, showMs = false) {
+    function formatTime(ms, showCs = false) {
         if (ms < 0) ms = 0;
         let totalSec = Math.floor(ms / 1000);
         let h = Math.floor(totalSec / 3600);
         let m = Math.floor((totalSec % 3600) / 60);
         let sec = totalSec % 60;
         let str = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-        if (showMs) {
+        if (showCs) {
             let cs = Math.floor((ms % 1000) / 10);
             str += `.${String(cs).padStart(2,'0')}`;
         }
@@ -40,7 +40,6 @@
             if (p) {
                 let data = JSON.parse(p);
                 localStorage.removeItem(PENDING_KEY);
-                // If sessionStorage is empty, the tab was closed. Save the session!
                 if (!getState()) {
                     saveSession(data.ms, data.mode);
                     return true;
@@ -51,7 +50,7 @@
     }
 
     function saveSession(ms, mode) {
-        if (ms < 1000) return; // Don't save sessions < 1 second
+        if (ms < 1000) return;
         try {
             let sessions = JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]');
             sessions.unshift({ id: Date.now(), ms: ms, mode: mode || 'stopwatch', date: new Date().toLocaleString() });
@@ -61,7 +60,6 @@
         } catch(e) {}
     }
 
-    // If timer is running, save to localStorage right before tab closes/navigates
     window.addEventListener('beforeunload', () => {
         let s = getState();
         if (s && s.isRunning) {
@@ -69,9 +67,8 @@
         }
     });
 
-    processPending(); // Check for closed tabs on load
+    processPending();
 
-    // Public API to use in your HTML files
     window.BgTimer = {
         getState, getElapsed, formatTime, 
         getSessions: () => { try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]'); } catch(e) { return []; } },
