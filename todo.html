@@ -1354,4 +1354,111 @@
     </script>
 
 </body>
+
+    <!-- ---- Floating background timer indicator ---- -->
+    <style>
+        #bgTimerBadge {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 30, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-radius: 40px;
+            padding: 8px 18px 8px 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.92);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+            user-select: none;
+        }
+        #bgTimerBadge.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        #bgTimerBadge:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+        }
+        #bgTimerBadge .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #5ef08a;
+            box-shadow: 0 0 8px #5ef08a;
+            flex-shrink: 0;
+            animation: badgePulse 1.4s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.55; transform: scale(0.8); }
+        }
+        #bgTimerBadge .badge-label { opacity: 0.65; margin-right: 2px; }
+        #bgTimerBadge .badge-time  { font-variant-numeric: tabular-nums; font-weight: 600; }
+        #bgTimerBadge .badge-goto  { opacity: 0.55; font-size: 11px; margin-left: 4px; }
+    </style>
+
+    <a href="timer.html" id="bgTimerBadge" title="Timer running in background – click to go back">
+        <span class="badge-dot"></span>
+        <span class="badge-label">⏱</span>
+        <span class="badge-time" id="bgTimerTime">--:--</span>
+        <span class="badge-goto">→ timer</span>
+    </a>
+
+    <script>
+    (function() {
+        const badge  = document.getElementById('bgTimerBadge');
+        const timeEl = document.getElementById('bgTimerTime');
+        const KEY    = 'focusTimerState';
+
+        function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
+
+        function fmt(ms) {
+            const totalSec = Math.max(0, Math.floor(ms / 1000));
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            const s = totalSec % 60;
+            return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+        }
+
+        function update() {
+            try {
+                const raw = localStorage.getItem(KEY);
+                if (!raw) { badge.classList.remove('visible'); return; }
+                const st = JSON.parse(raw);
+                if (!st || !st.running) { badge.classList.remove('visible'); return; }
+
+                const passedMs     = Date.now() - st.startTimestamp;
+                const totalElapsed = (st.accumulatedMs || 0) + passedMs;
+
+                let display;
+                if (st.mode === 'stopwatch') {
+                    display = fmt(totalElapsed);
+                } else {
+                    const left = Math.max(0, st.initialMs - totalElapsed);
+                    if (left <= 0) { badge.classList.remove('visible'); return; }
+                    display = fmt(left);
+                }
+
+                timeEl.textContent = display;
+                badge.classList.add('visible');
+            } catch (_) {
+                badge.classList.remove('visible');
+            }
+        }
+
+        update();
+        setInterval(update, 500);
+    })();
+    </script>
+
 </html>

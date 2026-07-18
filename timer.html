@@ -762,176 +762,6 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ---- Todo Panel ---- */
-        .todo-panel {
-            position: fixed;
-            bottom: clamp(140px, 15vh, 170px);
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            z-index: 6;
-            width: 400px;
-            max-width: calc(100vw - 32px);
-            max-height: 55vh;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(24px) saturate(160%);
-            -webkit-backdrop-filter: blur(24px) saturate(160%);
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateX(-50%) translateY(10px) scale(0.95);
-            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            color: var(--text-hi);
-        }
-        .todo-panel.open {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-        .todo-panel .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 15px;
-            letter-spacing: 0.02em;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 8px;
-        }
-        .todo-panel .header .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-lo);
-            cursor: pointer;
-            font-size: 20px;
-            padding: 0 4px;
-            transition: color 0.2s;
-        }
-        .todo-panel .header .close-btn:hover {
-            color: var(--text-hi);
-        }
-        .todo-input-row {
-            display: flex;
-            gap: 8px;
-        }
-        .todo-input-row input {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.06);
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            transition: border 0.2s;
-        }
-        .todo-input-row input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
-        }
-        .todo-input-row input:focus {
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-        .todo-input-row .add-btn {
-            padding: 8px 16px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            white-space: nowrap;
-        }
-        .todo-input-row .add-btn:hover {
-            background: rgba(255, 255, 255, 0.24);
-        }
-        .todo-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            max-height: 35vh;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .todo-list li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.04);
-            transition: background 0.2s;
-            font-size: 13px;
-            word-break: break-word;
-        }
-        .todo-list li:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-        .todo-list li .checkbox {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            flex-shrink: 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .todo-list li .checkbox.checked {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: var(--text-hi);
-        }
-        .todo-list li .checkbox.checked::after {
-            content: "✓";
-            color: var(--text-hi);
-            font-size: 14px;
-        }
-        .todo-list li .task-text {
-            flex: 1;
-            color: var(--text-hi);
-            transition: opacity 0.2s;
-            cursor: text;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-        .todo-list li .task-text.done {
-            opacity: 0.4;
-            text-decoration: line-through;
-        }
-        .todo-list li .task-text.editing {
-            background: rgba(255, 255, 255, 0.08);
-            outline: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .todo-list li .delete-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0 4px;
-            transition: color 0.2s;
-        }
-        .todo-list li .delete-btn:hover {
-            color: #ff6b6b;
-        }
-        .todo-empty {
-            color: var(--text-lo);
-            font-size: 13px;
-            text-align: center;
-            padding: 20px 0;
-            opacity: 0.6;
-        }
 
         /* ---- scene picker popover (existing) ---- */
         .scene-picker {
@@ -1291,16 +1121,13 @@
         }
 
         /* scrollbar styling */
-        .todo-list::-webkit-scrollbar,
         .session-list::-webkit-scrollbar {
             width: 4px;
         }
-        .todo-list::-webkit-scrollbar-track,
         .session-list::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
         }
-        .todo-list::-webkit-scrollbar-thumb,
         .session-list::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
@@ -1462,31 +1289,9 @@
         </div>
     </div>
 
-    <!-- ---- Todo Panel ---- -->
-    <div class="todo-panel" id="todoPanel">
-        <div class="header">
-            <span>📋 Todo</span>
-            <button class="close-btn" id="closeTodoBtn">✕</button>
-        </div>
-        <div class="todo-input-row">
-            <input type="text" id="todoInput" placeholder="Add a task…" />
-            <button class="add-btn" id="addTodoBtn">Add</button>
-        </div>
-        <ul class="todo-list" id="todoList">
-            <li class="todo-empty">No tasks yet. Add one above!</li>
-        </ul>
-    </div>
 
     <!-- ---- control bar ---- -->
     <div class="control-bar">
-        <!-- Todo Button -->
-        <button class="icon-btn" id="todoToggle" title="Todo list">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-        </button>
-
         <!-- History Button -->
         <button class="icon-btn" id="historyToggle" title="Session History">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1554,13 +1359,6 @@
             const totalTimeStat = document.getElementById('totalTimeStat');
             const closeSessionBtn = document.getElementById('closeSessionBtn');
 
-            // Todo elements
-            const todoPanel = document.getElementById('todoPanel');
-            const todoToggle = document.getElementById('todoToggle');
-            const closeTodoBtn = document.getElementById('closeTodoBtn');
-            const todoInput = document.getElementById('todoInput');
-            const addTodoBtn = document.getElementById('addTodoBtn');
-            const todoList = document.getElementById('todoList');
 
             // scene elements
             const sceneRain = document.getElementById('scene-rain');
@@ -1669,9 +1467,10 @@
 
             // ---- state ----
             let mode = 'stopwatch';
-            let elapsedMs = 0;
-            let remainingMs = 1500 * 1000;
-            let initialMs = 1500 * 1000;
+
+            let elapsedMs = 0;        // accumulated ms (stopwatch)
+            let remainingMs = 1500 * 1000; // remaining ms (timer)
+            let initialMs  = 1500 * 1000; // full timer duration
             let running = false;
             let intervalId = null;
             let soundOn = false;
@@ -1679,6 +1478,10 @@
             let lastTickSecond = -1;
             let wakeLock = null;
             let wakeLockActive = false;
+
+            // ---- background-persistence state ----
+            let startTimestamp = null;  // Date.now() when last started
+            let accumulatedMs  = 0;     // ms accumulated before last start
 
             // ---- session tracking ----
             let sessions = [];
@@ -2257,8 +2060,17 @@
                 timerDisplay.textContent = getDisplayTime();
             }
 
-            function setLabel(text) {
-                stateLabel.textContent = text;
+            function setLabel(text) { if (stateLabel) stateLabel.textContent = text; }
+
+            function updateStateLabel() {
+                if (!running) { setLabel('Ready'); return; }
+                if (mode === 'stopwatch') {
+                    setLabel('Focusing •');
+                } else {
+                    const mins = Math.floor(remainingMs / 60000);
+                    const secs = Math.floor((remainingMs % 60000) / 1000);
+                    setLabel(`${mins}m ${secs.toString().padStart(2,'0')}s remaining`);
+                }
             }
 
             // ---- tick sound ----
@@ -2307,11 +2119,50 @@
                 } catch (_) {}
             }
 
-            // ---- core timer logic ----
+            // ---- Background-persistent timer state storage ----
+            const TIMER_STATE_KEY = 'focusTimerState';
+
+            function saveTimerState() {
+                try {
+                    const state = {
+                        running,
+                        mode,
+                        startTimestamp,
+                        accumulatedMs,
+                        initialMs,
+                        remainingMsAtPause: remainingMs
+                    };
+                    localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
+                } catch (_) {}
+            }
+
+            function clearTimerState() {
+                try { localStorage.removeItem(TIMER_STATE_KEY); } catch (_) {}
+            }
+
+            function updateDocTitle() {
+                if (running) {
+                    const display = getDisplayTime();
+                    document.title = `${display} · FOCUS`;
+                } else {
+                    document.title = 'FOCUS · by pushpraj';
+                }
+            }
+
+            // ---- core timer logic (timestamp-based) ----
+            function computeCurrentMs() {
+                if (!running || startTimestamp === null) return null;
+                return accumulatedMs + (Date.now() - startTimestamp);
+            }
+
             function tick() {
+                if (!running) return;
+                const nowMs = computeCurrentMs();
+
                 if (mode === 'stopwatch') {
-                    elapsedMs += 10;
+                    elapsedMs = nowMs;
                     updateDisplay();
+                    updateDocTitle();
                     const currentSecond = Math.floor(elapsedMs / 1000);
                     if (currentSecond !== lastTickSecond) {
                         playTick();
@@ -2319,17 +2170,24 @@
                     }
                     updateStateLabel();
                 } else {
-                    remainingMs -= 10;
+                    const elapsed = nowMs;
+                    remainingMs = Math.max(0, initialMs - elapsed);
+
                     if (remainingMs <= 0) {
                         remainingMs = 0;
                         updateDisplay();
-                        // Timer finished – record if >= 10 min
+                        updateDocTitle();
+                        // Timer finished
                         running = false;
+                        startTimestamp = null;
                         startPauseBtn.textContent = 'Start';
                         timerDisplay.classList.remove('running');
                         clearInterval(intervalId);
+                        intervalId = null;
                         releaseWakeLock();
+                        clearTimerState();
                         setLabel('Complete 🎯');
+                        document.title = 'FOCUS · by pushpraj';
                         playTick();
                         if (initialMs >= MIN_SESSION_MS) {
                             recordSession('timer', initialMs);
@@ -2337,6 +2195,7 @@
                         return;
                     }
                     updateDisplay();
+                    updateDocTitle();
                     const currentSecond = Math.floor(remainingMs / 1000);
                     if (currentSecond !== lastTickSecond) {
                         playTick();
@@ -2350,14 +2209,24 @@
                 if (running) return;
                 if (mode === 'timer' && remainingMs <= 0) {
                     remainingMs = initialMs;
+                    accumulatedMs = 0;
                     updateDisplay();
+                }
+                startTimestamp = Date.now();
+                // For stopwatch: continue from elapsedMs; for timer: accumulatedMs tracks elapsed
+                if (mode === 'stopwatch') {
+                    accumulatedMs = elapsedMs;
+                } else {
+                    accumulatedMs = initialMs - remainingMs;
                 }
                 running = true;
                 startPauseBtn.textContent = 'Pause';
                 timerDisplay.classList.add('running');
                 lastTickSecond = -1;
-                intervalId = setInterval(tick, 10);
+                intervalId = setInterval(tick, 100);
+                saveTimerState();
                 updateStateLabel();
+                updateDocTitle();
                 requestWakeLock();
                 if (Ambient.context && Ambient.context.state === 'suspended') {
                     Ambient.context.resume();
@@ -2365,38 +2234,66 @@
             }
 
             function pause() {
+                if (!running) return;
+                // Capture final elapsed before stopping
+                const nowMs = computeCurrentMs();
+                if (mode === 'stopwatch') {
+                    elapsedMs = nowMs;
+                    accumulatedMs = elapsedMs;
+                } else {
+                    accumulatedMs = nowMs;
+                    remainingMs = Math.max(0, initialMs - accumulatedMs);
+                }
                 running = false;
+                startTimestamp = null;
                 startPauseBtn.textContent = 'Start';
                 timerDisplay.classList.remove('running');
                 clearInterval(intervalId);
+                intervalId = null;
+                saveTimerState();
+                updateDisplay();
                 updateStateLabel();
+                updateDocTitle();
                 releaseWakeLock();
-                // ✅ No session recording on pause – we only record on reset, mode switch, or timer completion.
+                // ✅ No session recording on pause
             }
 
             function reset() {
-                // If stopwatch is running, pause first (no record yet)
                 if (running) pause();
 
                 // Record stopwatch session only if >= 10 min (only when resetting)
                 if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
                     recordSession('stopwatch', elapsedMs);
                 }
-                // For timer: do not record on reset (only on completion)
 
                 // Reset values
-                if (mode === 'stopwatch') {
-                    elapsedMs = 0;
-                } else {
+                elapsedMs = 0;
+                accumulatedMs = 0;
+                startTimestamp = null;
+                if (mode === 'timer') {
                     remainingMs = initialMs;
                 }
                 lastTickSecond = -1;
+                clearTimerState();
                 updateDisplay();
                 updateStateLabel();
+                updateDocTitle();
                 releaseWakeLock();
             }
 
-            // ---- mode switching ----
+            // Save state when navigating away
+            window.addEventListener('beforeunload', () => {
+                if (running) saveTimerState();
+            });
+
+            // Re-sync when tab becomes visible again (fixes drift on mobile)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && running) {
+                    // Force an immediate tick to snap the display
+                    tick();
+                }
+            });
+
             function setMode(newMode) {
                 if (newMode === mode) return;
                 // Pause if running
@@ -2414,19 +2311,25 @@
                 updateTimerControlsVisibility();
                 if (mode === 'stopwatch') {
                     elapsedMs = 0;
+                    accumulatedMs = 0;
                 } else {
                     if (initialMs <= 0) initialMs = 1500 * 1000;
                     remainingMs = initialMs;
+                    accumulatedMs = 0;
                 }
+                startTimestamp = null;
                 lastTickSecond = -1;
+                clearTimerState();
                 updateDisplay();
                 updateStateLabel();
+                updateDocTitle();
                 startPauseBtn.textContent = 'Start';
                 timerDisplay.classList.remove('running');
                 presetBtns.forEach(b => b.classList.remove('active'));
                 document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
                 document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
             }
+
 
             // ---- preset timer buttons ----
             presetBtns.forEach(btn => {
@@ -2481,7 +2384,15 @@
             customMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
             customSeconds.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
 
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
             // ---- saved presets ----
+
             function loadSavedPresets() {
                 try {
                     const data = localStorage.getItem('focusPresets');
@@ -2802,223 +2713,6 @@
                 }
             });
 
-            // ---- Todo list ----
-            let todos = [];
-
-            function loadTodos() {
-                try {
-                    const data = localStorage.getItem('focusTodos');
-                    if (data) {
-                        todos = JSON.parse(data);
-                    } else {
-                        todos = [];
-                    }
-                } catch (_) {
-                    todos = [];
-                }
-                renderTodos();
-            }
-
-            function saveTodos() {
-                try {
-                    localStorage.setItem('focusTodos', JSON.stringify(todos));
-                } catch (_) {}
-            }
-
-            function addTodo() {
-                const text = todoInput.value.trim();
-                if (!text) return;
-                todos.push({
-                    id: Date.now() + Math.random(),
-                    text: text,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
-                todoInput.value = '';
-                saveTodos();
-                renderTodos();
-                if (!todoPanel.classList.contains('open')) {
-                    todoPanel.classList.add('open');
-                }
-            }
-
-            function toggleTodo(id) {
-                const todo = todos.find(t => t.id === id);
-                if (todo) {
-                    todo.completed = !todo.completed;
-                    saveTodos();
-                    renderTodos();
-                    if (!todoPanel.classList.contains('open')) {
-                        todoPanel.classList.add('open');
-                    }
-                }
-            }
-
-            function deleteTodo(id) {
-                todos = todos.filter(t => t.id !== id);
-                saveTodos();
-                renderTodos();
-                if (!todoPanel.classList.contains('open')) {
-                    todoPanel.classList.add('open');
-                }
-            }
-
-            function editTodo(id, newText) {
-                const todo = todos.find(t => t.id === id);
-                if (todo) {
-                    todo.text = newText.trim() || todo.text;
-                    saveTodos();
-                    renderTodos();
-                }
-            }
-
-            function renderTodos() {
-                if (todos.length === 0) {
-                    todoList.innerHTML = '<li class="todo-empty">No tasks yet. Add one above!</li>';
-                    return;
-                }
-                let html = '';
-                todos.forEach(todo => {
-                    const checked = todo.completed ? 'checked' : '';
-                    const doneClass = todo.completed ? 'done' : '';
-                    html += `
-                            <li>
-                                <div class="checkbox ${checked}" data-id="${todo.id}"></div>
-                                <span class="task-text ${doneClass}" data-id="${todo.id}">${escapeHtml(todo.text)}</span>
-                                <button class="delete-btn" data-id="${todo.id}">✕</button>
-                            </li>
-                        `;
-                });
-                todoList.innerHTML = html;
-
-                todoList.querySelectorAll('.checkbox').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseFloat(el.dataset.id);
-                        toggleTodo(id);
-                    });
-                });
-
-                todoList.querySelectorAll('.delete-btn').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = parseFloat(el.dataset.id);
-                        deleteTodo(id);
-                    });
-                });
-
-                todoList.querySelectorAll('.task-text').forEach(el => {
-                    el.addEventListener('dblclick', (e) => {
-                        e.stopPropagation();
-                        const id = parseFloat(el.dataset.id);
-                        const currentText = el.textContent;
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = currentText;
-                        input.className = 'task-text editing';
-                        input.dataset.id = id;
-                        el.replaceWith(input);
-                        input.focus();
-                        input.select();
-
-                        const finishEdit = () => {
-                            const newText = input.value.trim() || currentText;
-                            const parent = input.parentNode;
-                            const newSpan = document.createElement('span');
-                            newSpan.className = 'task-text';
-                            newSpan.dataset.id = id;
-                            newSpan.textContent = newText;
-                            input.replaceWith(newSpan);
-                            newSpan.addEventListener('dblclick', (e2) => {
-                                e2.stopPropagation();
-                                const id2 = parseFloat(newSpan.dataset.id);
-                                const currentText2 = newSpan.textContent;
-                                const input2 = document.createElement('input');
-                                input2.type = 'text';
-                                input2.value = currentText2;
-                                input2.className = 'task-text editing';
-                                input2.dataset.id = id2;
-                                newSpan.replaceWith(input2);
-                                input2.focus();
-                                input2.select();
-                                const finishEdit2 = () => {
-                                    const newText2 = input2.value.trim() || currentText2;
-                                    const parent2 = input2.parentNode;
-                                    const newSpan2 = document.createElement('span');
-                                    newSpan2.className = 'task-text';
-                                    newSpan2.dataset.id = id2;
-                                    newSpan2.textContent = newText2;
-                                    input2.replaceWith(newSpan2);
-                                    editTodo(id2, newText2);
-                                    newSpan2.addEventListener('dblclick', arguments.callee);
-                                };
-                                input2.addEventListener('blur', finishEdit2);
-                                input2.addEventListener('keydown', (e3) => {
-                                    if (e3.key === 'Enter') {
-                                        e3.preventDefault();
-                                        input2.blur();
-                                    }
-                                    if (e3.key === 'Escape') {
-                                        input2.value = currentText2;
-                                        input2.blur();
-                                    }
-                                });
-                            });
-                            editTodo(id, newText);
-                        };
-
-                        input.addEventListener('blur', finishEdit);
-                        input.addEventListener('keydown', (e2) => {
-                            if (e2.key === 'Enter') {
-                                e2.preventDefault();
-                                input.blur();
-                            }
-                            if (e2.key === 'Escape') {
-                                input.value = currentText;
-                                input.blur();
-                            }
-                        });
-                    });
-                });
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            // ---- Todo panel toggle ----
-            function toggleTodoPanel() {
-                todoPanel.classList.toggle('open');
-                if (todoPanel.classList.contains('open')) {
-                    todoInput.focus();
-                }
-            }
-
-            todoToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleTodoPanel();
-            });
-
-            closeTodoBtn.addEventListener('click', () => {
-                todoPanel.classList.remove('open');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (todoPanel.classList.contains('open') &&
-                    !todoPanel.contains(e.target) &&
-                    e.target !== todoToggle) {
-                    todoPanel.classList.remove('open');
-                }
-            });
-
-            addTodoBtn.addEventListener('click', addTodo);
-            todoInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    addTodo();
-                }
-            });
 
             // ---- keyboard shortcuts ----
             document.addEventListener('keydown', (e) => {
@@ -3058,24 +2752,99 @@
             // ---- init ----
             loadSessions();
             updateTimerControlsVisibility();
-
-            loadTodos();
             renderSavedPresets();
 
             document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
 
+            // ---- Restore timer state from previous session ----
+            (function restoreTimerState() {
+                try {
+                    const raw = localStorage.getItem(TIMER_STATE_KEY);
+                    if (!raw) return;
+                    const s = JSON.parse(raw);
+                    if (!s) return;
+
+                    // Restore mode
+                    if (s.mode && s.mode !== mode) {
+                        setMode(s.mode);
+                    }
+
+                    // Restore duration
+                    if (s.initialMs > 0) {
+                        initialMs = s.initialMs;
+                    }
+
+                    if (s.running && s.startTimestamp) {
+                        // Timer was running when user left – compute how much has passed
+                        const passedMs = Date.now() - s.startTimestamp;
+                        const totalElapsed = (s.accumulatedMs || 0) + passedMs;
+
+                        if (s.mode === 'stopwatch') {
+                            elapsedMs = totalElapsed;
+                            accumulatedMs = totalElapsed;
+                            updateDisplay();
+                            // Restart
+                            running = true;
+                            startTimestamp = Date.now();
+                            accumulatedMs = elapsedMs;
+                            startPauseBtn.textContent = 'Pause';
+                            timerDisplay.classList.add('running');
+                            lastTickSecond = -1;
+                            intervalId = setInterval(tick, 100);
+                            updateStateLabel();
+                            updateDocTitle();
+                        } else {
+                            // Timer countdown
+                            const leftMs = initialMs - totalElapsed;
+                            if (leftMs <= 0) {
+                                // Timer already finished while away
+                                remainingMs = 0;
+                                updateDisplay();
+                                setLabel('Complete 🎯 (finished while away)');
+                                clearTimerState();
+                                if (initialMs >= MIN_SESSION_MS) {
+                                    recordSession('timer', initialMs);
+                                }
+                            } else {
+                                remainingMs = leftMs;
+                                accumulatedMs = totalElapsed;
+                                updateDisplay();
+                                // Restart
+                                running = true;
+                                startTimestamp = Date.now();
+                                startPauseBtn.textContent = 'Pause';
+                                timerDisplay.classList.add('running');
+                                lastTickSecond = -1;
+                                intervalId = setInterval(tick, 100);
+                                updateStateLabel();
+                                updateDocTitle();
+                            }
+                        }
+                    } else if (!s.running) {
+                        // Was paused when user left
+                        if (s.mode === 'stopwatch') {
+                            elapsedMs = s.accumulatedMs || 0;
+                        } else {
+                            remainingMs = s.remainingMsAtPause || initialMs;
+                        }
+                        updateDisplay();
+                        setLabel('Paused');
+                    }
+                } catch (_) {
+                    clearTimerState();
+                }
+            })();
+
             updateDisplay();
-            setLabel('Ready');
 
             if (!restoreScene()) {
                 activateScene('scene-rain');
             }
 
             console.log('⏱️ Focus Timer · Space to start/stop · M to toggle mode · A for ambient');
-            console.log('📋 Todo list saved to localStorage · Double‑click a todo to edit');
             console.log('💾 Save named timer presets with the 💾 button');
             console.log('🎯 Sessions: 10min minimum · H for history');
-            console.log('📲 Install button in top‑right corner');
+            console.log('📲 Install button in top-right corner');
 
         })();
     </script>
