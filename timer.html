@@ -1486,8 +1486,7 @@
             // ---- session tracking ----
             let sessions = [];
 
-            // ---- 🔥 MINIMUM SESSION DURATION: 10 MINUTES (600,000 ms) ----
-            const MIN_SESSION_MS = 10 * 60 * 1000;
+            // ---- No minimum session duration – save any non-zero session ----
 
             function loadSessions() {
                 try {
@@ -2189,9 +2188,9 @@
                         setLabel('Complete 🎯');
                         document.title = 'FOCUS · by pushpraj';
                         playTick();
-                        if (initialMs >= MIN_SESSION_MS) {
+                        // Timer finished – always record
                             recordSession('timer', initialMs);
-                        }
+
                         return;
                     }
                     updateDisplay();
@@ -2261,9 +2260,13 @@
             function reset() {
                 if (running) pause();
 
-                // Record stopwatch session only if >= 10 min (only when resetting)
-                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                // Record stopwatch session if any time has elapsed
+                if (mode === 'stopwatch' && elapsedMs > 0) {
                     recordSession('stopwatch', elapsedMs);
+                }
+                // Record timer session if any time was used
+                if (mode === 'timer' && (initialMs - remainingMs) > 0) {
+                    recordSession('timer', initialMs - remainingMs);
                 }
 
                 // Reset values
@@ -2299,8 +2302,8 @@
                 // Pause if running
                 if (running) pause();
 
-                // If switching away from stopwatch, record if >= 10 min
-                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) {
+                // If switching away from stopwatch, record any elapsed time
+                if (mode === 'stopwatch' && elapsedMs > 0) {
                     recordSession('stopwatch', elapsedMs);
                 }
                 // Switching from timer: no record unless timer completed (already handled)
@@ -2802,9 +2805,9 @@
                                 updateDisplay();
                                 setLabel('Complete 🎯 (finished while away)');
                                 clearTimerState();
-                                if (initialMs >= MIN_SESSION_MS) {
+                                // Timer already finished while away – always record
                                     recordSession('timer', initialMs);
-                                }
+
                             } else {
                                 remainingMs = leftMs;
                                 accumulatedMs = totalElapsed;
