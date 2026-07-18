@@ -1307,6 +1307,7 @@
         }
     </style>
 </head>
+    <script src="bg-timer.js"></script>
 <body>
 
     <!-- ---- scenes (presets) ---- -->
@@ -2253,9 +2254,27 @@
                 return formatTime(remainingMs);
             }
 
-            function updateDisplay() {
-                timerDisplay.textContent = getDisplayTime();
-            }
+          function updateTimerDisplay() {
+    const state = BgTimer.getState();
+    if (!state || !state.isRunning) return;
+
+    const elapsed = BgTimer.getElapsed(state);
+
+    if (state.mode === 'timer') {
+        const remaining = Math.max(0, state.targetMs - elapsed);
+        timerDisplay.textContent = BgTimer.formatTime(remaining, true);
+        
+        if (remaining <= 0) {
+            BgTimer.stop(); // Automatically saves session to history!
+            clearInterval(timerInterval);
+            timerDisplay.classList.remove('running');
+            startPauseBtn.textContent = 'Start';
+            // Keep your existing finish sound/alert logic here if you had any
+        }
+    } else {
+        timerDisplay.textContent = BgTimer.formatTime(elapsed, true);
+    }
+}
 
             function setLabel(text) {
                 stateLabel.textContent = text;
@@ -2587,9 +2606,43 @@
                 renderSavedPresets();
             });
 
-            // ---- start/pause/reset ----
-            startPauseBtn.addEventListener('click', () => running ? pause() : start());
-            resetBtn.addEventListener('click', reset);
+           startPauseBtn.addEventListener('click', () => {
+    const state = BgTimer.getState();
+    
+    // If timer is completely stopped, START it
+    if (!state || !state.isRunning) {
+        const activeMode = document.querySelector('.mode-btn.active').dataset.mode;
+        let targetMs = 0;
+        
+        if (activeMode === 'timer') {
+            // Grab selected preset time
+            const activePreset = document.querySelector('.preset-btn.active');
+            if (activePreset) targetMs = parseInt(activePreset.dataset.seconds) * 1000;
+        }
+        
+        BgTimer.start(activeMode, targetMs);
+        startPauseBtn.textContent = 'Pause';
+        timerDisplay.classList.add('running');
+        
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimerDisplay, 50); 
+    } 
+    // If running and NOT paused, PAUSE it
+    else if (!state.isPaused) {
+        BgTimer.pause();
+        startPauseBtn.textContent = 'Resume';
+        timerDisplay.classList.remove('running');
+        if (timerInterval) clearInterval(timerInterval);
+    } 
+    // If paused, RESUME it
+    else {
+        BgTimer.resume();
+        startPauseBtn.textContent = 'Pause';
+        timerDisplay.classList.add('running');
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimerDisplay, 50);
+    }
+});
 
             // ---- sound toggle ----
             soundToggle.addEventListener('click', () => {
@@ -3101,7 +3154,14 @@
     renderBgSessions();
 });
 
-
+// --- Reset Button Logic ---
+document.getElementById('resetBtn').addEventListener('click', () => {
+    if (typeof timerInterval !== 'undefined' && timerInterval) clearInterval(timerInterval);
+    BgTimer.reset(); 
+    document.getElementById('timerDisplay').textContent = '00:00.00';
+    document.getElementById('timerDisplay').classList.remove('running');
+    document.getElementById('startPauseBtn').textContent = 'Start';
+});
             
             // ---- init ----
             loadSessions();
