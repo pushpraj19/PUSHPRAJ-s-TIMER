@@ -1355,8 +1355,6 @@
         const totalSessionsStat = document.getElementById('totalSessionsStat');
         const totalTimeStat = document.getElementById('totalTimeStat');
         const closeSessionBtn = document.getElementById('closeSessionBtn');
-
-        // Scene elements
         const scenes = document.querySelectorAll('.scene');
         const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
         const customThumb = document.getElementById('customThumb');
@@ -1369,13 +1367,18 @@
         const sceneCustom = document.getElementById('scene-custom');
 
         // ---- STATE ----
-        let currentMode = 'stopwatch';   // 'stopwatch' | 'timer'
+        let currentMode = 'stopwatch';
         let isRunning = false;
         let elapsedMs = 0;               // stopwatch: total elapsed
         let timerDurationMs = 1500000;   // timer: chosen duration (default 25 min)
         let remainingMs = 1500000;       // timer: what's left
-        let lastTimestamp = null;
+
+        // Wall-clock based timing — keeps running when tab is backgrounded
+        let startWallClock = 0;          // Date.now() when started/resumed
+        let elapsedAtStart = 0;          // elapsed or consumed ms at the moment of start/resume
+
         let rafId = null;
+        let bgCheckInterval = null;      // setInterval safety net for background completion
 
         // Sound state
         let tickingEnabled = false;
@@ -1402,12 +1405,23 @@
                    String(cents).padStart(2, '0');
         }
 
+        // ---- CALCULATE CURRENT TIME (wall-clock based) ----
+        function getElapsedMs() {
+            if (!isRunning) return elapsedMs;
+            return elapsedAtStart + (Date.now() - startWallClock);
+        }
+
+        function getRemainingMs() {
+            if (!isRunning) return remainingMs;
+            return Math.max(0, remainingMs - (Date.now() - startWallClock));
+        }
+
         // ---- DISPLAY UPDATE ----
         function updateDisplay() {
             if (currentMode === 'stopwatch') {
-                timerDisplay.textContent = formatMs(elapsedMs);
+                timerDisplay.textContent = formatMs(getElapsedMs());
             } else {
-                timerDisplay.textContent = formatMs(remainingMs);
+                timerDisplay.textContent = formatMs(getRemainingMs());
             }
         }
 
@@ -1471,32 +1485,24 @@
         fetchWeather();
 
         // =============================
-        //  MODE TOGGLE (THE FIX #2)
+        //  MODE TOGGLE
         // =============================
         var modeBtns = modeToggle.querySelectorAll('.mode-btn');
         modeBtns.forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (isRunning) return; // don't switch while running
-
+                if (isRunning) return;
                 var mode = btn.getAttribute('data-mode');
                 if (mode === currentMode) return;
-
-                // Update active button
                 modeBtns.forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
-
                 currentMode = mode;
-
-                // Show/hide timer presets
                 if (currentMode === 'timer') {
                     timerControls.classList.add('visible');
-                    // Set display to current timer duration
                     remainingMs = timerDurationMs;
                 } else {
                     timerControls.classList.remove('visible');
                     elapsedMs = 0;
                 }
-
                 updateDisplay();
                 timerDisplay.classList.remove('running');
             });
@@ -1511,37 +1517,29 @@
                 var secs = parseInt(btn.getAttribute('data-seconds'), 10);
                 timerDurationMs = secs * 1000;
                 remainingMs = timerDurationMs;
-
                 presetBtns.forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 updateDisplay();
             });
         });
 
-        // ---- Custom time ----
         setCustomTime.addEventListener('click', function () {
             if (isRunning) return;
             var m = parseInt(customMinutes.value, 10) || 0;
             var s = parseInt(customSeconds.value, 10) || 0;
             if (m <= 0 && s <= 0) return;
-            var totalSecs = m * 60 + s;
-            timerDurationMs = totalSecs * 1000;
+            timerDurationMs = (m * 60 + s) * 1000;
             remainingMs = timerDurationMs;
-
-            // Deselect preset buttons
             presetBtns.forEach(function (b) { b.classList.remove('active'); });
             updateDisplay();
         });
 
-        // ---- Save preset ----
         savePresetBtn.addEventListener('click', function () {
             if (isRunning) return;
             var m = parseInt(customMinutes.value, 10) || 0;
             var s = parseInt(customSeconds.value, 10) || 0;
             if (m <= 0 && s <= 0) return;
             var totalSecs = m * 60 + s;
-            var label = (m > 0 ? m + 'm' : '') + (s > 0 ? s + 's' : '');
-
             var saved = JSON.parse(localStorage.getItem('focus_presets') || '[]');
             if (saved.indexOf(totalSecs) === -1) {
                 saved.push(totalSecs);
@@ -1563,8 +1561,9 @@
                 btn.innerHTML = label + ' <span class="delete-preset">✕</span>';
                 btn.addEventListener('click', function (e) {
                     if (e.target.classList.contains('delete-preset')) {
-                        saved = saved.filter(function (v) { return v !== secs; });
-                        localStorage.setItem('focus_presets', JSON.stringify(saved));
+                        var arr = JSON.parse(localStorage.getItem('focus_presets') || '[]');
+                        arr = arr.filter(function (v) { return v !== secs; });
+                        localStorage.setItem('focus_presets', JSON.stringify(arr));
                         renderSavedPresets();
                         return;
                     }
@@ -1583,27 +1582,37 @@
         //  START / PAUSE
         // =============================
         startPauseBtn.addEventListener('click', function () {
-            if (isRunning) {
-                pause();
-            } else {
-                start();
-            }
+            if (isRunning) { pause(); } else { start(); }
         });
 
         function start() {
             isRunning = true;
-            lastTimestamp = performance.now();
+            // Snapshot wall-clock time so we can compute elapsed even when tab is hidden
+            startWallClock = Date.now();
+            if (currentMode === 'stopwatch') {
+                elapsedAtStart = elapsedMs;
+            } else {
+                elapsedAtStart = 0; // elapsedAtStart = how much of remainingMs has been consumed
+            }
             startPauseBtn.textContent = 'Pause';
             timerDisplay.classList.add('running');
             requestWakeLock();
             tick();
+            startBgCheck();  // safety net: fires completion even in background
             if (tickingEnabled) startTickSound();
         }
 
         function pause() {
+            // Freeze current values from wall-clock before stopping
+            if (currentMode === 'stopwatch') {
+                elapsedMs = getElapsedMs();
+            } else {
+                remainingMs = getRemainingMs();
+            }
             isRunning = false;
             cancelAnimationFrame(rafId);
             rafId = null;
+            stopBgCheck();
             startPauseBtn.textContent = 'Resume';
             timerDisplay.classList.remove('running');
             releaseWakeLock();
@@ -1612,35 +1621,54 @@
 
         function tick() {
             if (!isRunning) return;
-
-            var now = performance.now();
-            var delta = now - lastTimestamp;
-            lastTimestamp = now;
-
-            if (currentMode === 'stopwatch') {
-                elapsedMs += delta;
-            } else {
-                remainingMs -= delta;
-                if (remainingMs <= 0) {
-                    remainingMs = 0;
-                    updateDisplay();
-                    timerComplete();
-                    return;
-                }
-            }
-
             updateDisplay();
             rafId = requestAnimationFrame(tick);
         }
 
+        // ---- Background safety check ----
+        // rAF stops when tab is hidden. This setInterval keeps running
+        // (browsers throttle to ~1/sec in background, which is enough)
+        // and fires the completion event at the right moment.
+        function startBgCheck() {
+            stopBgCheck();
+            bgCheckInterval = setInterval(function () {
+                if (!isRunning) return;
+                if (currentMode === 'timer' && getRemainingMs() <= 0) {
+                    // Timer expired while tab was in background
+                    timerComplete();
+                }
+            }, 500);
+        }
+        function stopBgCheck() {
+            if (bgCheckInterval) {
+                clearInterval(bgCheckInterval);
+                bgCheckInterval = null;
+            }
+        }
+
+        // ---- Also update display when tab becomes visible again ----
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden && isRunning) {
+                updateDisplay();
+            }
+        });
+
         function timerComplete() {
+            // Freeze values
+            if (currentMode === 'stopwatch') {
+                elapsedMs = getElapsedMs();
+            } else {
+                remainingMs = 0;
+            }
             isRunning = false;
             cancelAnimationFrame(rafId);
             rafId = null;
+            stopBgCheck();
             startPauseBtn.textContent = 'Start';
             timerDisplay.classList.remove('running');
             releaseWakeLock();
             stopTickSound();
+            updateDisplay();
 
             // Save session
             saveSession(timerDurationMs, 'timer');
@@ -1661,7 +1689,7 @@
                     osc.start(ctx.currentTime + i * 0.18);
                     osc.stop(ctx.currentTime + i * 0.18 + 0.5);
                 });
-            } catch (e) { /* silent fail */ }
+            } catch (e) {}
 
             // Reset timer after completion
             remainingMs = timerDurationMs;
@@ -1674,28 +1702,28 @@
         }
 
         // =============================
-        //  RESET (THE FIX #1)
+        //  RESET
         // =============================
         resetBtn.addEventListener('click', function () {
-            // Stop everything
+            // Save stopwatch session if meaningful (capture phase — runs before display reset)
+            if (currentMode === 'stopwatch' && getElapsedMs() >= 5000) {
+                saveSession(getElapsedMs(), 'stopwatch');
+            }
+
             isRunning = false;
             cancelAnimationFrame(rafId);
             rafId = null;
-            lastTimestamp = null;
+            stopBgCheck();
             startPauseBtn.textContent = 'Start';
             timerDisplay.classList.remove('running');
             releaseWakeLock();
             stopTickSound();
 
-            // Reset based on current mode
             if (currentMode === 'stopwatch') {
                 elapsedMs = 0;
-                // Optionally save session if time was meaningful
             } else {
-                // Timer mode: reset to the selected duration
                 remainingMs = timerDurationMs;
             }
-
             updateDisplay();
         });
 
@@ -1714,14 +1742,6 @@
             updateTodayTotal();
         }
 
-        // Save stopwatch session on reset if meaningful
-        var origReset = resetBtn.onclick;
-        resetBtn.addEventListener('click', function () {
-            if (currentMode === 'stopwatch' && elapsedMs >= 5000) {
-                saveSession(elapsedMs, 'stopwatch');
-            }
-        }, true); // capture phase so it runs before the main handler
-
         function renderSessions() {
             sessionList.innerHTML = '';
             if (sessions.length === 0) {
@@ -1736,15 +1756,12 @@
                     var durMin = Math.floor(durMs / 60000);
                     var durSec = Math.round((durMs % 60000) / 1000);
                     var durStr = durMin > 0 ? durMin + 'm ' + durSec + 's' : durSec + 's';
-
                     li.innerHTML = '<span class="session-date">' + dateStr + '</span>' +
                                    '<span class="session-mode ' + s.mode + '">' + (s.mode === 'stopwatch' ? 'Stopwatch' : 'Timer') + '</span>' +
                                    '<span class="session-duration">' + durStr + '</span>';
                     sessionList.appendChild(li);
                 });
             }
-
-            // Footer stats
             totalSessionsStat.textContent = sessions.length;
             var totalMs = 0;
             sessions.forEach(function (s) { totalMs += s.durationMs; });
@@ -1778,11 +1795,12 @@
                 tickAudio = { ctx: ctx, buf: buf, interval: null };
                 var lastSec = -1;
                 tickAudio.interval = setInterval(function () {
+                    if (!isRunning) return;
                     var sec;
                     if (currentMode === 'stopwatch') {
-                        sec = Math.floor(elapsedMs / 1000);
+                        sec = Math.floor(getElapsedMs() / 1000);
                     } else {
-                        sec = Math.floor(remainingMs / 1000);
+                        sec = Math.floor(getRemainingMs() / 1000);
                     }
                     if (sec !== lastSec) {
                         lastSec = sec;
@@ -1792,7 +1810,7 @@
                         src.start();
                     }
                 }, 50);
-            } catch (e) { /* silent */ }
+            } catch (e) {}
         }
         function stopTickSound() {
             if (tickAudio) {
@@ -1833,8 +1851,6 @@
                 currentAmbient = sound;
                 ambientBtns.forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
-
-                // Stop previous
                 if (ambientAudio) {
                     ambientAudio.pause();
                     ambientAudio = null;
@@ -1882,7 +1898,6 @@
             localStorage.setItem('focus_scene', sceneId);
         }
 
-        // Custom URL
         applyUrlBtn.addEventListener('click', function () {
             var url = customUrlInput.value.trim();
             if (!url) return;
@@ -1894,7 +1909,6 @@
             setTimeout(function () { customStatus.textContent = ''; }, 2000);
         });
 
-        // Custom file
         fileInput.addEventListener('change', function () {
             var file = fileInput.files[0];
             if (!file) return;
@@ -1916,7 +1930,6 @@
             customUrlInput.value = '';
             customPanel.classList.remove('open');
             customThumb.classList.remove('active');
-            // Switch to default
             switchScene('scene-rain');
             thumbs.forEach(function (t) { t.classList.remove('active'); });
             thumbs[0].classList.add('active');
@@ -1925,7 +1938,6 @@
             setTimeout(function () { customStatus.textContent = ''; }, 2000);
         });
 
-        // Restore saved scene
         var savedScene = localStorage.getItem('focus_scene');
         if (savedScene) {
             var el = document.getElementById(savedScene);
@@ -1970,7 +1982,7 @@
                         wakeIndicator.classList.remove('active');
                     });
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) {}
         }
         function releaseWakeLock() {
             if (wakeLock) {
@@ -2000,7 +2012,6 @@
             }
         });
 
-        // Notification permission
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }
