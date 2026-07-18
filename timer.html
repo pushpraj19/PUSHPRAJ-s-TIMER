@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FOCUS · by pushpraj</title>
 
-   
-      <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="icon" type="image/png" href="logo.png" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" id="manifestLink" />
     <script>
@@ -28,7 +27,7 @@
             const url = URL.createObjectURL(blob);
             document.getElementById('manifestLink').href = url;
         })();
-    </script>      
+    </script>
 
     <style>
         :root {
@@ -57,7 +56,6 @@
             position: relative;
         }
 
-        /* ---- scenic background, crossfading ---- */
         .scene {
             position: fixed;
             inset: 0;
@@ -94,7 +92,6 @@
             box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.45);
         }
 
-        /* ---- top bar ---- */
         .top-bar {
             position: fixed;
             top: 20px;
@@ -134,7 +131,6 @@
             line-height: 1.4;
         }
 
-        /* Install button – now part of flow */
         .install-top {
             display: flex;
             justify-content: flex-end;
@@ -222,7 +218,6 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* ---- stage ---- */
         .stage {
             position: relative;
             z-index: 2;
@@ -235,7 +230,6 @@
             padding: 20px;
         }
 
-        /* ---- mode toggle ---- */
         .mode-toggle {
             display: flex;
             gap: 4px;
@@ -284,16 +278,10 @@
         }
 
         @keyframes breathe {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
 
-        /* ---- timer controls (presets + custom) ---- */
         .timer-controls {
             display: none;
             flex-direction: column;
@@ -417,7 +405,7 @@
             text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
             min-height: 20px;
         }
-  /* ---- Home Button (bottom left) ---- */
+
         .home-btn {
             position: fixed;
             bottom: 30px;
@@ -456,35 +444,7 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
-         .home-btn {
-                bottom: 20px;
-                left: 16px;
-                width: 48px;
-                height: 48px;
-            }
-            .home-btn svg {
-                width: 22px;
-                height: 22px;
-            }
-          .home-btn {
-                bottom: 16px;
-                left: 12px;
-                width: 42px;
-                height: 42px;
-            }
-            .home-btn svg {
-                width: 18px;
-                height: 18px;
-            }
-            .bg-toggle-btn {
-                bottom: 16px;
-                right: 12px;
-                width: 42px;
-                height: 42px;
-                font-size: 18px;
-            }
-        
-        /* ---- Session history panel ---- */
+
         .session-panel {
             position: fixed;
             bottom: clamp(140px, 15vh, 170px);
@@ -599,7 +559,6 @@
             color: var(--text-hi);
         }
 
-        /* ---- Action Row (Start + Reset above control bar) ---- */
         .action-row {
             position: fixed;
             bottom: clamp(110px, 14vh, 150px);
@@ -663,7 +622,6 @@
             height: clamp(20px, 1.8vw, 26px);
         }
 
-        /* ---- control bar ---- */
         .control-bar {
             position: fixed;
             bottom: 30px;
@@ -710,7 +668,6 @@
             height: clamp(14px, 1.3vw, 18px);
         }
 
-        /* ---- Ambient Popover ---- */
         .ambient-popover {
             position: fixed;
             bottom: clamp(140px, 15vh, 170px);
@@ -762,7 +719,6 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ---- Todo Panel ---- */
         .todo-panel {
             position: fixed;
             bottom: clamp(140px, 15vh, 170px);
@@ -933,7 +889,6 @@
             opacity: 0.6;
         }
 
-        /* ---- scene picker popover (existing) ---- */
         .scene-picker {
             position: fixed;
             bottom: clamp(140px, 15vh, 170px);
@@ -1011,7 +966,6 @@
             color: #fff;
         }
 
-        /* ---- custom bg panel ---- */
         .custom-panel {
             display: none;
             flex-direction: column;
@@ -1107,172 +1061,6 @@
             color: #9ed9b0;
         }
 
-        ::selection {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* ---- responsive ---- */
-        @media (max-width: 480px) {
-            .top-bar {
-                top: 14px;
-                left: 16px;
-                right: 16px;
-            }
-            .logo {
-                font-size: clamp(28px, 5vw, 42px);
-            }
-            .logo-sub {
-                font-size: 0.3em;
-                margin-top: -3px;
-            }
-            .action-row {
-                bottom: clamp(85px, 12vh, 100px);
-                gap: 10px;
-            }
-            .btn-start {
-                font-size: 15px;
-                padding: 12px 28px;
-                min-width: 80px;
-            }
-            .btn-reset-icon {
-                width: 40px;
-                height: 40px;
-            }
-            .btn-reset-icon svg {
-                width: 18px;
-                height: 18px;
-            }
-            .control-bar {
-                padding: 8px 12px;
-                gap: 6px;
-                bottom: 20px;
-                border-radius: 18px;
-            }
-            .icon-btn {
-                width: 34px;
-                height: 34px;
-            }
-            .icon-btn svg {
-                width: 14px;
-                height: 14px;
-            }
-            .scene-picker {
-                bottom: clamp(120px, 14vh, 140px);
-                padding: 10px 12px 12px 12px;
-                min-width: unset;
-                width: calc(100vw - 28px);
-            }
-            .scene-thumb {
-                width: 38px;
-                height: 38px;
-                border-radius: 10px;
-            }
-            .ambient-popover {
-                bottom: clamp(120px, 14vh, 140px);
-                padding: 8px 12px;
-                gap: 6px;
-                max-width: calc(100vw - 24px);
-            }
-            .ambient-btn-option {
-                font-size: 10px;
-                padding: 5px 12px;
-            }
-            .timer {
-                font-size: clamp(72px, 16vw, 110px);
-            }
-            .state-label {
-                font-size: 11px;
-            }
-            .mode-btn {
-                font-size: 11px;
-                padding: 5px 16px;
-            }
-            .preset-btn {
-                font-size: 10px;
-                padding: 4px 12px;
-            }
-            .custom-time-input input {
-                width: 50px;
-                font-size: 11px;
-            }
-            .custom-time-input .set-btn {
-                font-size: 10px;
-                padding: 4px 10px;
-            }
-            .session-panel {
-                width: calc(100vw - 32px);
-                bottom: clamp(120px, 14vh, 140px);
-                max-height: 50vh;
-            }
-            .todo-panel {
-                width: calc(100vw - 32px);
-                bottom: clamp(120px, 14vh, 140px);
-                max-height: 50vh;
-            }
-            .install-top .icon-btn {
-                width: 28px;
-                height: 28px;
-            }
-            .install-top .icon-btn svg {
-                width: 14px;
-                height: 14px;
-            }
-            .weather {
-                font-size: 12px;
-                min-height: 18px;
-            }
-            .today-total {
-                font-size: 12px;
-                min-height: 18px;
-            }
-            .clock {
-                font-size: 12px;
-            }
-            .running-time {
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .action-row {
-                bottom: clamp(75px, 10vh, 85px);
-                gap: 8px;
-            }
-            .btn-start {
-                font-size: 13px;
-                padding: 10px 20px;
-                min-width: 68px;
-            }
-            .btn-reset-icon {
-                width: 36px;
-                height: 36px;
-            }
-            .btn-reset-icon svg {
-                width: 16px;
-                height: 16px;
-            }
-            .control-bar {
-                gap: 4px;
-                padding: 6px 10px;
-            }
-            .icon-btn {
-                width: 30px;
-                height: 30px;
-            }
-            .timer {
-                font-size: clamp(56px, 14vw, 85px);
-            }
-            .scene-thumb {
-                width: 34px;
-                height: 34px;
-            }
-            .mode-btn {
-                font-size: 10px;
-                padding: 4px 12px;
-            }
-        }
-
-        /* Wake Lock indicator */
         .wake-indicator {
             display: none;
             position: fixed;
@@ -1290,7 +1078,6 @@
             display: block;
         }
 
-        /* scrollbar styling */
         .todo-list::-webkit-scrollbar,
         .session-list::-webkit-scrollbar {
             width: 4px;
@@ -1305,11 +1092,53 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
         }
+
+        @media (max-width: 480px) {
+            .top-bar { top: 14px; left: 16px; right: 16px; }
+            .logo { font-size: clamp(28px, 5vw, 42px); }
+            .logo-sub { font-size: 0.3em; margin-top: -3px; }
+            .action-row { bottom: clamp(85px, 12vh, 100px); gap: 10px; }
+            .btn-start { font-size: 15px; padding: 12px 28px; min-width: 80px; }
+            .btn-reset-icon { width: 40px; height: 40px; }
+            .btn-reset-icon svg { width: 18px; height: 18px; }
+            .control-bar { padding: 8px 12px; gap: 6px; bottom: 20px; border-radius: 18px; }
+            .icon-btn { width: 34px; height: 34px; }
+            .icon-btn svg { width: 14px; height: 14px; }
+            .scene-picker { bottom: clamp(120px, 14vh, 140px); padding: 10px 12px 12px 12px; min-width: unset; width: calc(100vw - 28px); }
+            .scene-thumb { width: 38px; height: 38px; border-radius: 10px; }
+            .ambient-popover { bottom: clamp(120px, 14vh, 140px); padding: 8px 12px; gap: 6px; max-width: calc(100vw - 24px); }
+            .ambient-btn-option { font-size: 10px; padding: 5px 12px; }
+            .timer { font-size: clamp(72px, 16vw, 110px); }
+            .state-label { font-size: 11px; }
+            .mode-btn { font-size: 11px; padding: 5px 16px; }
+            .preset-btn { font-size: 10px; padding: 4px 12px; }
+            .custom-time-input input { width: 50px; font-size: 11px; }
+            .custom-time-input .set-btn { font-size: 10px; padding: 4px 10px; }
+            .session-panel { width: calc(100vw - 32px); bottom: clamp(120px, 14vh, 140px); max-height: 50vh; }
+            .todo-panel { width: calc(100vw - 32px); bottom: clamp(120px, 14vh, 140px); max-height: 50vh; }
+            .install-top .icon-btn { width: 28px; height: 28px; }
+            .install-top .icon-btn svg { width: 14px; height: 14px; }
+            .weather { font-size: 12px; min-height: 18px; }
+            .today-total { font-size: 12px; min-height: 18px; }
+            .clock { font-size: 12px; }
+            .running-time { font-size: 12px; }
+        }
+
+        @media (max-width: 380px) {
+            .action-row { bottom: clamp(75px, 10vh, 85px); gap: 8px; }
+            .btn-start { font-size: 13px; padding: 10px 20px; min-width: 68px; }
+            .btn-reset-icon { width: 36px; height: 36px; }
+            .btn-reset-icon svg { width: 16px; height: 16px; }
+            .control-bar { gap: 4px; padding: 6px 10px; }
+            .icon-btn { width: 30px; height: 30px; }
+            .timer { font-size: clamp(56px, 14vw, 85px); }
+            .scene-thumb { width: 34px; height: 34px; }
+            .mode-btn { font-size: 10px; padding: 4px 12px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ---- scenes (presets) ---- -->
     <div class="scene active" id="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');"></div>
     <div class="scene" id="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop');"></div>
     <div class="scene" id="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1600&auto=format&fit=crop');"></div>
@@ -1322,14 +1151,12 @@
     <div class="scene-overlay"></div>
     <div class="vignette"></div>
 
-    <!-- ---- top bar ---- -->
     <div class="top-bar">
         <div class="logo">
             FOCUS
             <span class="logo-sub">by pushpraj</span>
         </div>
         <div class="top-right">
-            <!-- Install Button at very top -->
             <div class="install-top">
                 <button class="icon-btn hidden" id="installBtn" title="Install App">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1339,33 +1166,23 @@
                     </svg>
                 </button>
             </div>
-
-            <!-- Weather + Today's total -->
             <div class="info-row">
                 <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
                 <div class="today-total" id="todayTotal">🎯 <span class="highlight">0m</span></div>
             </div>
-
-            <!-- Date -->
             <div class="clock" id="clock">--:--</div>
-
-            <!-- Current time with seconds -->
             <div class="running-time" id="runningTime">--:--:--</div>
         </div>
     </div>
 
-    <!-- ---- stage ---- -->
     <div class="stage">
-        <!-- Mode Toggle -->
         <div class="mode-toggle" id="modeToggle">
             <button class="mode-btn active" data-mode="stopwatch">Stopwatch</button>
             <button class="mode-btn" data-mode="timer">Timer</button>
         </div>
 
-        <!-- Timer Display -->
         <div class="timer" id="timerDisplay">00:00.00</div>
 
-        <!-- Timer Controls (presets + custom) -->
         <div class="timer-controls" id="timerControls">
             <div class="preset-row">
                 <button class="preset-btn" data-seconds="300">5m</button>
@@ -1383,20 +1200,17 @@
             </div>
         </div>
 
-   
+        <div class="state-label" id="stateLabel">Ready</div>
     </div>
-    
- <!-- ---- Home Button (bottom left) ---- -->
+
     <a href="index.html" class="home-btn" title="Home">
         <svg viewBox="0 0 24 24">
             <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
     </a>
-    
-    <!-- Wake Lock indicator -->
+
     <div class="wake-indicator" id="wakeIndicator">⚡ screen awake</div>
 
-    <!-- ---- Action Row (Start + Reset above control bar) ---- -->
     <div class="action-row">
         <button class="btn-start" id="startPauseBtn">Start</button>
         <button class="btn-reset-icon" id="resetBtn" title="Reset">
@@ -1407,7 +1221,6 @@
         </button>
     </div>
 
-    <!-- ---- Session history panel ---- -->
     <div class="session-panel" id="sessionPanel">
         <div class="header">
             <span>📊 Session History</span>
@@ -1422,7 +1235,6 @@
         </div>
     </div>
 
-    <!-- ---- ambient popover ---- -->
     <div class="ambient-popover" id="ambientPopover">
         <button class="ambient-btn-option active" data-sound="none">🔇 None</button>
         <button class="ambient-btn-option" data-sound="forest">🌲 Forest</button>
@@ -1432,7 +1244,6 @@
         <button class="ambient-btn-option" data-sound="night">🌙 Night</button>
     </div>
 
-    <!-- ---- scene picker ---- -->
     <div class="scene-picker" id="scenePicker">
         <div class="thumbs">
             <div class="scene-thumb active" data-scene="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');" title="Default"></div>
@@ -1462,7 +1273,6 @@
         </div>
     </div>
 
-    <!-- ---- Todo Panel ---- -->
     <div class="todo-panel" id="todoPanel">
         <div class="header">
             <span>📋 Todo</span>
@@ -1477,24 +1287,19 @@
         </ul>
     </div>
 
-    <!-- ---- control bar ---- -->
     <div class="control-bar">
-        <!-- Todo Button -->
         <button class="icon-btn" id="todoToggle" title="Todo list">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                 <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
         </button>
-
-        <!-- History Button -->
         <button class="icon-btn" id="historyToggle" title="Session History">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
             </svg>
         </button>
-
         <button class="icon-btn" id="sceneToggle" title="Change scene">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -1502,14 +1307,12 @@
                 <path d="M21 15l-5-5L5 21"/>
             </svg>
         </button>
-
         <button class="icon-btn" id="soundToggle" title="Toggle soft ticking">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 5 6 9H2v6h4l5 4V5z"/>
                 <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
             </svg>
         </button>
-
         <button class="icon-btn" id="ambientToggle" title="Ambient sounds">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
@@ -1517,1032 +1320,901 @@
             </svg>
         </button>
     </div>
-  <script>
-(function() {
-    'use strict';
 
-    // ---------- localStorage keys ----------
-    const TIMER_STATE_KEY = 'focusTimerState';
-    const SESSIONS_KEY = 'focusSessions';
-    const TODOS_KEY = 'focusTodos';
-    const PRESETS_KEY = 'focusPresets';
-    const SCENE_KEY = 'sceneState';
+    <script>
+        (function() {
+            'use strict';
 
-    // ---- DOM refs ----
-    const timerDisplay = document.getElementById('timerDisplay');
-    const stateLabel = document.getElementById('stateLabel');
-    const startPauseBtn = document.getElementById('startPauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const soundToggle = document.getElementById('soundToggle');
-    const sceneToggle = document.getElementById('sceneToggle');
-    const ambientToggle = document.getElementById('ambientToggle');
-    const ambientPopover = document.getElementById('ambientPopover');
-    const scenePicker = document.getElementById('scenePicker');
-    const clockEl = document.getElementById('clock');
-    const runningTimeEl = document.getElementById('runningTime');
-    const weatherDisplay = document.getElementById('weatherDisplay');
-    const todayTotal = document.getElementById('todayTotal');
-    const modeToggle = document.getElementById('modeToggle');
-    const timerControls = document.getElementById('timerControls');
-    const presetBtns = document.querySelectorAll('.preset-btn:not(.saved-preset)');
-    const savedPresetsContainer = document.getElementById('savedPresets');
-    const customMinutes = document.getElementById('customMinutes');
-    const customSeconds = document.getElementById('customSeconds');
-    const setCustomTimeBtn = document.getElementById('setCustomTime');
-    const savePresetBtn = document.getElementById('savePresetBtn');
-    const wakeIndicator = document.getElementById('wakeIndicator');
-    const installBtn = document.getElementById('installBtn');
+            const TIMER_STATE_KEY = 'focusTimerState';
+            const SESSIONS_KEY = 'focusSessions';
+            const TODOS_KEY = 'focusTodos';
+            const PRESETS_KEY = 'focusPresets';
+            const SCENE_KEY = 'sceneState';
 
-    const historyToggle = document.getElementById('historyToggle');
-    const sessionPanel = document.getElementById('sessionPanel');
-    const sessionList = document.getElementById('sessionList');
-    const totalSessionsStat = document.getElementById('totalSessionsStat');
-    const totalTimeStat = document.getElementById('totalTimeStat');
-    const closeSessionBtn = document.getElementById('closeSessionBtn');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const stateLabel = document.getElementById('stateLabel');
+            const startPauseBtn = document.getElementById('startPauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const soundToggle = document.getElementById('soundToggle');
+            const sceneToggle = document.getElementById('sceneToggle');
+            const ambientToggle = document.getElementById('ambientToggle');
+            const ambientPopover = document.getElementById('ambientPopover');
+            const scenePicker = document.getElementById('scenePicker');
+            const clockEl = document.getElementById('clock');
+            const runningTimeEl = document.getElementById('runningTime');
+            const weatherDisplay = document.getElementById('weatherDisplay');
+            const todayTotal = document.getElementById('todayTotal');
+            const modeToggle = document.getElementById('modeToggle');
+            const timerControls = document.getElementById('timerControls');
+            const presetBtns = document.querySelectorAll('.preset-btn:not(.saved-preset)');
+            const savedPresetsContainer = document.getElementById('savedPresets');
+            const customMinutes = document.getElementById('customMinutes');
+            const customSeconds = document.getElementById('customSeconds');
+            const setCustomTimeBtn = document.getElementById('setCustomTime');
+            const savePresetBtn = document.getElementById('savePresetBtn');
+            const wakeIndicator = document.getElementById('wakeIndicator');
+            const installBtn = document.getElementById('installBtn');
 
-    const todoPanel = document.getElementById('todoPanel');
-    const todoToggle = document.getElementById('todoToggle');
-    const closeTodoBtn = document.getElementById('closeTodoBtn');
-    const todoInput = document.getElementById('todoInput');
-    const addTodoBtn = document.getElementById('addTodoBtn');
-    const todoList = document.getElementById('todoList');
+            const historyToggle = document.getElementById('historyToggle');
+            const sessionPanel = document.getElementById('sessionPanel');
+            const sessionList = document.getElementById('sessionList');
+            const totalSessionsStat = document.getElementById('totalSessionsStat');
+            const totalTimeStat = document.getElementById('totalTimeStat');
+            const closeSessionBtn = document.getElementById('closeSessionBtn');
 
-    const scenes = {
-        rain: document.getElementById('scene-rain'),
-        forest: document.getElementById('scene-forest'),
-        lake: document.getElementById('scene-lake'),
-        cafe: document.getElementById('scene-cafe'),
-        ocean: document.getElementById('scene-ocean'),
-        night: document.getElementById('scene-night'),
-        city: document.getElementById('scene-city'),
-        custom: document.getElementById('scene-custom')
-    };
+            const todoPanel = document.getElementById('todoPanel');
+            const todoToggle = document.getElementById('todoToggle');
+            const closeTodoBtn = document.getElementById('closeTodoBtn');
+            const todoInput = document.getElementById('todoInput');
+            const addTodoBtn = document.getElementById('addTodoBtn');
+            const todoList = document.getElementById('todoList');
 
-    const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
-    const customThumb = document.getElementById('customThumb');
-    const customPanel = document.getElementById('customPanel');
-    const customUrlInput = document.getElementById('customUrlInput');
-    const applyUrlBtn = document.getElementById('applyUrlBtn');
-    const fileInput = document.getElementById('fileInput');
-    const clearCustomBtn = document.getElementById('clearCustomBtn');
-    const customStatus = document.getElementById('customStatus');
+            const scenes = {
+                rain: document.getElementById('scene-rain'),
+                forest: document.getElementById('scene-forest'),
+                lake: document.getElementById('scene-lake'),
+                cafe: document.getElementById('scene-cafe'),
+                ocean: document.getElementById('scene-ocean'),
+                night: document.getElementById('scene-night'),
+                city: document.getElementById('scene-city'),
+                custom: document.getElementById('scene-custom')
+            };
 
-    // ---- Install Button ----
-    let deferredPrompt = null;
-    let isAppInstalled = false;
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        isAppInstalled = true;
-        installBtn.classList.add('hidden');
-    }
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (!isAppInstalled) {
-            installBtn.classList.remove('hidden');
-            installBtn.classList.add('visible');
-        }
-    });
-    window.addEventListener('appinstalled', () => {
-        isAppInstalled = true;
-        installBtn.classList.add('hidden');
-        deferredPrompt = null;
-        stateLabel.textContent = '✅ App installed!';
-    });
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            try {
-                await deferredPrompt.prompt();
-            } catch (_) {}
-        } else if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'FOCUS Timer',
-                    text: 'Focus timer app',
-                    url: window.location.href
-                });
-            } catch (_) {}
-        }
-    });
+            const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
+            const customThumb = document.getElementById('customThumb');
+            const customPanel = document.getElementById('customPanel');
+            const customUrlInput = document.getElementById('customUrlInput');
+            const applyUrlBtn = document.getElementById('applyUrlBtn');
+            const fileInput = document.getElementById('fileInput');
+            const clearCustomBtn = document.getElementById('clearCustomBtn');
+            const customStatus = document.getElementById('customStatus');
 
-    // ---- state ----
-    let mode = 'stopwatch';   // 'stopwatch' or 'timer'
-    let elapsedMs = 0;
-    let remainingMs = 1500 * 1000;
-    let initialMs = 1500 * 1000;
-    let running = false;
-    let intervalId = null;
-    let soundOn = false;
-    let audioCtx = null;
-    let lastTickSecond = -1;
-    let wakeLock = null;
-    let wakeLockActive = false;
-    const MIN_SESSION_MS = 10 * 60 * 1000;   // 10 minutes
+            let deferredPrompt = null;
+            let isAppInstalled = false;
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                isAppInstalled = true;
+                installBtn.classList.add('hidden');
+            }
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!isAppInstalled) {
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('visible');
+                }
+            });
+            window.addEventListener('appinstalled', () => {
+                isAppInstalled = true;
+                installBtn.classList.add('hidden');
+                deferredPrompt = null;
+                stateLabel.textContent = '✅ App installed!';
+            });
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    try { await deferredPrompt.prompt(); } catch (_) {}
+                } else if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'FOCUS Timer',
+                            text: 'Focus timer app',
+                            url: window.location.href
+                        });
+                    } catch (_) {}
+                }
+            });
 
-    // ---- Timer persistence (cross‑page) ----
-    function saveTimerState() {
-        const state = {
-            running,
-            mode,
-            elapsedMs,
-            remainingMs,
-            initialMs,
-            timestamp: Date.now()
-        };
-        try {
-            localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
-        } catch (_) {}
-    }
+            let mode = 'stopwatch';
+            let elapsedMs = 0;
+            let remainingMs = 1500 * 1000;
+            let initialMs = 1500 * 1000;
+            let running = false;
+            let intervalId = null;
+            let soundOn = false;
+            let audioCtx = null;
+            let lastTickSecond = -1;
+            let wakeLock = null;
+            let wakeLockActive = false;
+            const MIN_SESSION_MS = 10 * 60 * 1000;
 
-    function loadTimerState() {
-        try {
-            const raw = localStorage.getItem(TIMER_STATE_KEY);
-            if (!raw) return null;
-            const state = JSON.parse(raw);
-            if (state && typeof state.timestamp === 'number') {
-                const now = Date.now();
-                const delta = now - state.timestamp;
-                if (state.running) {
-                    if (state.mode === 'stopwatch') {
-                        state.elapsedMs += delta;
-                    } else { // timer
-                        state.remainingMs -= delta;
-                        if (state.remainingMs < 0) state.remainingMs = 0;
+            function saveTimerState() {
+                const state = {
+                    running,
+                    mode,
+                    elapsedMs,
+                    remainingMs,
+                    initialMs,
+                    timestamp: Date.now()
+                };
+                try { localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state)); } catch (_) {}
+            }
+
+            function loadTimerState() {
+                try {
+                    const raw = localStorage.getItem(TIMER_STATE_KEY);
+                    if (!raw) return null;
+                    const state = JSON.parse(raw);
+                    if (state && typeof state.timestamp === 'number') {
+                        const now = Date.now();
+                        const delta = now - state.timestamp;
+                        if (state.running) {
+                            if (state.mode === 'stopwatch') {
+                                state.elapsedMs += delta;
+                            } else {
+                                state.remainingMs -= delta;
+                                if (state.remainingMs < 0) state.remainingMs = 0;
+                            }
+                        }
+                        return state;
                     }
+                } catch (_) {}
+                return null;
+            }
+
+            let sessions = [];
+            function loadSessions() {
+                try {
+                    const data = localStorage.getItem(SESSIONS_KEY);
+                    sessions = data ? JSON.parse(data) : [];
+                } catch (_) { sessions = []; }
+                updateSessionDisplay();
+            }
+            function saveSessions() {
+                try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch (_) {}
+                updateSessionDisplay();
+            }
+            function getTodayKey() { return new Date().toISOString().split('T')[0]; }
+            function getTotalTimeForDay(dateKey) {
+                return sessions.filter(s => s.date === dateKey).reduce((sum, s) => sum + s.durationMs, 0);
+            }
+            function formatDuration(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSec / 60);
+                const seconds = totalSec % 60;
+                if (minutes >= 60) {
+                    const h = Math.floor(minutes / 60);
+                    const m = minutes % 60;
+                    return `${h}h ${m}m`;
                 }
-                return state;
+                if (minutes > 0) return `${minutes}m ${seconds}s`;
+                return `${seconds}s`;
             }
-        } catch (_) {}
-        return null;
-    }
-
-    // ---- Session storage ----
-    let sessions = [];
-    function loadSessions() {
-        try {
-            const data = localStorage.getItem(SESSIONS_KEY);
-            sessions = data ? JSON.parse(data) : [];
-        } catch (_) { sessions = []; }
-        updateSessionDisplay();
-    }
-    function saveSessions() {
-        try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch (_) {}
-        updateSessionDisplay();
-    }
-    function getTodayKey() { return new Date().toISOString().split('T')[0]; }
-    function getTotalTimeForDay(dateKey) {
-        return sessions.filter(s => s.date === dateKey).reduce((sum, s) => sum + s.durationMs, 0);
-    }
-    function formatDuration(ms) {
-        const totalSec = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSec / 60);
-        const seconds = totalSec % 60;
-        if (minutes >= 60) {
-            const h = Math.floor(minutes / 60);
-            const m = minutes % 60;
-            return `${h}h ${m}m`;
-        }
-        if (minutes > 0) return `${minutes}m ${seconds}s`;
-        return `${seconds}s`;
-    }
-    function formatDurationShort(ms) {
-        const totalSec = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSec / 60);
-        if (minutes >= 60) {
-            const h = Math.floor(minutes / 60);
-            const m = minutes % 60;
-            return `${h}h ${m}m`;
-        }
-        return `${minutes}m`;
-    }
-    function updateSessionDisplay() {
-        const total = getTotalTimeForDay(getTodayKey());
-        todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
-        totalSessionsStat.textContent = sessions.length;
-        const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
-        totalTimeStat.textContent = formatDuration(totalAllTime);
-        renderSessionList();
-    }
-    function renderSessionList() {
-        if (sessions.length === 0) {
-            sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
-            return;
-        }
-        const sorted = [...sessions].reverse().slice(0, 50);
-        let html = '';
-        sorted.forEach(s => {
-            const dateObj = new Date(s.date + 'T00:00:00');
-            const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
-            const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
-            html += `<li>
-                <span class="session-date">${dateStr}</span>
-                <span class="session-duration">${formatDuration(s.durationMs)}</span>
-                <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
-            </li>`;
-        });
-        sessionList.innerHTML = html;
-    }
-    function recordSession(mode, durationMs) {
-        const today = getTodayKey();
-        sessions.push({ date: today, mode, durationMs, timestamp: Date.now() });
-        saveSessions();
-        stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
-    }
-
-    function updateTimerControlsVisibility() {
-        timerControls.classList.toggle('visible', mode === 'timer');
-    }
-
-    // ---- Update state label (was missing) ----
-    function updateStateLabel() {
-        if (running) {
-            stateLabel.textContent = mode === 'stopwatch' ? 'Focusing...' : 'Countdown running';
-        } else {
-            stateLabel.textContent = mode === 'stopwatch' ? 'Ready' : 'Timer paused';
-        }
-    }
-
-    // ---- Ambient sounds (full implementation) ----
-    const Ambient = {
-        context: null,
-        nodes: [],
-        currentType: 'none',
-        isPlaying: false,
-
-        init() {
-            try {
-                this.context = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (_) {}
-        },
-
-        createNoiseBuffer(duration) {
-            if (!this.context) return null;
-            const bufferSize = Math.floor(this.context.sampleRate * duration);
-            const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-            return buffer;
-        },
-
-        createPinkBuffer(duration) {
-            if (!this.context) return null;
-            const bufferSize = Math.floor(this.context.sampleRate * duration);
-            const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
-            const data = buffer.getChannelData(0);
-            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                b0 = 0.99886 * b0 + white * 0.0555179;
-                b1 = 0.99332 * b1 + white * 0.0750759;
-                b2 = 0.96900 * b2 + white * 0.1538520;
-                b3 = 0.86650 * b3 + white * 0.3104856;
-                b4 = 0.55000 * b4 + white * 0.5329522;
-                b5 = -0.7616 * b5 - white * 0.0168980;
-                data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-                data[i] *= 0.11;
-                b6 = white * 0.115926;
-            }
-            return buffer;
-        },
-
-        createForest() {
-            if (!this.context) return [];
-            const nodes = [];
-            const buffer = this.createPinkBuffer(4);
-            if (!buffer) return nodes;
-            const source = this.context.createBufferSource();
-            source.buffer = buffer;
-            source.loop = true;
-            const filter = this.context.createBiquadFilter();
-            filter.type = 'bandpass'; filter.frequency.value = 500; filter.Q.value = 0.8;
-            const gain = this.context.createGain();
-            gain.gain.value = 0.15;
-            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
-            source.start();
-            nodes.push(source, filter, gain);
-
-            const birds = [
-                { freq: 3000, dur: 0.15, delay: 0.5, bend: 800 },
-                { freq: 4200, dur: 0.1, delay: 1.2, bend: 600 },
-                { freq: 2500, dur: 0.2, delay: 2.0, bend: 1000 },
-                { freq: 5000, dur: 0.08, delay: 2.8, bend: 400 },
-                { freq: 3500, dur: 0.12, delay: 3.5, bend: 700 },
-                { freq: 2800, dur: 0.18, delay: 4.2, bend: 900 },
-                { freq: 4500, dur: 0.09, delay: 5.0, bend: 500 },
-                { freq: 3200, dur: 0.14, delay: 5.8, bend: 750 }
-            ];
-            birds.forEach((p, idx) => {
-                const osc = this.context.createOscillator();
-                osc.type = 'sine'; osc.frequency.value = p.freq;
-                const oscGain = this.context.createGain();
-                oscGain.gain.setValueAtTime(0, this.context.currentTime + p.delay);
-                oscGain.gain.linearRampToValueAtTime(0.04, this.context.currentTime + p.delay + 0.01);
-                oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + p.delay + p.dur);
-                osc.frequency.setValueAtTime(p.freq, this.context.currentTime + p.delay);
-                osc.frequency.linearRampToValueAtTime(p.freq + p.bend, this.context.currentTime + p.delay + p.dur * 0.3);
-                osc.frequency.linearRampToValueAtTime(p.freq + p.bend * 0.6, this.context.currentTime + p.delay + p.dur);
-                osc.connect(oscGain); oscGain.connect(this.context.destination);
-                osc.start(this.context.currentTime + p.delay);
-                osc.stop(this.context.currentTime + p.delay + p.dur + 0.05);
-                nodes.push(osc, oscGain);
-            });
-            return nodes;
-        },
-
-        createWaves() {
-            if (!this.context) return [];
-            const nodes = [];
-            const buffer = this.createPinkBuffer(6);
-            if (!buffer) return nodes;
-            const source = this.context.createBufferSource();
-            source.buffer = buffer; source.loop = true;
-            const filter = this.context.createBiquadFilter();
-            filter.type = 'lowpass'; filter.frequency.value = 250; filter.Q.value = 1;
-            const lfo = this.context.createOscillator();
-            lfo.frequency.value = 0.12;
-            const lfoGain = this.context.createGain();
-            lfoGain.gain.value = 0.08;
-            const gain = this.context.createGain();
-            gain.gain.value = 0.2;
-            lfo.connect(lfoGain); lfoGain.connect(gain.gain);
-            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
-            lfo.start(); source.start();
-            nodes.push(source, filter, lfo, lfoGain, gain);
-
-            const buffer2 = this.createNoiseBuffer(3);
-            const source2 = this.context.createBufferSource();
-            source2.buffer = buffer2; source2.loop = true;
-            const filter2 = this.context.createBiquadFilter();
-            filter2.type = 'bandpass'; filter2.frequency.value = 800; filter2.Q.value = 0.5;
-            const gain2 = this.context.createGain();
-            gain2.gain.value = 0.06;
-            source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
-            source2.start();
-            nodes.push(source2, filter2, gain2);
-            return nodes;
-        },
-
-        createWaterfall() {
-            if (!this.context) return [];
-            const nodes = [];
-            const buffer = this.createPinkBuffer(5);
-            if (!buffer) return nodes;
-            const source = this.context.createBufferSource();
-            source.buffer = buffer; source.loop = true;
-            const filter = this.context.createBiquadFilter();
-            filter.type = 'lowpass'; filter.frequency.value = 800; filter.Q.value = 1.2;
-            const lfo = this.context.createOscillator();
-            lfo.frequency.value = 0.4;
-            const lfoGain = this.context.createGain();
-            lfoGain.gain.value = 150;
-            lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
-            const gain = this.context.createGain();
-            gain.gain.value = 0.3;
-            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
-            lfo.start(); source.start();
-            nodes.push(source, filter, lfo, lfoGain, gain);
-
-            const buffer2 = this.createNoiseBuffer(3);
-            const source2 = this.context.createBufferSource();
-            source2.buffer = buffer2; source2.loop = true;
-            const filter2 = this.context.createBiquadFilter();
-            filter2.type = 'highpass'; filter2.frequency.value = 2000;
-            const gain2 = this.context.createGain();
-            gain2.gain.value = 0.05;
-            source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
-            source2.start();
-            nodes.push(source2, filter2, gain2);
-            return nodes;
-        },
-
-        createCafe() {
-            if (!this.context) return [];
-            const nodes = [];
-            const buffer = this.createPinkBuffer(4);
-            if (!buffer) return nodes;
-            const source = this.context.createBufferSource();
-            source.buffer = buffer; source.loop = true;
-            const filter = this.context.createBiquadFilter();
-            filter.type = 'lowpass'; filter.frequency.value = 250; filter.Q.value = 0.8;
-            const gain = this.context.createGain();
-            gain.gain.value = 0.2;
-            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
-            source.start();
-            nodes.push(source, filter, gain);
-
-            for (let i = 0; i < 15; i++) {
-                const cs = this.context.createBufferSource();
-                const cb = this.createNoiseBuffer(0.1 + Math.random() * 0.15);
-                if (!cb) continue;
-                cs.buffer = cb;
-                const cf = this.context.createBiquadFilter();
-                cf.type = 'bandpass'; cf.frequency.value = 600 + Math.random() * 1200; cf.Q.value = 1.5;
-                const cg = this.context.createGain();
-                cg.gain.value = 0.02 + Math.random() * 0.03;
-                cs.connect(cf); cf.connect(cg); cg.connect(this.context.destination);
-                const st = this.context.currentTime + Math.random() * 8;
-                cs.start(st); cs.stop(st + 0.12 + Math.random() * 0.1);
-                nodes.push(cs, cf, cg);
-            }
-            return nodes;
-        },
-
-        createNight() {
-            if (!this.context) return [];
-            const nodes = [];
-            const buffer = this.createPinkBuffer(4);
-            if (!buffer) return nodes;
-            const source = this.context.createBufferSource();
-            source.buffer = buffer; source.loop = true;
-            const filter = this.context.createBiquadFilter();
-            filter.type = 'lowpass'; filter.frequency.value = 150; filter.Q.value = 0.6;
-            const gain = this.context.createGain();
-            gain.gain.value = 0.1;
-            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
-            source.start();
-            nodes.push(source, filter, gain);
-
-            for (let i = 0; i < 12; i++) {
-                const osc = this.context.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.value = 4000 + Math.random() * 2000;
-                const oscGain = this.context.createGain();
-                oscGain.gain.setValueAtTime(0, this.context.currentTime + i * 0.4 + Math.random() * 0.5);
-                oscGain.gain.linearRampToValueAtTime(0.02 + Math.random() * 0.015, this.context.currentTime + i * 0.4 + 0.02);
-                oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + i * 0.4 + 0.2);
-                const lfo = this.context.createOscillator();
-                lfo.frequency.value = 5 + Math.random() * 10;
-                const lfoGain = this.context.createGain();
-                lfoGain.gain.value = 200 + Math.random() * 300;
-                lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-                osc.connect(oscGain); oscGain.connect(this.context.destination);
-                osc.start(this.context.currentTime + i * 0.4);
-                osc.stop(this.context.currentTime + i * 0.4 + 0.3);
-                lfo.start(); lfo.stop();
-                nodes.push(osc, oscGain, lfo, lfoGain);
-            }
-            return nodes;
-        },
-
-        start(type) {
-            this.stop();
-            if (type === 'none' || !this.context) {
-                this.currentType = 'none';
-                this.isPlaying = false;
-                return;
-            }
-            try {
-                let nodes = [];
-                switch (type) {
-                    case 'forest': nodes = this.createForest(); break;
-                    case 'waves': nodes = this.createWaves(); break;
-                    case 'waterfall': nodes = this.createWaterfall(); break;
-                    case 'cafe': nodes = this.createCafe(); break;
-                    case 'night': nodes = this.createNight(); break;
+            function formatDurationShort(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSec / 60);
+                if (minutes >= 60) {
+                    const h = Math.floor(minutes / 60);
+                    const m = minutes % 60;
+                    return `${h}h ${m}m`;
                 }
-                this.nodes = nodes;
-                this.currentType = type;
-                this.isPlaying = true;
-                if (this.context.state === 'suspended') this.context.resume();
-            } catch (_) {
-                this.currentType = 'none';
-                this.isPlaying = false;
+                return `${minutes}m`;
             }
-        },
-
-        stop() {
-            try {
-                this.nodes.forEach(n => {
-                    try { n.stop(); } catch (_) {}
-                    try { n.disconnect(); } catch (_) {}
+            function updateSessionDisplay() {
+                const total = getTotalTimeForDay(getTodayKey());
+                todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
+                totalSessionsStat.textContent = sessions.length;
+                const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
+                totalTimeStat.textContent = formatDuration(totalAllTime);
+                renderSessionList();
+            }
+            function renderSessionList() {
+                if (sessions.length === 0) {
+                    sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
+                    return;
+                }
+                const sorted = [...sessions].reverse().slice(0, 50);
+                let html = '';
+                sorted.forEach(s => {
+                    const dateObj = new Date(s.date + 'T00:00:00');
+                    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
+                    const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
+                    html += `<li>
+                        <span class="session-date">${dateStr}</span>
+                        <span class="session-duration">${formatDuration(s.durationMs)}</span>
+                        <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
+                    </li>`;
                 });
-                this.nodes = [];
-            } catch (_) {}
-            this.currentType = 'none';
-            this.isPlaying = false;
-        },
-
-        toggle(type) {
-            if (!this.context) this.init();
-            if (this.currentType === type) {
-                this.stop();
-                return;
+                sessionList.innerHTML = html;
             }
-            this.start(type);
-        }
-    };
+            function recordSession(mode, durationMs) {
+                const today = getTodayKey();
+                sessions.push({ date: today, mode, durationMs, timestamp: Date.now() });
+                saveSessions();
+                stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
+            }
 
-    // ---- ambient popover ----
-    ambientToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        ambientPopover.classList.toggle('open');
-        scenePicker.classList.remove('open');
-    });
-    document.addEventListener('click', (e) => {
-        if (!ambientPopover.contains(e.target) && e.target !== ambientToggle) ambientPopover.classList.remove('open');
-    });
-    ambientPopover.querySelectorAll('.ambient-btn-option').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const sound = btn.dataset.sound;
-            ambientPopover.querySelectorAll('.ambient-btn-option').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            Ambient.toggle(sound);
-            ambientToggle.classList.toggle('on', sound !== 'none');
-            ambientPopover.classList.remove('open');
-        });
-    });
+            function updateTimerControlsVisibility() {
+                timerControls.classList.toggle('visible', mode === 'timer');
+            }
 
-    // ---- clock ----
-    function updateClock() {
-        const now = new Date();
-        clockEl.textContent = now.toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-        runningTimeEl.textContent = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+            function updateStateLabel() {
+                if (running) {
+                    stateLabel.textContent = mode === 'stopwatch' ? 'Focusing...' : 'Countdown running';
+                } else {
+                    stateLabel.textContent = mode === 'stopwatch' ? 'Ready' : 'Timer paused';
+                }
+            }
 
-    // ---- weather ----
-    async function fetchWeather() {
-        try {
-            if (!navigator.geolocation) throw new Error();
-            const pos = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+            const Ambient = {
+                context: null, nodes: [], currentType: 'none', isPlaying: false,
+                init() { try { this.context = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {} },
+                createNoiseBuffer(duration) {
+                    if (!this.context) return null;
+                    const bufferSize = Math.floor(this.context.sampleRate * duration);
+                    const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                    return buffer;
+                },
+                createPinkBuffer(duration) {
+                    if (!this.context) return null;
+                    const bufferSize = Math.floor(this.context.sampleRate * duration);
+                    const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+                    for (let i=0;i<bufferSize;i++) {
+                        const white=Math.random()*2-1;
+                        b0=0.99886*b0+white*0.0555179;
+                        b1=0.99332*b1+white*0.0750759;
+                        b2=0.96900*b2+white*0.1538520;
+                        b3=0.86650*b3+white*0.3104856;
+                        b4=0.55000*b4+white*0.5329522;
+                        b5=-0.7616*b5-white*0.0168980;
+                        data[i]=b0+b1+b2+b3+b4+b5+b6+white*0.5362;
+                        data[i]*=0.11;
+                        b6=white*0.115926;
+                    }
+                    return buffer;
+                },
+                createForest() {
+                    if (!this.context) return [];
+                    const nodes = [];
+                    const buffer = this.createPinkBuffer(4);
+                    if (!buffer) return nodes;
+                    const source = this.context.createBufferSource();
+                    source.buffer = buffer; source.loop = true;
+                    const filter = this.context.createBiquadFilter();
+                    filter.type='bandpass'; filter.frequency.value=500; filter.Q.value=0.8;
+                    const gain = this.context.createGain(); gain.gain.value=0.15;
+                    source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+                    source.start(); nodes.push(source,filter,gain);
+                    const birds=[{freq:3000,dur:0.15,delay:0.5,bend:800},{freq:4200,dur:0.1,delay:1.2,bend:600},{freq:2500,dur:0.2,delay:2.0,bend:1000},{freq:5000,dur:0.08,delay:2.8,bend:400},{freq:3500,dur:0.12,delay:3.5,bend:700},{freq:2800,dur:0.18,delay:4.2,bend:900},{freq:4500,dur:0.09,delay:5.0,bend:500},{freq:3200,dur:0.14,delay:5.8,bend:750}];
+                    birds.forEach((p,idx)=>{
+                        const osc=this.context.createOscillator(); osc.type='sine'; osc.frequency.value=p.freq;
+                        const oscGain=this.context.createGain();
+                        oscGain.gain.setValueAtTime(0,this.context.currentTime+p.delay);
+                        oscGain.gain.linearRampToValueAtTime(0.04,this.context.currentTime+p.delay+0.01);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001,this.context.currentTime+p.delay+p.dur);
+                        osc.frequency.setValueAtTime(p.freq,this.context.currentTime+p.delay);
+                        osc.frequency.linearRampToValueAtTime(p.freq+p.bend,this.context.currentTime+p.delay+p.dur*0.3);
+                        osc.frequency.linearRampToValueAtTime(p.freq+p.bend*0.6,this.context.currentTime+p.delay+p.dur);
+                        osc.connect(oscGain); oscGain.connect(this.context.destination);
+                        osc.start(this.context.currentTime+p.delay); osc.stop(this.context.currentTime+p.delay+p.dur+0.05);
+                        nodes.push(osc,oscGain);
+                    });
+                    return nodes;
+                },
+                createWaves() {
+                    if (!this.context) return [];
+                    const nodes=[];
+                    const buffer=this.createPinkBuffer(6); if(!buffer) return nodes;
+                    const source=this.context.createBufferSource(); source.buffer=buffer; source.loop=true;
+                    const filter=this.context.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=250; filter.Q.value=1;
+                    const lfo=this.context.createOscillator(); lfo.frequency.value=0.12;
+                    const lfoGain=this.context.createGain(); lfoGain.gain.value=0.08;
+                    const gain=this.context.createGain(); gain.gain.value=0.2;
+                    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+                    source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+                    lfo.start(); source.start(); nodes.push(source,filter,lfo,lfoGain,gain);
+                    const buffer2=this.createNoiseBuffer(3);
+                    const source2=this.context.createBufferSource(); source2.buffer=buffer2; source2.loop=true;
+                    const filter2=this.context.createBiquadFilter(); filter2.type='bandpass'; filter2.frequency.value=800; filter2.Q.value=0.5;
+                    const gain2=this.context.createGain(); gain2.gain.value=0.06;
+                    source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
+                    source2.start(); nodes.push(source2,filter2,gain2);
+                    return nodes;
+                },
+                createWaterfall() {
+                    if (!this.context) return [];
+                    const nodes=[];
+                    const buffer=this.createPinkBuffer(5); if(!buffer) return nodes;
+                    const source=this.context.createBufferSource(); source.buffer=buffer; source.loop=true;
+                    const filter=this.context.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=800; filter.Q.value=1.2;
+                    const lfo=this.context.createOscillator(); lfo.frequency.value=0.4;
+                    const lfoGain=this.context.createGain(); lfoGain.gain.value=150;
+                    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+                    const gain=this.context.createGain(); gain.gain.value=0.3;
+                    source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+                    lfo.start(); source.start(); nodes.push(source,filter,lfo,lfoGain,gain);
+                    const buffer2=this.createNoiseBuffer(3);
+                    const source2=this.context.createBufferSource(); source2.buffer=buffer2; source2.loop=true;
+                    const filter2=this.context.createBiquadFilter(); filter2.type='highpass'; filter2.frequency.value=2000;
+                    const gain2=this.context.createGain(); gain2.gain.value=0.05;
+                    source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
+                    source2.start(); nodes.push(source2,filter2,gain2);
+                    return nodes;
+                },
+                createCafe() {
+                    if (!this.context) return [];
+                    const nodes=[];
+                    const buffer=this.createPinkBuffer(4); if(!buffer) return nodes;
+                    const source=this.context.createBufferSource(); source.buffer=buffer; source.loop=true;
+                    const filter=this.context.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=250; filter.Q.value=0.8;
+                    const gain=this.context.createGain(); gain.gain.value=0.2;
+                    source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+                    source.start(); nodes.push(source,filter,gain);
+                    for(let i=0;i<15;i++){
+                        const cs=this.context.createBufferSource();
+                        const cb=this.createNoiseBuffer(0.1+Math.random()*0.15); if(!cb) continue;
+                        cs.buffer=cb;
+                        const cf=this.context.createBiquadFilter(); cf.type='bandpass'; cf.frequency.value=600+Math.random()*1200; cf.Q.value=1.5;
+                        const cg=this.context.createGain(); cg.gain.value=0.02+Math.random()*0.03;
+                        cs.connect(cf); cf.connect(cg); cg.connect(this.context.destination);
+                        const st=this.context.currentTime+Math.random()*8;
+                        cs.start(st); cs.stop(st+0.12+Math.random()*0.1);
+                        nodes.push(cs,cf,cg);
+                    }
+                    return nodes;
+                },
+                createNight() {
+                    if (!this.context) return [];
+                    const nodes=[];
+                    const buffer=this.createPinkBuffer(4); if(!buffer) return nodes;
+                    const source=this.context.createBufferSource(); source.buffer=buffer; source.loop=true;
+                    const filter=this.context.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=150; filter.Q.value=0.6;
+                    const gain=this.context.createGain(); gain.gain.value=0.1;
+                    source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+                    source.start(); nodes.push(source,filter,gain);
+                    for(let i=0;i<12;i++){
+                        const osc=this.context.createOscillator(); osc.type='sine';
+                        osc.frequency.value=4000+Math.random()*2000;
+                        const oscGain=this.context.createGain();
+                        oscGain.gain.setValueAtTime(0,this.context.currentTime+i*0.4+Math.random()*0.5);
+                        oscGain.gain.linearRampToValueAtTime(0.02+Math.random()*0.015,this.context.currentTime+i*0.4+0.02);
+                        oscGain.gain.exponentialRampToValueAtTime(0.001,this.context.currentTime+i*0.4+0.2);
+                        const lfo=this.context.createOscillator(); lfo.frequency.value=5+Math.random()*10;
+                        const lfoGain=this.context.createGain(); lfoGain.gain.value=200+Math.random()*300;
+                        lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+                        osc.connect(oscGain); oscGain.connect(this.context.destination);
+                        osc.start(this.context.currentTime+i*0.4); osc.stop(this.context.currentTime+i*0.4+0.3);
+                        lfo.start(); lfo.stop();
+                        nodes.push(osc,oscGain,lfo,lfoGain);
+                    }
+                    return nodes;
+                },
+                start(type) {
+                    this.stop();
+                    if(type==='none'||!this.context){this.currentType='none';this.isPlaying=false;return;}
+                    try{
+                        let nodes=[];
+                        switch(type){
+                            case 'forest': nodes=this.createForest(); break;
+                            case 'waves': nodes=this.createWaves(); break;
+                            case 'waterfall': nodes=this.createWaterfall(); break;
+                            case 'cafe': nodes=this.createCafe(); break;
+                            case 'night': nodes=this.createNight(); break;
+                            default: return;
+                        }
+                        this.nodes=nodes; this.currentType=type; this.isPlaying=true;
+                        if(this.context.state==='suspended') this.context.resume();
+                    }catch(_){this.currentType='none';this.isPlaying=false;}
+                },
+                stop() {
+                    try{this.nodes.forEach(n=>{try{n.stop();}catch(_){} try{n.disconnect();}catch(_){}}); this.nodes=[];}catch(_){}
+                    this.currentType='none'; this.isPlaying=false;
+                },
+                toggle(type) {
+                    if(!this.context) this.init();
+                    if(this.currentType===type){this.stop();return;}
+                    this.start(type);
+                }
+            };
+
+            ambientToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                ambientPopover.classList.toggle('open');
+                scenePicker.classList.remove('open');
             });
-            const { latitude, longitude } = pos.coords;
-            const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
-            const data = await resp.json();
-            if (data.current_weather) {
-                const temp = Math.round(data.current_weather.temperature);
-                weatherDisplay.innerHTML = `⛅ <span class="temp">${temp}°</span>`;
-            }
-        } catch (_) {
-            weatherDisplay.innerHTML = `⛅ <span class="temp">--°</span>`;
-        }
-    }
-    fetchWeather();
-    setInterval(fetchWeather, 600000);
-
-    // ---- format ----
-    function formatTime(ms) {
-        const totalSec = Math.floor(ms / 1000);
-        const min = Math.floor(totalSec / 60);
-        const sec = totalSec % 60;
-        const cs = Math.floor((ms % 1000) / 10);
-        return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
-    }
-    function getDisplayTime() {
-        return mode === 'stopwatch' ? formatTime(elapsedMs) : formatTime(remainingMs);
-    }
-    function updateDisplay() {
-        timerDisplay.textContent = getDisplayTime();
-    }
-
-    // ---- tick sound ----
-    function playTick() {
-        if (!soundOn) return;
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine'; osc.frequency.value = 880;
-            gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.005);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.09);
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        } catch (_) {}
-    }
-
-    // ---- Wake Lock ----
-    async function requestWakeLock() {
-        try {
-            if ('wakeLock' in navigator && !wakeLockActive) {
-                wakeLock = await navigator.wakeLock.request('screen');
-                wakeLockActive = true;
-                wakeIndicator.classList.add('active');
-                wakeLock.addEventListener('release', () => {
-                    wakeLockActive = false;
-                    wakeIndicator.classList.remove('active');
+            document.addEventListener('click', (e) => {
+                if (!ambientPopover.contains(e.target) && e.target !== ambientToggle) ambientPopover.classList.remove('open');
+            });
+            ambientPopover.querySelectorAll('.ambient-btn-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sound = btn.dataset.sound;
+                    ambientPopover.querySelectorAll('.ambient-btn-option').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    Ambient.toggle(sound);
+                    ambientToggle.classList.toggle('on', sound !== 'none');
+                    ambientPopover.classList.remove('open');
                 });
+            });
+
+            function updateClock() {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                runningTimeEl.textContent = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             }
-        } catch (_) {}
-    }
-    function releaseWakeLock() {
-        try {
-            if (wakeLock) { wakeLock.release(); wakeLock = null; wakeLockActive = false; wakeIndicator.classList.remove('active'); }
-        } catch (_) {}
-    }
+            updateClock();
+            setInterval(updateClock, 1000);
 
-    // ---- core timer logic ----
-    function handleTimerFinish() {
-        running = false;
-        startPauseBtn.textContent = 'Start';
-        timerDisplay.classList.remove('running');
-        clearInterval(intervalId);
-        releaseWakeLock();
-        updateStateLabel();
-        playTick();
-        if (initialMs >= MIN_SESSION_MS) recordSession('timer', initialMs);
-        saveTimerState();
-    }
-
-    function tick() {
-        if (mode === 'stopwatch') {
-            elapsedMs += 10;
-            updateDisplay();
-            const currentSecond = Math.floor(elapsedMs / 1000);
-            if (currentSecond !== lastTickSecond) { playTick(); lastTickSecond = currentSecond; }
-        } else {
-            remainingMs -= 10;
-            if (remainingMs <= 0) {
-                remainingMs = 0;
-                updateDisplay();
-                handleTimerFinish();
-                return;
+            async function fetchWeather() {
+                try {
+                    if (!navigator.geolocation) throw new Error();
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+                    });
+                    const { latitude, longitude } = pos.coords;
+                    const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+                    const data = await resp.json();
+                    if (data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        weatherDisplay.innerHTML = `⛅ <span class="temp">${temp}°</span>`;
+                    }
+                } catch (_) {
+                    weatherDisplay.innerHTML = `⛅ <span class="temp">--°</span>`;
+                }
             }
-            updateDisplay();
-            const currentSecond = Math.floor(remainingMs / 1000);
-            if (currentSecond !== lastTickSecond) { playTick(); lastTickSecond = currentSecond; }
-        }
-    }
+            fetchWeather();
+            setInterval(fetchWeather, 600000);
 
-    function start() {
-        if (running) return;
-        if (mode === 'timer' && remainingMs <= 0) {
-            remainingMs = initialMs;
-            updateDisplay();
-        }
-        running = true;
-        startPauseBtn.textContent = 'Pause';
-        timerDisplay.classList.add('running');
-        lastTickSecond = -1;
-        intervalId = setInterval(tick, 10);
-        updateStateLabel();
-        requestWakeLock();
-        if (Ambient.context && Ambient.context.state === 'suspended') Ambient.context.resume();
-        saveTimerState();
-    }
+            function formatTime(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const min = Math.floor(totalSec / 60);
+                const sec = totalSec % 60;
+                const cs = Math.floor((ms % 1000) / 10);
+                return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
+            }
+            function getDisplayTime() {
+                return mode === 'stopwatch' ? formatTime(elapsedMs) : formatTime(remainingMs);
+            }
+            function updateDisplay() {
+                timerDisplay.textContent = getDisplayTime();
+            }
 
-    function pause() {
-        running = false;
-        startPauseBtn.textContent = 'Start';
-        timerDisplay.classList.remove('running');
-        clearInterval(intervalId);
-        updateStateLabel();
-        releaseWakeLock();
-        saveTimerState();
-    }
+            function playTick() {
+                if (!soundOn) return;
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine'; osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.005);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.09);
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                } catch (_) {}
+            }
 
-    function reset() {
-        if (running) pause();
-        if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) recordSession('stopwatch', elapsedMs);
-        if (mode === 'stopwatch') elapsedMs = 0;
-        else remainingMs = initialMs;
-        lastTickSecond = -1;
-        updateDisplay();
-        updateStateLabel();
-        saveTimerState();
-    }
+            async function requestWakeLock() {
+                try {
+                    if ('wakeLock' in navigator && !wakeLockActive) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        wakeLockActive = true;
+                        wakeIndicator.classList.add('active');
+                        wakeLock.addEventListener('release', () => {
+                            wakeLockActive = false;
+                            wakeIndicator.classList.remove('active');
+                        });
+                    }
+                } catch (_) {}
+            }
+            function releaseWakeLock() {
+                try {
+                    if (wakeLock) { wakeLock.release(); wakeLock = null; wakeLockActive = false; wakeIndicator.classList.remove('active'); }
+                } catch (_) {}
+            }
 
-    // ---- mode switching ----
-    function setMode(newMode) {
-        if (newMode === mode) return;
-        if (running) pause();
-        if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) recordSession('stopwatch', elapsedMs);
-        mode = newMode;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
-        updateTimerControlsVisibility();
-        if (mode === 'stopwatch') elapsedMs = 0;
-        else {
-            if (initialMs <= 0) initialMs = 1500 * 1000;
-            remainingMs = initialMs;
-        }
-        lastTickSecond = -1;
-        updateDisplay();
-        updateStateLabel();
-        startPauseBtn.textContent = 'Start';
-        timerDisplay.classList.remove('running');
-        presetBtns.forEach(b => b.classList.remove('active'));
-        document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
-        document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
-        saveTimerState();
-    }
+            function handleTimerFinish() {
+                running = false;
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                clearInterval(intervalId);
+                releaseWakeLock();
+                updateStateLabel();
+                playTick();
+                if (initialMs >= MIN_SESSION_MS) recordSession('timer', initialMs);
+                saveTimerState();
+            }
 
-    // ---- preset timer buttons ----
-    presetBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (mode !== 'timer') return;
-            if (running) pause();
-            const seconds = parseInt(btn.dataset.seconds);
-            initialMs = seconds * 1000;
-            remainingMs = initialMs;
-            presetBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
-            updateDisplay();
-            updateStateLabel();
-            customMinutes.value = ''; customSeconds.value = '';
-            saveTimerState();
-        });
-    });
+            function tick() {
+                if (mode === 'stopwatch') {
+                    elapsedMs += 10;
+                    updateDisplay();
+                    const currentSecond = Math.floor(elapsedMs / 1000);
+                    if (currentSecond !== lastTickSecond) { playTick(); lastTickSecond = currentSecond; }
+                } else {
+                    remainingMs -= 10;
+                    if (remainingMs <= 0) {
+                        remainingMs = 0;
+                        updateDisplay();
+                        handleTimerFinish();
+                        return;
+                    }
+                    updateDisplay();
+                    const currentSecond = Math.floor(remainingMs / 1000);
+                    if (currentSecond !== lastTickSecond) { playTick(); lastTickSecond = currentSecond; }
+                }
+            }
 
-    // ---- custom time set ----
-    setCustomTimeBtn.addEventListener('click', () => {
-        if (mode !== 'timer') return;
-        const mins = parseInt(customMinutes.value) || 0;
-        const secs = parseInt(customSeconds.value) || 0;
-        if (mins === 0 && secs === 0) return;
-        const totalSecs = mins * 60 + secs;
-        if (running) pause();
-        initialMs = totalSecs * 1000;
-        remainingMs = initialMs;
-        presetBtns.forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
-        updateDisplay();
-        updateStateLabel();
-        saveTimerState();
-    });
+            function start() {
+                if (running) return;
+                if (mode === 'timer' && remainingMs <= 0) {
+                    remainingMs = initialMs;
+                    updateDisplay();
+                }
+                running = true;
+                startPauseBtn.textContent = 'Pause';
+                timerDisplay.classList.add('running');
+                lastTickSecond = -1;
+                intervalId = setInterval(tick, 10);
+                updateStateLabel();
+                requestWakeLock();
+                if (Ambient.context && Ambient.context.state === 'suspended') Ambient.context.resume();
+                saveTimerState();
+            }
 
-    // ---- saved presets ----
-    function loadSavedPresets() {
-        try {
-            const data = localStorage.getItem(PRESETS_KEY);
-            return data ? JSON.parse(data) : [];
-        } catch (_) { return []; }
-    }
-    function saveSavedPresets(presets) {
-        try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); } catch (_) {}
-    }
-    function renderSavedPresets() {
-        const presets = loadSavedPresets();
-        let html = '';
-        presets.forEach((p, i) => {
-            const active = (p.seconds === initialMs / 1000 && mode === 'timer') ? 'active' : '';
-            html += `<button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}">
-                ${p.name} <span class="delete-preset" data-index="${i}">✕</span>
-            </button>`;
-        });
-        savedPresetsContainer.innerHTML = html;
-        savedPresetsContainer.querySelectorAll('.preset-btn.saved-preset').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-preset')) return;
-                if (mode !== 'timer') return;
+            function pause() {
+                running = false;
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                clearInterval(intervalId);
+                updateStateLabel();
+                releaseWakeLock();
+                saveTimerState();
+            }
+
+            function reset() {
                 if (running) pause();
-                const secs = parseInt(btn.dataset.seconds);
-                initialMs = secs * 1000;
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) recordSession('stopwatch', elapsedMs);
+                if (mode === 'stopwatch') elapsedMs = 0;
+                else remainingMs = initialMs;
+                lastTickSecond = -1;
+                updateDisplay();
+                updateStateLabel();
+                saveTimerState();
+            }
+
+            function setMode(newMode) {
+                if (newMode === mode) return;
+                if (running) pause();
+                if (mode === 'stopwatch' && elapsedMs >= MIN_SESSION_MS) recordSession('stopwatch', elapsedMs);
+                mode = newMode;
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+                updateTimerControlsVisibility();
+                if (mode === 'stopwatch') elapsedMs = 0;
+                else {
+                    if (initialMs <= 0) initialMs = 1500 * 1000;
+                    remainingMs = initialMs;
+                }
+                lastTickSecond = -1;
+                updateDisplay();
+                updateStateLabel();
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                presetBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
+                document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                saveTimerState();
+            }
+
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (mode !== 'timer') return;
+                    if (running) pause();
+                    const seconds = parseInt(btn.dataset.seconds);
+                    initialMs = seconds * 1000;
+                    remainingMs = initialMs;
+                    presetBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                    updateDisplay();
+                    updateStateLabel();
+                    customMinutes.value = ''; customSeconds.value = '';
+                    saveTimerState();
+                });
+            });
+
+            setCustomTimeBtn.addEventListener('click', () => {
+                if (mode !== 'timer') return;
+                const mins = parseInt(customMinutes.value) || 0;
+                const secs = parseInt(customSeconds.value) || 0;
+                if (mins === 0 && secs === 0) return;
+                const totalSecs = mins * 60 + secs;
+                if (running) pause();
+                initialMs = totalSecs * 1000;
                 remainingMs = initialMs;
                 presetBtns.forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
                 updateDisplay();
                 updateStateLabel();
                 saveTimerState();
             });
-        });
-        savedPresetsContainer.querySelectorAll('.delete-preset').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = parseInt(el.dataset.index);
+
+            function loadSavedPresets() {
+                try {
+                    const data = localStorage.getItem(PRESETS_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (_) { return []; }
+            }
+            function saveSavedPresets(presets) {
+                try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); } catch (_) {}
+            }
+            function renderSavedPresets() {
                 const presets = loadSavedPresets();
-                presets.splice(idx, 1);
+                let html = '';
+                presets.forEach((p, i) => {
+                    const active = (p.seconds === initialMs / 1000 && mode === 'timer') ? 'active' : '';
+                    html += `<button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}">
+                        ${p.name} <span class="delete-preset" data-index="${i}">✕</span>
+                    </button>`;
+                });
+                savedPresetsContainer.innerHTML = html;
+                savedPresetsContainer.querySelectorAll('.preset-btn.saved-preset').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('delete-preset')) return;
+                        if (mode !== 'timer') return;
+                        if (running) pause();
+                        const secs = parseInt(btn.dataset.seconds);
+                        initialMs = secs * 1000;
+                        remainingMs = initialMs;
+                        presetBtns.forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        updateDisplay();
+                        updateStateLabel();
+                        saveTimerState();
+                    });
+                });
+                savedPresetsContainer.querySelectorAll('.delete-preset').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(el.dataset.index);
+                        const presets = loadSavedPresets();
+                        presets.splice(idx, 1);
+                        saveSavedPresets(presets);
+                        renderSavedPresets();
+                    });
+                });
+            }
+            savePresetBtn.addEventListener('click', () => {
+                if (mode !== 'timer') return;
+                const totalSecs = Math.floor(initialMs / 1000);
+                const name = prompt('Preset name:', 'Focus');
+                if (!name) return;
+                const presets = loadSavedPresets();
+                const existing = presets.find(p => p.name === name);
+                if (existing) existing.seconds = totalSecs;
+                else presets.push({ name, seconds: totalSecs });
                 saveSavedPresets(presets);
                 renderSavedPresets();
             });
-        });
-    }
-    savePresetBtn.addEventListener('click', () => {
-        if (mode !== 'timer') return;
-        const totalSecs = Math.floor(initialMs / 1000);
-        const name = prompt('Preset name:', 'Focus');
-        if (!name) return;
-        const presets = loadSavedPresets();
-        const existing = presets.find(p => p.name === name);
-        if (existing) existing.seconds = totalSecs;
-        else presets.push({ name, seconds: totalSecs });
-        saveSavedPresets(presets);
-        renderSavedPresets();
-    });
 
-    // ---- mode toggle click ----
-    modeToggle.addEventListener('click', (e) => {
-        const btn = e.target.closest('.mode-btn');
-        if (!btn) return;
-        setMode(btn.dataset.mode);
-        renderSavedPresets();
-    });
-
-    // ---- start/pause/reset ----
-    startPauseBtn.addEventListener('click', () => running ? pause() : start());
-    resetBtn.addEventListener('click', reset);
-
-    // ---- sound toggle ----
-    soundToggle.addEventListener('click', () => {
-        soundOn = !soundOn;
-        soundToggle.classList.toggle('on', soundOn);
-    });
-
-    // ---- scene picker ----
-    sceneToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        scenePicker.classList.toggle('open');
-        ambientPopover.classList.remove('open');
-    });
-    document.addEventListener('click', (e) => {
-        if (!scenePicker.contains(e.target) && e.target !== sceneToggle) scenePicker.classList.remove('open');
-    });
-
-    // ---- scene persistence ----
-    function saveSceneState(sceneId, customUrl) {
-        try { localStorage.setItem(SCENE_KEY, JSON.stringify({ sceneId, customUrl })); } catch (_) {}
-    }
-    function loadSceneState() {
-        try {
-            const raw = localStorage.getItem(SCENE_KEY);
-            return raw ? JSON.parse(raw) : null;
-        } catch (_) { return null; }
-    }
-    function activateScene(sceneId) {
-        Object.values(scenes).forEach(s => s.classList.remove('active'));
-        if (scenes[sceneId]) scenes[sceneId].classList.add('active');
-        if (sceneId !== 'custom') scenes.custom.style.display = 'none';
-        thumbs.forEach(t => t.classList.remove('active'));
-        customThumb.classList.remove('active');
-        customPanel.classList.remove('open');
-        document.querySelector(`.scene-thumb[data-scene="scene-${sceneId}"]`)?.classList.add('active');
-        saveSceneState(sceneId, null);
-    }
-    thumbs.forEach(thumb => {
-        thumb.addEventListener('click', () => {
-            const sceneId = thumb.dataset.scene.replace('scene-', '');
-            activateScene(sceneId);
-            scenePicker.classList.remove('open');
-        });
-    });
-
-    // ---- custom background ----
-    function applyCustomBackground(url) {
-        document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-        scenes.custom.style.display = '';
-        scenes.custom.style.backgroundImage = `url('${url}')`;
-        scenes.custom.classList.add('active');
-        thumbs.forEach(t => t.classList.remove('active'));
-        customThumb.classList.add('active');
-        saveSceneState('custom', url);
-    }
-    customThumb.addEventListener('click', () => customPanel.classList.toggle('open'));
-    applyUrlBtn.addEventListener('click', () => {
-        const url = customUrlInput.value.trim();
-        if (url) applyCustomBackground(url);
-    });
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => applyCustomBackground(ev.target.result);
-            reader.readAsDataURL(file);
-        }
-    });
-    clearCustomBtn.addEventListener('click', () => activateScene('rain'));
-
-    // ---- Session panel toggle ----
-    historyToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sessionPanel.classList.toggle('open');
-    });
-    closeSessionBtn.addEventListener('click', () => sessionPanel.classList.remove('open'));
-    document.addEventListener('click', (e) => {
-        if (sessionPanel.classList.contains('open') && !sessionPanel.contains(e.target) && e.target !== historyToggle)
-            sessionPanel.classList.remove('open');
-    });
-
-    // ---- Todo list ----
-    let todos = [];
-    function loadTodos() {
-        try { todos = JSON.parse(localStorage.getItem(TODOS_KEY)) || []; } catch (_) { todos = []; }
-        renderTodos();
-    }
-    function saveTodos() { localStorage.setItem(TODOS_KEY, JSON.stringify(todos)); }
-    function addTodo() {
-        const text = todoInput.value.trim();
-        if (!text) return;
-        todos.push({ id: Date.now(), text, completed: false });
-        todoInput.value = '';
-        saveTodos(); renderTodos();
-    }
-    function toggleTodo(id) {
-        const todo = todos.find(t => t.id === id);
-        if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); }
-    }
-    function deleteTodo(id) {
-        todos = todos.filter(t => t.id !== id);
-        saveTodos(); renderTodos();
-    }
-    function editTodo(id, newText) {
-        const todo = todos.find(t => t.id === id);
-        if (todo) { todo.text = newText; saveTodos(); renderTodos(); }
-    }
-    function renderTodos() {
-        let html = '';
-        todos.forEach(todo => {
-            html += `<li>
-                <div class="checkbox ${todo.completed ? 'checked' : ''}" data-id="${todo.id}"></div>
-                <span class="task-text ${todo.completed ? 'done' : ''}" data-id="${todo.id}">${todo.text}</span>
-                <button class="delete-btn" data-id="${todo.id}">✕</button>
-            </li>`;
-        });
-        todoList.innerHTML = html || '<li class="todo-empty">No tasks yet</li>';
-        todoList.querySelectorAll('.checkbox').forEach(el => el.addEventListener('click', () => toggleTodo(parseFloat(el.dataset.id))));
-        todoList.querySelectorAll('.delete-btn').forEach(el => el.addEventListener('click', () => deleteTodo(parseFloat(el.dataset.id))));
-        todoList.querySelectorAll('.task-text').forEach(el => {
-            el.addEventListener('dblclick', () => {
-                const id = parseFloat(el.dataset.id);
-                const input = document.createElement('input');
-                input.value = el.textContent;
-                input.className = 'task-text editing';
-                input.addEventListener('blur', () => {
-                    editTodo(id, input.value);
-                    renderTodos();
-                });
-                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
-                el.replaceWith(input);
-                input.focus();
+            modeToggle.addEventListener('click', (e) => {
+                const btn = e.target.closest('.mode-btn');
+                if (!btn) return;
+                setMode(btn.dataset.mode);
+                renderSavedPresets();
             });
-        });
-    }
-    todoToggle.addEventListener('click', (e) => { e.stopPropagation(); todoPanel.classList.toggle('open'); });
-    closeTodoBtn.addEventListener('click', () => todoPanel.classList.remove('open'));
-    addTodoBtn.addEventListener('click', addTodo);
-    todoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
 
-    // ---- keyboard shortcuts ----
-    document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-        if (e.code === 'Space') { e.preventDefault(); running ? pause() : start(); }
-        if (e.code === 'KeyR') reset();
-        if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) soundToggle.click();
-        if (e.code === 'KeyB') sceneToggle.click();
-        if (e.code === 'KeyM') {
-            const btns = document.querySelectorAll('.mode-btn');
-            const active = document.querySelector('.mode-btn.active');
-            const idx = Array.from(btns).indexOf(active);
-            setMode(btns[(idx + 1) % btns.length].dataset.mode);
+            startPauseBtn.addEventListener('click', () => running ? pause() : start());
+            resetBtn.addEventListener('click', reset);
+
+            soundToggle.addEventListener('click', () => {
+                soundOn = !soundOn;
+                soundToggle.classList.toggle('on', soundOn);
+            });
+
+            sceneToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                scenePicker.classList.toggle('open');
+                ambientPopover.classList.remove('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!scenePicker.contains(e.target) && e.target !== sceneToggle) scenePicker.classList.remove('open');
+            });
+
+            function saveSceneState(sceneId, customUrl) {
+                try { localStorage.setItem(SCENE_KEY, JSON.stringify({ sceneId, customUrl })); } catch (_) {}
+            }
+            function loadSceneState() {
+                try {
+                    const raw = localStorage.getItem(SCENE_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (_) { return null; }
+            }
+            function activateScene(sceneId) {
+                Object.values(scenes).forEach(s => s.classList.remove('active'));
+                if (scenes[sceneId]) scenes[sceneId].classList.add('active');
+                if (sceneId !== 'custom') scenes.custom.style.display = 'none';
+                thumbs.forEach(t => t.classList.remove('active'));
+                customThumb.classList.remove('active');
+                customPanel.classList.remove('open');
+                document.querySelector(`.scene-thumb[data-scene="scene-${sceneId}"]`)?.classList.add('active');
+                saveSceneState(sceneId, null);
+            }
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const sceneId = thumb.dataset.scene.replace('scene-', '');
+                    activateScene(sceneId);
+                    scenePicker.classList.remove('open');
+                });
+            });
+
+            function applyCustomBackground(url) {
+                document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+                scenes.custom.style.display = '';
+                scenes.custom.style.backgroundImage = `url('${url}')`;
+                scenes.custom.classList.add('active');
+                thumbs.forEach(t => t.classList.remove('active'));
+                customThumb.classList.add('active');
+                saveSceneState('custom', url);
+            }
+            customThumb.addEventListener('click', () => customPanel.classList.toggle('open'));
+            applyUrlBtn.addEventListener('click', () => {
+                const url = customUrlInput.value.trim();
+                if (url) applyCustomBackground(url);
+            });
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => applyCustomBackground(ev.target.result);
+                    reader.readAsDataURL(file);
+                }
+            });
+            clearCustomBtn.addEventListener('click', () => activateScene('rain'));
+
+            historyToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sessionPanel.classList.toggle('open');
+            });
+            closeSessionBtn.addEventListener('click', () => sessionPanel.classList.remove('open'));
+            document.addEventListener('click', (e) => {
+                if (sessionPanel.classList.contains('open') && !sessionPanel.contains(e.target) && e.target !== historyToggle)
+                    sessionPanel.classList.remove('open');
+            });
+
+            let todos = [];
+            function loadTodos() {
+                try { todos = JSON.parse(localStorage.getItem(TODOS_KEY)) || []; } catch (_) { todos = []; }
+                renderTodos();
+            }
+            function saveTodos() { localStorage.setItem(TODOS_KEY, JSON.stringify(todos)); }
+            function addTodo() {
+                const text = todoInput.value.trim();
+                if (!text) return;
+                todos.push({ id: Date.now(), text, completed: false });
+                todoInput.value = '';
+                saveTodos(); renderTodos();
+            }
+            function toggleTodo(id) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); }
+            }
+            function deleteTodo(id) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos(); renderTodos();
+            }
+            function editTodo(id, newText) {
+                const todo = todos.find(t => t.id === id);
+                if (todo) { todo.text = newText; saveTodos(); renderTodos(); }
+            }
+            function renderTodos() {
+                let html = '';
+                todos.forEach(todo => {
+                    html += `<li>
+                        <div class="checkbox ${todo.completed ? 'checked' : ''}" data-id="${todo.id}"></div>
+                        <span class="task-text ${todo.completed ? 'done' : ''}" data-id="${todo.id}">${todo.text}</span>
+                        <button class="delete-btn" data-id="${todo.id}">✕</button>
+                    </li>`;
+                });
+                todoList.innerHTML = html || '<li class="todo-empty">No tasks yet</li>';
+                todoList.querySelectorAll('.checkbox').forEach(el => el.addEventListener('click', () => toggleTodo(parseFloat(el.dataset.id))));
+                todoList.querySelectorAll('.delete-btn').forEach(el => el.addEventListener('click', () => deleteTodo(parseFloat(el.dataset.id))));
+                todoList.querySelectorAll('.task-text').forEach(el => {
+                    el.addEventListener('dblclick', () => {
+                        const id = parseFloat(el.dataset.id);
+                        const input = document.createElement('input');
+                        input.value = el.textContent;
+                        input.className = 'task-text editing';
+                        input.addEventListener('blur', () => {
+                            editTodo(id, input.value);
+                            renderTodos();
+                        });
+                        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+                        el.replaceWith(input);
+                        input.focus();
+                    });
+                });
+            }
+            todoToggle.addEventListener('click', (e) => { e.stopPropagation(); todoPanel.classList.toggle('open'); });
+            closeTodoBtn.addEventListener('click', () => todoPanel.classList.remove('open'));
+            addTodoBtn.addEventListener('click', addTodo);
+            todoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                if (e.code === 'Space') { e.preventDefault(); running ? pause() : start(); }
+                if (e.code === 'KeyR') reset();
+                if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) soundToggle.click();
+                if (e.code === 'KeyB') sceneToggle.click();
+                if (e.code === 'KeyM') {
+                    const btns = document.querySelectorAll('.mode-btn');
+                    const active = document.querySelector('.mode-btn.active');
+                    const idx = Array.from(btns).indexOf(active);
+                    setMode(btns[(idx + 1) % btns.length].dataset.mode);
+                    renderSavedPresets();
+                }
+            });
+
+            loadSessions();
+            loadTodos();
             renderSavedPresets();
-        }
-    });
+            updateTimerControlsVisibility();
+            updateDisplay();
+            updateStateLabel();
 
-    // ---- Initialisation ----
-    loadSessions();
-    loadTodos();
-    renderSavedPresets();
-    updateTimerControlsVisibility();
-    updateDisplay();
-    updateStateLabel();
+            const savedScene = loadSceneState();
+            if (savedScene && savedScene.sceneId === 'custom' && savedScene.customUrl) {
+                applyCustomBackground(savedScene.customUrl);
+            } else if (savedScene && scenes[savedScene.sceneId]) {
+                activateScene(savedScene.sceneId);
+            } else {
+                activateScene('rain');
+            }
 
-    // Restore scene
-    const savedScene = loadSceneState();
-    if (savedScene && savedScene.sceneId === 'custom' && savedScene.customUrl) {
-        applyCustomBackground(savedScene.customUrl);
-    } else if (savedScene && scenes[savedScene.sceneId]) {
-        activateScene(savedScene.sceneId);
-    } else {
-        activateScene('rain');
-    }
+            const savedTimer = loadTimerState();
+            if (savedTimer) {
+                mode = savedTimer.mode;
+                elapsedMs = savedTimer.elapsedMs;
+                remainingMs = savedTimer.remainingMs;
+                initialMs = savedTimer.initialMs;
+                running = savedTimer.running;
+                if (running && mode === 'timer' && remainingMs <= 0) {
+                    running = false;
+                    handleTimerFinish();
+                }
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+                updateTimerControlsVisibility();
+                updateDisplay();
+                updateStateLabel();
+                startPauseBtn.textContent = running ? 'Pause' : 'Start';
+                if (running) {
+                    timerDisplay.classList.add('running');
+                    start();
+                }
+            } else {
+                document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
+            }
 
-    // Restore timer state (cross‑page persistence)
-    const savedTimer = loadTimerState();
-    if (savedTimer) {
-        mode = savedTimer.mode;
-        elapsedMs = savedTimer.elapsedMs;
-        remainingMs = savedTimer.remainingMs;
-        initialMs = savedTimer.initialMs;
-        running = savedTimer.running;
-        if (running && mode === 'timer' && remainingMs <= 0) {
-            running = false;
-            handleTimerFinish();
-        }
-        // Update UI
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
-        updateTimerControlsVisibility();
-        updateDisplay();
-        updateStateLabel();
-        startPauseBtn.textContent = running ? 'Pause' : 'Start';
-        if (running) {
-            timerDisplay.classList.add('running');
-            start(); // resumes the interval
-        }
-    } else {
-        // Fresh start, ensure default preset active
-        document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
-    }
+            window.addEventListener('pagehide', saveTimerState);
+            window.addEventListener('beforeunload', saveTimerState);
 
-    // Save timer state whenever the page is about to be hidden
-    window.addEventListener('pagehide', saveTimerState);
-    window.addEventListener('beforeunload', saveTimerState);
-
-})();
-</script>
+        })();
+    </script>
 </body>
 </html>
