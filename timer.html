@@ -1579,12 +1579,14 @@
                 const today = getTodayKey();
                 sessions.push({ date: today, mode: mode, durationMs: durationMs, timestamp: Date.now() });
                 saveSessions();
-                stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
-                setTimeout(() => {
-                    if (stateLabel.textContent.includes('Session saved')) {
-                        updateStateLabel();
-                    }
-                }, 2500);
+                if (stateLabel) {
+                    stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
+                    setTimeout(() => {
+                        if (stateLabel.textContent.includes('Session saved')) {
+                            updateStateLabel();
+                        }
+                    }, 2500);
+                }
             }
 
             function updateTimerControlsVisibility() {
