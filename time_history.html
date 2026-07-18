@@ -45,7 +45,8 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             overflow: hidden;
@@ -143,7 +144,7 @@
             display: inline-flex;
             flex-direction: column;
             align-items: flex-end;
-            font-size: clamp(36px, 6vw, 76px);
+            font-size: clamp(32px, 5vw, 64px);
             font-weight: 700;
             letter-spacing: 0.02em;
             text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
@@ -244,11 +245,11 @@
             align-items: center;
             justify-content: flex-start;
             padding: 20px;
-            padding-top: 110px;
+            padding-top: 100px;
             overflow-y: auto;
         }
 
-        /* ---- glass card containers ---- */
+        /* ---- glass card ---- */
         .glass-card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
@@ -348,17 +349,17 @@
             padding: 10px 0;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(.4,0,.2,1);
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
             font-family: inherit;
             letter-spacing: 0.03em;
         }
         .section-tabs .tab-btn.active {
             background: rgba(255, 255, 255, 0.14);
             color: var(--text-hi);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .section-tabs .tab-btn:hover:not(.active) {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         /* ---- sections ---- */
@@ -372,11 +373,17 @@
             display: block;
         }
         @keyframes fadeSlide {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        /* ---- chart section ---- */
+        /* ---- chart ---- */
         .chart-section-wrap {
             background: rgba(255, 255, 255, 0.04);
             border-radius: 20px;
@@ -411,8 +418,8 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-lo);
             cursor: pointer;
             display: flex;
@@ -423,7 +430,7 @@
             user-select: none;
         }
         .chart-header .chart-pagination .arrow-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.14);
+            background: rgba(255, 255, 255, 0.14);
             color: var(--text-hi);
         }
         .chart-header .chart-pagination .arrow-btn:disabled {
@@ -447,7 +454,9 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
-        .chart-bars::-webkit-scrollbar { display: none; }
+        .chart-bars::-webkit-scrollbar {
+            display: none;
+        }
 
         .chart-bar-wrapper {
             flex: 0 0 48px;
@@ -467,19 +476,24 @@
             flex-direction: column;
             justify-content: flex-end;
             border-radius: 6px 6px 0 0;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
         }
         .chart-bar {
             width: 100%;
             border-radius: 6px 6px 0 0;
             min-height: 4px;
             background: var(--bar-gradient);
-            transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1);
-            box-shadow: 0 0 20px rgba(107,203,255,0.12);
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 20px rgba(107, 203, 255, 0.12);
         }
         .chart-bar.today {
             background: linear-gradient(180deg, #ffd93d 0%, #f5a623 100%);
-            box-shadow: 0 0 24px rgba(255,215,0,0.25);
+            box-shadow: 0 0 24px rgba(255, 215, 0, 0.25);
+        }
+        .chart-bar.zero {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+            min-height: 4px;
         }
         .chart-bar-value {
             font-size: 8px;
@@ -515,17 +529,17 @@
             opacity: 0.4;
         }
 
-        /* ---- list section ---- */
+        /* ---- list ---- */
         .day-group {
             margin-bottom: 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             border-radius: 16px;
             overflow: hidden;
             transition: all 0.2s;
         }
         .day-group:hover {
-            border-color: rgba(255,255,255,0.20);
+            border-color: rgba(255, 255, 255, 0.20);
         }
         .day-header {
             display: flex;
@@ -537,7 +551,7 @@
             transition: background 0.2s;
         }
         .day-header:hover {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
         }
         .day-header .day-name {
             font-weight: 600;
@@ -552,14 +566,14 @@
             gap: 10px;
         }
         .day-header .day-total .count-badge {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             padding: 2px 10px;
             border-radius: 100px;
             font-size: 11px;
             font-weight: 500;
         }
         .day-header .chevron {
-            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             font-size: 10px;
             color: var(--text-lo);
             margin-left: 4px;
@@ -584,13 +598,13 @@
             align-items: center;
             padding: 7px 12px;
             border-radius: 8px;
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             font-size: 12.5px;
             color: var(--text-lo);
             transition: background 0.2s;
         }
         .day-sessions li:hover {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
         }
         .day-sessions li .session-time {
             font-weight: 500;
@@ -605,18 +619,18 @@
         .day-sessions li .session-mode {
             font-size: 9.5px;
             font-weight: 600;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             padding: 2px 12px;
             border-radius: 100px;
             letter-spacing: 0.03em;
         }
         .day-sessions li .session-mode.stopwatch {
             color: var(--accent-blue);
-            background: rgba(107,203,255,0.10);
+            background: rgba(107, 203, 255, 0.10);
         }
         .day-sessions li .session-mode.timer {
             color: var(--accent-gold);
-            background: rgba(255,215,0,0.10);
+            background: rgba(255, 215, 0, 0.10);
         }
         .list-empty {
             text-align: center;
@@ -641,28 +655,28 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(20,20,30,0.82);
-            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(20, 20, 30, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             backdrop-filter: blur(18px) saturate(160%);
             -webkit-backdrop-filter: blur(18px) saturate(160%);
             border-radius: 40px;
             padding: 8px 18px 8px 14px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            color: rgba(255,255,255,0.92);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.92);
             font-family: inherit;
             font-size: 13px;
             font-weight: 500;
             letter-spacing: 0.02em;
             cursor: pointer;
             text-decoration: none;
-            transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+            transition: transform 0.45s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.3s;
             user-select: none;
         }
         #bgTimerBadge.visible {
             transform: translateX(-50%) translateY(0);
         }
         #bgTimerBadge:hover {
-            box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
         }
         #bgTimerBadge .badge-dot {
             width: 8px;
@@ -674,23 +688,40 @@
             animation: badgePulse 1.4s ease-in-out infinite;
         }
         @keyframes badgePulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.55; transform: scale(0.8); }
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.55;
+                transform: scale(0.8);
+            }
         }
-        #bgTimerBadge .badge-label { opacity: 0.65; margin-right: 2px; }
-        #bgTimerBadge .badge-time  { font-variant-numeric: tabular-nums; font-weight: 600; }
-        #bgTimerBadge .badge-goto  { opacity: 0.55; font-size: 11px; margin-left: 4px; }
+        #bgTimerBadge .badge-label {
+            opacity: 0.65;
+            margin-right: 2px;
+        }
+        #bgTimerBadge .badge-time {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+        #bgTimerBadge .badge-goto {
+            opacity: 0.55;
+            font-size: 11px;
+            margin-left: 4px;
+        }
 
         /* ---- scrollbar ---- */
         .stage::-webkit-scrollbar {
             width: 4px;
         }
         .stage::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 10px;
         }
         .stage::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
         }
 
@@ -702,7 +733,7 @@
                 right: 16px;
             }
             .logo {
-                font-size: clamp(28px, 5vw, 42px);
+                font-size: clamp(24px, 4.5vw, 36px);
             }
             .logo-sub {
                 font-size: 0.3em;
@@ -781,6 +812,9 @@
             }
             .running-time {
                 font-size: 12px;
+            }
+            .stage {
+                padding-top: 85px;
             }
         }
 
@@ -873,7 +907,7 @@
     <!-- ---- main stage ---- -->
     <div class="stage" id="stage">
 
-        <!-- ---- today hero (glass card) ---- -->
+        <!-- ---- today hero ---- -->
         <div class="glass-card" style="margin-bottom:16px; padding:20px 24px;">
             <div class="today-hero">
                 <div>
@@ -1063,6 +1097,7 @@
             const KEY = 'focusTimerState';
 
             function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
+
             function fmt(ms) {
                 const totalSec = Math.max(0, Math.floor(ms / 1000));
                 const h = Math.floor(totalSec / 3600);
@@ -1188,6 +1223,30 @@
             let touchStartX = 0;
             let touchEndX = 0;
 
+            // ---- Get all dates from first session to today ----
+            function getDateRange() {
+                if (allSessions.length === 0) return [];
+
+                let earliest = null;
+                allSessions.forEach(s => {
+                    const d = new Date(s.date + 'T00:00:00');
+                    if (!earliest || d < earliest) earliest = d;
+                });
+
+                if (!earliest) return [];
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const dates = [];
+                let current = new Date(earliest);
+                while (current <= today) {
+                    dates.push(current.toISOString().split('T')[0]);
+                    current.setDate(current.getDate() + 1);
+                }
+                return dates;
+            }
+
             function renderTodayHero() {
                 const todayKey = getTodayKey();
                 const todaySessions = allSessions.filter(s => s.date === todayKey);
@@ -1254,7 +1313,8 @@
                             </li>
                         `;
                     });
-                    const countBadge = group.sessions.length > 1 ? `<span class="count-badge">${group.sessions.length}</span>` : '';
+                    const countBadge = group.sessions.length > 1 ? `<span class="count-badge">${group.sessions.length}</span>` :
+                        '';
                     html += `
                         <div class="day-group">
                             <div class="day-header">
@@ -1276,23 +1336,11 @@
             }
 
             function renderChart() {
-                let allDates = [];
-                if (allSessions.length > 0) {
-                    let earliest = new Date();
-                    allSessions.forEach(s => {
-                        const d = new Date(s.date + 'T00:00:00');
-                        if (d < earliest) earliest = d;
-                    });
-                    const today = new Date();
-                    let current = new Date(earliest);
-                    while (current <= today) {
-                        allDates.push(current.toISOString().split('T')[0]);
-                        current.setDate(current.getDate() + 1);
-                    }
-                }
+                const allDates = getDateRange();
 
                 if (allDates.length === 0) {
-                    chartBars.innerHTML = `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data to show.</div>`;
+                    chartBars.innerHTML =
+                        `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data to show.</div>`;
                     chartPrev.disabled = true;
                     chartNext.disabled = true;
                     chartPageInfo.textContent = '0 / 0';
@@ -1303,6 +1351,7 @@
                 if (chartPage >= totalPages) chartPage = totalPages - 1;
                 if (chartPage < 0) chartPage = 0;
 
+                // Page 0 = most recent (ending with today), page N = oldest
                 const startIdx = Math.max(0, allDates.length - (chartPage + 1) * PAGE_SIZE);
                 const endIdx = Math.min(allDates.length, allDates.length - chartPage * PAGE_SIZE);
                 const pageDates = allDates.slice(startIdx, endIdx);
@@ -1312,10 +1361,12 @@
                 chartNext.disabled = chartPage === 0;
 
                 if (pageDates.length === 0) {
-                    chartBars.innerHTML = `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data on this page.</div>`;
+                    chartBars.innerHTML =
+                        `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data on this page.</div>`;
                     return;
                 }
 
+                // Build day totals for the page
                 const dayTotals = pageDates.map(date => {
                     const daySessions = allSessions.filter(s => s.date === date);
                     const total = daySessions.reduce((sum, s) => sum + s.durationMs, 0);
@@ -1327,9 +1378,10 @@
 
                 let barsHtml = '';
                 dayTotals.forEach(day => {
-                    const pct = Math.max((day.total / maxTotal) * 100, 4);
                     const isToday = day.date === todayKey;
-                    const barClass = isToday ? 'chart-bar today' : 'chart-bar';
+                    const pct = day.total > 0 ? Math.max((day.total / maxTotal) * 100, 4) : 4;
+                    const barClass = isToday ? 'chart-bar today' : (day.total > 0 ? 'chart-bar' :
+                        'chart-bar zero');
                     const dayClass = isToday ? 'chart-bar-day today-label' : 'chart-bar-day';
                     const displayTotal = day.total > 0 ? formatDurationShort(day.total) : '0m';
                     const label = formatDateLabel(day.date);
@@ -1354,20 +1406,7 @@
             }
 
             function goToPage(page) {
-                let allDates = [];
-                if (allSessions.length > 0) {
-                    let earliest = new Date();
-                    allSessions.forEach(s => {
-                        const d = new Date(s.date + 'T00:00:00');
-                        if (d < earliest) earliest = d;
-                    });
-                    const today = new Date();
-                    let current = new Date(earliest);
-                    while (current <= today) {
-                        allDates.push(current.toISOString().split('T')[0]);
-                        current.setDate(current.getDate() + 1);
-                    }
-                }
+                const allDates = getDateRange();
                 const totalPages = Math.max(1, Math.ceil(allDates.length / PAGE_SIZE));
                 if (page < 0) page = 0;
                 if (page >= totalPages) page = totalPages - 1;
@@ -1378,6 +1417,7 @@
             chartPrev.addEventListener('click', () => goToPage(chartPage + 1));
             chartNext.addEventListener('click', () => goToPage(chartPage - 1));
 
+            // Swipe support
             const chartWrap = document.querySelector('.chart-section-wrap');
             chartWrap.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
@@ -1386,11 +1426,13 @@
                 touchEndX = e.changedTouches[0].screenX;
                 const diff = touchStartX - touchEndX;
                 if (Math.abs(diff) > 50) {
-                    if (diff > 0) goToPage(chartPage - 1);
-                    else goToPage(chartPage + 1);
+                    // Swipe left = go older (to the right in time = page+1)
+                    if (diff > 0) goToPage(chartPage + 1);
+                    else goToPage(chartPage - 1);
                 }
             }, { passive: true });
 
+            // Section tabs
             sectionTabs.addEventListener('click', (e) => {
                 const btn = e.target.closest('.tab-btn');
                 if (!btn) return;
@@ -1419,6 +1461,7 @@
                 }
             });
 
+            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 if (sectionChart.classList.contains('active')) {
@@ -1427,8 +1470,8 @@
                 }
             });
 
-            console.log('📊 History · Today on the right, past days on the left');
-            console.log('📋 Swipe chart left/right or use arrow buttons');
+            console.log('📊 History · Timeline from first session to today');
+            console.log('📋 Swipe left = go older · Swipe right = go newer');
         })();
     </script>
 
