@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FOCUS · by pushpraj</title>
-    <link rel="icon" type="image/png" href="logo.png" />
+    
+   
+      <link rel="icon" type="image/png" href="logo.png" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" id="manifestLink" />
     <script>
@@ -13,20 +15,21 @@
                 name: "FOCUS",
                 short_name: "FOCUS",
                 description: "Focus timer with scenic backgrounds and session tracking.",
-                start_url: ".",
+                start_url: new URL('.', document.baseURI).href,
                 display: "standalone",
                 background_color: "#0a0c10",
                 theme_color: "#0a0c10",
                 icons: [
-                    { src: "logo.png", sizes: "192x192", type: "image/png" },
-                    { src: "logo.png", sizes: "512x512", type: "image/png" }
+                    { src: new URL('logo.png', document.baseURI).href, sizes: "192x192", type: "image/png" },
+                    { src: new URL('logo.png', document.baseURI).href, sizes: "512x512", type: "image/png" }
                 ]
             };
             const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             document.getElementById('manifestLink').href = url;
         })();
-    </script>
+    </script>  
+    
     <style>
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
