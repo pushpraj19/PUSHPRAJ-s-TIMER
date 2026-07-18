@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Page 2: <span id="display"></span></p>
+  <a href="page1.html">Back</a>
+  <script>
+    const key = 'test_timer';
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const state = JSON.parse(raw);
+      const elapsed = (Date.now() - state.startTime) / 1000;
+      document.getElementById('display').textContent = elapsed.toFixed(1) + ' seconds passed';
+    }
+  </script>
+</body>
+</html>
