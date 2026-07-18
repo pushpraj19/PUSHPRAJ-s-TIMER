@@ -9,8 +9,8 @@
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
             --text-lo: rgba(255, 255, 255, 0.65);
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --accent-blue: #6bcbff;
             --accent-gold: #ffd93d;
             --bar-gradient: linear-gradient(180deg, #6bcbff 0%, #4a9ed6 100%);
@@ -31,7 +31,6 @@
         }
 
         body {
-            position: relative;
             min-height: 100vh;
             background:
                 radial-gradient(ellipse at 20% 20%, rgba(107, 203, 255, 0.04) 0%, transparent 50%),
@@ -50,7 +49,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .back-btn {
@@ -101,28 +100,28 @@
             letter-spacing: 0.02em;
         }
 
-        /* ---- Today's total (hero stat) ---- */
+        /* ---- Today hero ---- */
         .today-hero {
             background: var(--glass);
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(24px) saturate(160%);
             -webkit-backdrop-filter: blur(24px) saturate(160%);
             border-radius: 20px;
-            padding: 20px 24px;
-            margin-bottom: 20px;
+            padding: 18px 22px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         .today-hero .label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: var(--text-lo);
             letter-spacing: 0.04em;
         }
         .today-hero .time {
-            font-size: clamp(28px, 4.5vw, 42px);
+            font-size: clamp(26px, 4.2vw, 38px);
             font-weight: 700;
             letter-spacing: 0.02em;
             background: linear-gradient(135deg, #6bcbff 0%, #ffd93d 80%);
@@ -139,62 +138,186 @@
             text-align: right;
         }
 
-        /* ---- Chart ---- */
-        .chart-section {
+        /* ---- Overall stats ---- */
+        .overall-stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .overall-stats .stat-card {
+            flex: 1;
+            min-width: 90px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        .overall-stats .stat-card .label {
+            font-size: 10px;
+            color: var(--text-lo);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+        .overall-stats .stat-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        /* ---- Section toggle tabs ---- */
+        .section-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        .section-tabs .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-lo);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            font-family: inherit;
+            letter-spacing: 0.03em;
+        }
+        .section-tabs .tab-btn.active {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-hi);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .section-tabs .tab-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ---- Section containers ---- */
+        .section {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ---- Chart section ---- */
+        .chart-section-wrap {
             background: var(--glass);
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(24px) saturate(160%);
             -webkit-backdrop-filter: blur(24px) saturate(160%);
             border-radius: 20px;
             padding: 20px 16px 18px;
-            margin-bottom: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .chart-section .chart-header {
+        .chart-section-wrap .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
-            padding: 0 4px;
+            padding: 0 2px;
         }
-        .chart-section .chart-header .chart-label {
+        .chart-section-wrap .chart-header .chart-label {
             font-size: 12px;
             font-weight: 600;
             color: var(--text-lo);
             letter-spacing: 0.06em;
             text-transform: uppercase;
         }
-        .chart-section .chart-header .chart-total {
-            font-size: 12px;
-            color: var(--text-lo);
+        .chart-section-wrap .chart-header .chart-pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .chart-section .chart-header .chart-total span {
+        .chart-section-wrap .chart-header .chart-pagination .page-info {
+            font-size: 11px;
+            color: var(--text-lo);
+            min-width: 44px;
+            text-align: center;
+        }
+        .chart-section-wrap .chart-header .chart-pagination .arrow-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-lo);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            user-select: none;
+        }
+        .chart-section-wrap .chart-header .chart-pagination .arrow-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.14);
             color: var(--text-hi);
-            font-weight: 600;
+        }
+        .chart-section-wrap .chart-header .chart-pagination .arrow-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+        .chart-section-wrap .chart-header .chart-pagination .arrow-btn:active:not(:disabled) {
+            transform: scale(0.92);
         }
 
         .chart-bars {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             align-items: flex-end;
-            height: 140px;
+            height: 160px;
             padding: 0 4px;
-            gap: 6px;
+            gap: 8px;
+            touch-action: pan-x;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .chart-bars::-webkit-scrollbar {
+            display: none;
         }
 
         .chart-bar-wrapper {
-            flex: 1;
+            flex: 0 0 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
             height: 100%;
             justify-content: flex-end;
+            min-width: 36px;
         }
 
         .chart-bar-track {
             width: 100%;
-            max-width: 48px;
+            max-width: 44px;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -211,21 +334,11 @@
             min-height: 4px;
             background: var(--bar-gradient);
             transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            box-shadow: 0 0 20px rgba(107, 203, 255, 0.15);
+            box-shadow: 0 0 20px rgba(107, 203, 255, 0.12);
         }
         .chart-bar.today {
             background: linear-gradient(180deg, #ffd93d 0%, #f5a623 100%);
             box-shadow: 0 0 24px rgba(255, 215, 0, 0.2);
-        }
-
-        .chart-bar-label {
-            font-size: 9px;
-            color: var(--text-lo);
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            margin-top: 4px;
-            text-align: center;
         }
 
         .chart-bar-value {
@@ -239,49 +352,32 @@
         }
 
         .chart-bar-day {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: var(--text-lo);
-            letter-spacing: 0.03em;
+            letter-spacing: 0.02em;
             text-align: center;
             margin-top: 2px;
+            white-space: nowrap;
         }
         .chart-bar-day.today-label {
             color: var(--accent-gold);
         }
 
-        /* ---- Overall stats ---- */
-        .overall-stats {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .overall-stats .stat-card {
-            flex: 1;
-            min-width: 100px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(16px) saturate(160%);
-            -webkit-backdrop-filter: blur(16px) saturate(160%);
-            border-radius: 14px;
-            padding: 14px 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-        .overall-stats .stat-card .label {
-            font-size: 10px;
+        .chart-empty {
+            text-align: center;
             color: var(--text-lo);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 600;
+            padding: 40px 10px;
+            font-size: 13px;
         }
-        .overall-stats .stat-card .value {
-            font-size: 20px;
-            font-weight: 700;
-            margin-top: 4px;
+        .chart-empty .icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.4;
         }
 
-        /* ---- Day groups (session list) ---- */
+        /* ---- List section (session list) ---- */
         .day-group {
             margin-bottom: 12px;
             background: var(--glass);
@@ -391,22 +487,21 @@
             background: rgba(255, 215, 0, 0.10);
         }
 
-        /* ---- Empty state ---- */
-        .empty-state {
+        .list-empty {
             text-align: center;
             color: var(--text-lo);
-            padding: 60px 20px;
+            padding: 50px 20px;
             font-size: 14px;
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             backdrop-filter: blur(16px);
         }
-        .empty-state .icon {
-            font-size: 36px;
+        .list-empty .icon {
+            font-size: 32px;
             display: block;
-            margin-bottom: 12px;
-            opacity: 0.5;
+            margin-bottom: 10px;
+            opacity: 0.4;
         }
 
         /* ---- scrollbar ---- */
@@ -428,38 +523,43 @@
                 padding: 14px 12px 32px;
             }
             .today-hero {
-                padding: 16px 18px;
+                padding: 14px 16px;
                 border-radius: 16px;
             }
             .today-hero .time {
-                font-size: clamp(24px, 5vw, 32px);
+                font-size: clamp(22px, 4.5vw, 28px);
             }
-            .chart-section {
+            .overall-stats .stat-card {
+                min-width: 70px;
+                padding: 10px 10px;
+            }
+            .overall-stats .stat-card .value {
+                font-size: 15px;
+            }
+            .section-tabs .tab-btn {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+            .chart-section-wrap {
                 padding: 14px 10px 14px;
                 border-radius: 16px;
             }
             .chart-bars {
-                height: 110px;
+                height: 130px;
                 gap: 4px;
+            }
+            .chart-bar-wrapper {
+                flex: 0 0 36px;
+                min-width: 28px;
             }
             .chart-bar-track {
                 max-width: 32px;
-            }
-            .chart-bar-label {
-                font-size: 7px;
             }
             .chart-bar-value {
                 font-size: 7px;
             }
             .chart-bar-day {
                 font-size: 8px;
-            }
-            .overall-stats .stat-card {
-                min-width: 80px;
-                padding: 10px 12px;
-            }
-            .overall-stats .stat-card .value {
-                font-size: 16px;
             }
             .day-header {
                 padding: 12px 14px;
@@ -496,12 +596,24 @@
                 width: 17px;
                 height: 17px;
             }
+            .chart-section-wrap .chart-header .chart-pagination .arrow-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+            .chart-section-wrap .chart-header .chart-pagination .page-info {
+                font-size: 10px;
+                min-width: 36px;
+            }
         }
 
         @media (max-width: 380px) {
             .chart-bars {
-                height: 90px;
-                gap: 3px;
+                height: 110px;
+            }
+            .chart-bar-wrapper {
+                flex: 0 0 30px;
+                min-width: 22px;
             }
             .chart-bar-track {
                 max-width: 26px;
@@ -510,9 +622,6 @@
             .chart-bar {
                 border-radius: 4px 4px 0 0;
                 min-height: 3px;
-            }
-            .chart-bar-label {
-                font-size: 6px;
             }
             .chart-bar-value {
                 font-size: 6px;
@@ -524,11 +633,11 @@
                 gap: 6px;
             }
             .overall-stats .stat-card {
-                min-width: 60px;
-                padding: 8px 10px;
+                min-width: 50px;
+                padding: 8px 8px;
             }
             .overall-stats .stat-card .value {
-                font-size: 14px;
+                font-size: 13px;
             }
             .overall-stats .stat-card .label {
                 font-size: 8px;
@@ -561,23 +670,38 @@
             </div>
         </div>
 
-        <!-- Chart -->
-        <div class="chart-section" id="chartSection">
-            <div class="chart-header">
-                <span class="chart-label">Weekly Activity</span>
-                <span class="chart-total">Week total: <span id="weekTotalTime">--</span></span>
-            </div>
-            <div class="chart-bars" id="chartBars"></div>
-        </div>
-
         <!-- Overall stats -->
         <div class="overall-stats" id="overallStats"></div>
 
-        <!-- Session list -->
-        <div id="historyContainer"></div>
+        <!-- Section tabs -->
+        <div class="section-tabs" id="sectionTabs">
+            <button class="tab-btn active" data-section="list">📋 List</button>
+            <button class="tab-btn" data-section="chart">📊 Chart</button>
+        </div>
+
+        <!-- Section: List -->
+        <div class="section active" id="sectionList">
+            <div id="historyContainer"></div>
+        </div>
+
+        <!-- Section: Chart -->
+        <div class="section" id="sectionChart">
+            <div class="chart-section-wrap">
+                <div class="chart-header">
+                    <span class="chart-label">Daily Focus</span>
+                    <div class="chart-pagination">
+                        <button class="arrow-btn" id="chartPrev" disabled>‹</button>
+                        <span class="page-info" id="chartPageInfo">1 / 1</span>
+                        <button class="arrow-btn" id="chartNext" disabled>›</button>
+                    </div>
+                </div>
+                <div class="chart-bars" id="chartBars"></div>
+            </div>
+        </div>
     </div>
 
     <script>
+        // ---- Helpers ----
         function loadSessions() {
             try {
                 const data = localStorage.getItem('focusSessions');
@@ -626,9 +750,20 @@
             return getDayKey(new Date());
         }
 
-        function getDayOfWeek(date) {
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            return days[date.getDay()];
+        function dayLabel(dateKey) {
+            const today = getTodayKey();
+            const yestDate = new Date();
+            yestDate.setDate(yestDate.getDate() - 1);
+            const yesterday = getDayKey(yestDate);
+            if (dateKey === today) return 'Today';
+            if (dateKey === yesterday) return 'Yesterday';
+            const dateObj = new Date(dateKey + 'T00:00:00');
+            return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        function formatDateLabel(dateKey) {
+            const d = new Date(dateKey + 'T00:00:00');
+            return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
         }
 
         function groupByDay(sessions) {
@@ -645,110 +780,73 @@
                 }));
         }
 
-        function dayLabel(dateKey) {
-            const today = getTodayKey();
-            const yestDate = new Date();
-            yestDate.setDate(yestDate.getDate() - 1);
-            const yesterday = getDayKey(yestDate);
-            if (dateKey === today) return 'Today';
-            if (dateKey === yesterday) return 'Yesterday';
-            const dateObj = new Date(dateKey + 'T00:00:00');
-            return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        }
+        // ---- State ----
+        let allSessions = [];
+        let chartPage = 0;
+        const PAGE_SIZE = 7;
 
-        function getWeekDays() {
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const days = [];
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - dayOfWeek + i);
-                d.setHours(0, 0, 0, 0);
-                days.push(d);
-            }
-            return days;
-        }
+        // ---- DOM refs ----
+        const todayTotalTime = document.getElementById('todayTotalTime');
+        const todaySessionsCount = document.getElementById('todaySessionsCount');
+        const overallStats = document.getElementById('overallStats');
+        const historyContainer = document.getElementById('historyContainer');
+        const chartBars = document.getElementById('chartBars');
+        const chartPrev = document.getElementById('chartPrev');
+        const chartNext = document.getElementById('chartNext');
+        const chartPageInfo = document.getElementById('chartPageInfo');
+        const sectionTabs = document.getElementById('sectionTabs');
+        const sectionList = document.getElementById('sectionList');
+        const sectionChart = document.getElementById('sectionChart');
 
-        function render() {
-            const sessions = loadSessions();
-            const container = document.getElementById('historyContainer');
-            const overallStats = document.getElementById('overallStats');
-            const todayTotalTime = document.getElementById('todayTotalTime');
-            const todaySessionsCount = document.getElementById('todaySessionsCount');
-            const chartBars = document.getElementById('chartBars');
-            const weekTotalTime = document.getElementById('weekTotalTime');
+        let touchStartX = 0;
+        let touchEndX = 0;
 
+        // ---- Render functions ----
+        function renderTodayHero() {
             const todayKey = getTodayKey();
-            const todaySessions = sessions.filter(s => s.date === todayKey);
+            const todaySessions = allSessions.filter(s => s.date === todayKey);
             const todayTotal = todaySessions.reduce((sum, s) => sum + s.durationMs, 0);
-
             todayTotalTime.textContent = formatDuration(todayTotal);
             todaySessionsCount.textContent = `${todaySessions.length} session${todaySessions.length !== 1 ? 's' : ''}`;
+        }
 
-            // ---- Chart ----
-            const weekDays = getWeekDays();
-            const weekData = weekDays.map(day => {
-                const key = getDayKey(day);
-                const daySessions = sessions.filter(s => s.date === key);
-                const total = daySessions.reduce((sum, s) => sum + s.durationMs, 0);
-                return { date: key, day: getDayOfWeek(day), total, isToday: key === todayKey };
-            });
-
-            const maxTotal = Math.max(...weekData.map(d => d.total), 1);
-            const weekSum = weekData.reduce((sum, d) => sum + d.total, 0);
-            weekTotalTime.textContent = formatDuration(weekSum);
-
-            let chartHtml = '';
-            weekData.forEach((d, idx) => {
-                const pct = Math.max((d.total / maxTotal) * 100, 4);
-                const isToday = d.isToday;
-                const barClass = isToday ? 'chart-bar today' : 'chart-bar';
-                const dayClass = isToday ? 'chart-bar-day today-label' : 'chart-bar-day';
-                const displayTotal = d.total > 0 ? formatDurationShort(d.total) : '';
-                chartHtml += `
-                        <div class="chart-bar-wrapper">
-                            <div class="chart-bar-track">
-                                <div class="${barClass}" style="height: ${pct}%;"></div>
-                            </div>
-                            <div class="chart-bar-value">${displayTotal}</div>
-                            <div class="${dayClass}">${d.day}</div>
-                        </div>
-                    `;
-            });
-            chartBars.innerHTML = chartHtml;
-
-            // ---- Overall stats ----
-            if (sessions.length === 0) {
+        function renderOverallStats() {
+            if (allSessions.length === 0) {
                 overallStats.innerHTML = '';
-                container.innerHTML = `
-                        <div class="empty-state">
-                            <span class="icon">🧘</span>
-                            No sessions recorded yet.<br />
-                            Start a focus session to see your history here.
-                        </div>
-                    `;
+                return;
+            }
+            const totalAllTime = allSessions.reduce((sum, s) => sum + s.durationMs, 0);
+            const dayGroups = groupByDay(allSessions);
+            overallStats.innerHTML = `
+                <div class="stat-card">
+                    <div class="label">Total sessions</div>
+                    <div class="value">${allSessions.length}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total time</div>
+                    <div class="value">${formatDuration(totalAllTime)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Days tracked</div>
+                    <div class="value">${dayGroups.length}</div>
+                </div>
+            `;
+        }
+
+        function renderList() {
+            if (allSessions.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="list-empty">
+                        <span class="icon">🧘</span>
+                        No sessions recorded yet.<br />
+                        Start a focus session to see your history here.
+                    </div>
+                `;
                 return;
             }
 
-            const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
-            const dayGroups = groupByDay(sessions);
-
-            overallStats.innerHTML = `
-                    <div class="stat-card">
-                        <div class="label">Total sessions</div>
-                        <div class="value">${sessions.length}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total time</div>
-                        <div class="value">${formatDuration(totalAllTime)}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Days tracked</div>
-                        <div class="value">${dayGroups.length}</div>
-                    </div>
-                `;
-
-            // ---- Session list ----
+            const todayKey = getTodayKey();
+            const dayGroups = groupByDay(allSessions);
             let html = '';
             dayGroups.forEach(group => {
                 const dayTotal = group.sessions.reduce((sum, s) => sum + s.durationMs, 0);
@@ -763,29 +861,28 @@
                     const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
                     const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
                     sessionsHtml += `
-                            <li>
-                                <span class="session-time">${timeStr}</span>
-                                <span class="session-duration">${formatDuration(s.durationMs)}</span>
-                                <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
-                            </li>
-                        `;
+                        <li>
+                            <span class="session-time">${timeStr}</span>
+                            <span class="session-duration">${formatDuration(s.durationMs)}</span>
+                            <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
+                        </li>
+                    `;
                 });
                 const countBadge = group.sessions.length > 1 ? `<span class="count-badge">${group.sessions.length}</span>` :
                     '';
                 html += `
-                        <div class="day-group">
-                            <div class="day-header">
-                                <span class="day-name">${label}</span>
-                                <span class="day-total">${countBadge} ${formatDuration(dayTotal)} <span class="chevron">▼</span></span>
-                            </div>
-                            <ul class="day-sessions">${sessionsHtml}</ul>
+                    <div class="day-group">
+                        <div class="day-header">
+                            <span class="day-name">${label}</span>
+                            <span class="day-total">${countBadge} ${formatDuration(dayTotal)} <span class="chevron">▼</span></span>
                         </div>
-                    `;
+                        <ul class="day-sessions">${sessionsHtml}</ul>
+                    </div>
+                `;
             });
-            container.innerHTML = html;
+            historyContainer.innerHTML = html;
 
-            // ---- Toggle collapse ----
-            container.querySelectorAll('.day-header').forEach(header => {
+            historyContainer.querySelectorAll('.day-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const group = header.closest('.day-group');
                     group.classList.toggle('collapsed');
@@ -793,7 +890,143 @@
             });
         }
 
-        render();
+        function renderChart() {
+            if (allSessions.length === 0) {
+                chartBars.innerHTML = `
+                    <div class="chart-empty" style="width:100%;">
+                        <span class="icon">📊</span>
+                        No data to show.
+                    </div>
+                `;
+                chartPrev.disabled = true;
+                chartNext.disabled = true;
+                chartPageInfo.textContent = '0 / 0';
+                return;
+            }
+
+            // Group by day and sort descending
+            const dayGroups = groupByDay(allSessions);
+            const totalPages = Math.max(1, Math.ceil(dayGroups.length / PAGE_SIZE));
+            if (chartPage >= totalPages) chartPage = totalPages - 1;
+            if (chartPage < 0) chartPage = 0;
+
+            const start = chartPage * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, dayGroups.length);
+            const pageData = dayGroups.slice(start, end);
+
+            chartPageInfo.textContent = `${chartPage + 1} / ${totalPages}`;
+            chartPrev.disabled = chartPage === 0;
+            chartNext.disabled = chartPage >= totalPages - 1;
+
+            if (pageData.length === 0) {
+                chartBars.innerHTML = `
+                    <div class="chart-empty" style="width:100%;">
+                        <span class="icon">📊</span>
+                        No data on this page.
+                    </div>
+                `;
+                return;
+            }
+
+            const maxTotal = Math.max(...pageData.map(d => d.sessions.reduce((sum, s) => sum + s.durationMs, 0)), 1);
+            const todayKey = getTodayKey();
+
+            let barsHtml = '';
+            pageData.forEach(group => {
+                const dayTotal = group.sessions.reduce((sum, s) => sum + s.durationMs, 0);
+                const pct = Math.max((dayTotal / maxTotal) * 100, 4);
+                const isToday = group.date === todayKey;
+                const barClass = isToday ? 'chart-bar today' : 'chart-bar';
+                const dayClass = isToday ? 'chart-bar-day today-label' : 'chart-bar-day';
+                const displayTotal = dayTotal > 0 ? formatDurationShort(dayTotal) : '';
+                const label = formatDateLabel(group.date);
+                barsHtml += `
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar-track">
+                            <div class="${barClass}" style="height: ${pct}%;"></div>
+                        </div>
+                        <div class="chart-bar-value">${displayTotal}</div>
+                        <div class="${dayClass}">${label}</div>
+                    </div>
+                `;
+            });
+            chartBars.innerHTML = barsHtml;
+        }
+
+        function fullRender() {
+            renderTodayHero();
+            renderOverallStats();
+            renderList();
+            renderChart();
+        }
+
+        // ---- Chart navigation ----
+        function goToPage(page) {
+            const dayGroups = groupByDay(allSessions);
+            const totalPages = Math.max(1, Math.ceil(dayGroups.length / PAGE_SIZE));
+            if (page < 0) page = 0;
+            if (page >= totalPages) page = totalPages - 1;
+            chartPage = page;
+            renderChart();
+        }
+
+        chartPrev.addEventListener('click', () => goToPage(chartPage - 1));
+        chartNext.addEventListener('click', () => goToPage(chartPage + 1));
+
+        // ---- Swipe support for chart ----
+        const chartWrap = document.querySelector('.chart-section-wrap');
+        chartWrap.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        chartWrap.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goToPage(chartPage + 1);
+                else goToPage(chartPage - 1);
+            }
+        }, { passive: true });
+
+        // ---- Section tabs ----
+        sectionTabs.addEventListener('click', (e) => {
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            const section = btn.dataset.section;
+            sectionTabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (section === 'list') {
+                sectionList.classList.add('active');
+                sectionChart.classList.remove('active');
+            } else {
+                sectionChart.classList.add('active');
+                sectionList.classList.remove('active');
+                // Re-render chart in case data changed
+                renderChart();
+            }
+        });
+
+        // ---- Init ----
+        allSessions = loadSessions();
+        fullRender();
+
+        // Re-render when returning to page (in case data changed in timer)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                allSessions = loadSessions();
+                fullRender();
+            }
+        });
+
+        // ---- Keyboard shortcuts ----
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (sectionChart.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') goToPage(chartPage - 1);
+                if (e.key === 'ArrowRight') goToPage(chartPage + 1);
+            }
+        });
     </script>
 </body>
 </html>
