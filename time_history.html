@@ -386,7 +386,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 4px;
             padding: 0 6px;
         }
         .chart-header .chart-label {
@@ -434,11 +434,43 @@
             transform: scale(0.92);
         }
 
+        .chart-range-label {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-lo);
+            opacity: 0.7;
+            margin-bottom: 14px;
+            letter-spacing: 0.02em;
+        }
+
+        .chart-avg-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1.5px dashed rgba(255, 217, 61, 0.35);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .chart-avg-tag {
+            position: absolute;
+            right: 2px;
+            top: -8px;
+            font-size: 8.5px;
+            font-weight: 600;
+            color: rgba(255, 217, 61, 0.75);
+            background: rgba(10,12,16,0.55);
+            padding: 1px 6px;
+            border-radius: 100px;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
         .chart-bars {
+            position: relative;
             display: flex;
             justify-content: space-around;
             align-items: flex-end;
-            height: 160px;
+            height: 180px;
             padding: 0 4px;
             gap: 8px;
             touch-action: pan-x;
@@ -450,6 +482,7 @@
         .chart-bars::-webkit-scrollbar { display: none; }
 
         .chart-bar-wrapper {
+            position: relative;
             flex: 0 0 48px;
             display: flex;
             flex-direction: column;
@@ -458,6 +491,7 @@
             height: 100%;
             justify-content: flex-end;
             min-width: 36px;
+            z-index: 2;
         }
         .chart-bar-track {
             width: 100%;
@@ -468,27 +502,44 @@
             justify-content: flex-end;
             border-radius: 6px 6px 0 0;
             background: rgba(255,255,255,0.04);
+            cursor: pointer;
+            position: relative;
         }
         .chart-bar {
             width: 100%;
             border-radius: 6px 6px 0 0;
             min-height: 4px;
             background: var(--bar-gradient);
-            transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1);
+            transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1), filter 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 0 20px rgba(107,203,255,0.12);
+        }
+        .chart-bar-track:hover .chart-bar {
+            filter: brightness(1.18);
+            box-shadow: 0 0 26px rgba(107,203,255,0.3);
         }
         .chart-bar.today {
             background: linear-gradient(180deg, #ffd93d 0%, #f5a623 100%);
             box-shadow: 0 0 24px rgba(255,215,0,0.25);
         }
+        .chart-bar-track:hover .chart-bar.today {
+            box-shadow: 0 0 30px rgba(255,215,0,0.4);
+        }
+        .chart-bar.empty-day {
+            background: rgba(255,255,255,0.06);
+            box-shadow: none;
+        }
         .chart-bar-value {
             font-size: 8px;
             color: var(--text-lo);
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
             margin-bottom: 2px;
-            opacity: 0.7;
+            opacity: 0.75;
             white-space: nowrap;
+        }
+        .chart-bar-value.today-value {
+            color: var(--accent-gold);
+            opacity: 1;
         }
         .chart-bar-day {
             font-size: 9px;
@@ -502,6 +553,39 @@
         .chart-bar-day.today-label {
             color: var(--accent-gold);
         }
+
+        .chart-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px) scale(0.9);
+            background: rgba(15, 16, 22, 0.95);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text-hi);
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+        .chart-bar-track:hover .chart-tooltip,
+        .chart-bar-track:active .chart-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-12px) scale(1);
+        }
+        .chart-tooltip .tt-sessions {
+            display: block;
+            font-weight: 400;
+            color: var(--text-lo);
+            font-size: 9.5px;
+            margin-top: 1px;
+        }
+
         .chart-empty {
             text-align: center;
             color: var(--text-lo);
@@ -513,6 +597,32 @@
             display: block;
             margin-bottom: 8px;
             opacity: 0.4;
+        }
+
+        .chart-view-toggle {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 14px;
+        }
+        .chart-view-toggle .view-btn {
+            flex: 1;
+            border: none;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-lo);
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 7px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            letter-spacing: 0.02em;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .chart-view-toggle .view-btn.active {
+            background: rgba(107,203,255,0.14);
+            color: var(--accent-blue);
+            border-color: rgba(107,203,255,0.3);
         }
 
         /* ---- list section ---- */
@@ -727,7 +837,7 @@
                 padding: 8px 0;
             }
             .chart-bars {
-                height: 130px;
+                height: 150px;
                 gap: 4px;
             }
             .chart-bar-wrapper {
@@ -790,7 +900,7 @@
                 border-radius: 16px;
             }
             .chart-bars {
-                height: 110px;
+                height: 130px;
             }
             .chart-bar-wrapper {
                 flex: 0 0 30px;
@@ -917,6 +1027,12 @@
                                 <span class="page-info" id="chartPageInfo">1 / 1</span>
                                 <button class="arrow-btn" id="chartNext" disabled>›</button>
                             </div>
+                        </div>
+                        <div class="chart-range-label" id="chartRangeLabel"></div>
+                        <div class="chart-view-toggle" id="chartViewToggle">
+                            <button class="view-btn active" data-view="7">Week</button>
+                            <button class="view-btn" data-view="30">Month</button>
+                            <button class="view-btn" data-view="all">All</button>
                         </div>
                         <div class="chart-bars" id="chartBars"></div>
                     </div>
@@ -1135,15 +1251,23 @@
                 return `${minutes}m`;
             }
 
+            // ---- Local-date helpers (fixes day flipping at UTC midnight instead of local midnight) ----
+            function toDateKey(d) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
             function getTodayKey() {
-                return new Date().toISOString().split('T')[0];
+                return toDateKey(new Date());
             }
 
             function dayLabel(dateKey) {
                 const today = getTodayKey();
                 const yestDate = new Date();
                 yestDate.setDate(yestDate.getDate() - 1);
-                const yesterday = yestDate.toISOString().split('T')[0];
+                const yesterday = toDateKey(yestDate);
                 if (dateKey === today) return 'Today';
                 if (dateKey === yesterday) return 'Yesterday';
                 const dateObj = new Date(dateKey + 'T00:00:00');
@@ -1153,6 +1277,11 @@
             function formatDateLabel(dateKey) {
                 const d = new Date(dateKey + 'T00:00:00');
                 return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+
+            function formatDateLabelFull(dateKey) {
+                const d = new Date(dateKey + 'T00:00:00');
+                return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
             }
 
             function groupByDay(sessions) {
@@ -1171,7 +1300,7 @@
 
             let allSessions = [];
             let chartPage = 0;
-            const PAGE_SIZE = 7;
+            let chartView = '7'; // '7' | '30' | 'all'
 
             const todayTotalTime = document.getElementById('todayTotalTime');
             const todaySessionsCount = document.getElementById('todaySessionsCount');
@@ -1181,6 +1310,8 @@
             const chartPrev = document.getElementById('chartPrev');
             const chartNext = document.getElementById('chartNext');
             const chartPageInfo = document.getElementById('chartPageInfo');
+            const chartRangeLabel = document.getElementById('chartRangeLabel');
+            const chartViewToggle = document.getElementById('chartViewToggle');
             const sectionTabs = document.getElementById('sectionTabs');
             const sectionList = document.getElementById('sectionList');
             const sectionChart = document.getElementById('sectionChart');
@@ -1275,7 +1406,7 @@
                 });
             }
 
-            function renderChart() {
+            function buildAllDates() {
                 let allDates = [];
                 if (allSessions.length > 0) {
                     let earliest = new Date();
@@ -1284,21 +1415,36 @@
                         if (d < earliest) earliest = d;
                     });
                     const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    earliest.setHours(0, 0, 0, 0);
                     let current = new Date(earliest);
                     while (current <= today) {
-                        allDates.push(current.toISOString().split('T')[0]);
+                        allDates.push(toDateKey(current));
                         current.setDate(current.getDate() + 1);
                     }
                 }
+                return allDates;
+            }
+
+            function getPageSize() {
+                if (chartView === '30') return 30;
+                if (chartView === 'all') return Infinity;
+                return 7;
+            }
+
+            function renderChart() {
+                const allDates = buildAllDates();
 
                 if (allDates.length === 0) {
                     chartBars.innerHTML = `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data to show.</div>`;
                     chartPrev.disabled = true;
                     chartNext.disabled = true;
                     chartPageInfo.textContent = '0 / 0';
+                    chartRangeLabel.textContent = '';
                     return;
                 }
 
+                const PAGE_SIZE = getPageSize();
                 const totalPages = Math.max(1, Math.ceil(allDates.length / PAGE_SIZE));
                 if (chartPage >= totalPages) chartPage = totalPages - 1;
                 if (chartPage < 0) chartPage = 0;
@@ -1313,7 +1459,14 @@
 
                 if (pageDates.length === 0) {
                     chartBars.innerHTML = `<div class="chart-empty" style="width:100%;"><span class="icon">📊</span>No data on this page.</div>`;
+                    chartRangeLabel.textContent = '';
                     return;
+                }
+
+                if (pageDates.length > 1) {
+                    chartRangeLabel.textContent = `${formatDateLabel(pageDates[0])} — ${formatDateLabel(pageDates[pageDates.length - 1])}`;
+                } else {
+                    chartRangeLabel.textContent = formatDateLabelFull(pageDates[0]);
                 }
 
                 const dayTotals = pageDates.map(date => {
@@ -1323,27 +1476,57 @@
                 });
 
                 const maxTotal = Math.max(...dayTotals.map(d => d.total), 1);
+                const activeDays = dayTotals.filter(d => d.total > 0);
+                const avgTotal = activeDays.length > 0
+                    ? activeDays.reduce((sum, d) => sum + d.total, 0) / activeDays.length
+                    : 0;
+                const avgPct = avgTotal > 0 ? Math.min((avgTotal / maxTotal) * 100, 100) : 0;
                 const todayKey = getTodayKey();
 
                 let barsHtml = '';
+                if (avgTotal > 0 && dayTotals.length > 1) {
+                    barsHtml += `
+                        <div class="chart-avg-line" style="bottom: calc(${avgPct}% + 24px);">
+                            <span class="chart-avg-tag">avg ${formatDurationShort(avgTotal)}</span>
+                        </div>
+                    `;
+                }
+
                 dayTotals.forEach(day => {
-                    const pct = Math.max((day.total / maxTotal) * 100, 4);
+                    const hasData = day.total > 0;
+                    const pct = hasData ? Math.max((day.total / maxTotal) * 100, 4) : 3;
                     const isToday = day.date === todayKey;
-                    const barClass = isToday ? 'chart-bar today' : 'chart-bar';
+                    let barClass = 'chart-bar';
+                    if (!hasData) barClass += ' empty-day';
+                    else if (isToday) barClass += ' today';
                     const dayClass = isToday ? 'chart-bar-day today-label' : 'chart-bar-day';
-                    const displayTotal = day.total > 0 ? formatDurationShort(day.total) : '0m';
+                    const valueClass = isToday ? 'chart-bar-value today-value' : 'chart-bar-value';
+                    const displayTotal = hasData ? formatDurationShort(day.total) : '';
                     const label = formatDateLabel(day.date);
+                    const fullLabel = formatDateLabelFull(day.date);
+                    const sessionCount = day.sessions.length;
+                    const tooltipDuration = hasData ? formatDuration(day.total) : 'No sessions';
+                    const tooltipSessions = hasData ? `${sessionCount} session${sessionCount !== 1 ? 's' : ''}` : '';
                     barsHtml += `
                         <div class="chart-bar-wrapper">
-                            <div class="chart-bar-track">
+                            <div class="chart-bar-track" data-date="${day.date}">
+                                <div class="chart-tooltip">
+                                    ${fullLabel}
+                                    <span class="tt-sessions">${tooltipDuration}${tooltipSessions ? ' · ' + tooltipSessions : ''}</span>
+                                </div>
                                 <div class="${barClass}" style="height: ${pct}%;"></div>
                             </div>
-                            <div class="chart-bar-value">${displayTotal}</div>
+                            <div class="${valueClass}">${displayTotal}</div>
                             <div class="${dayClass}">${label}</div>
                         </div>
                     `;
                 });
                 chartBars.innerHTML = barsHtml;
+
+                // Scroll to the end (most recent day) so "today" is visible without manual scrolling
+                requestAnimationFrame(() => {
+                    chartBars.scrollLeft = chartBars.scrollWidth;
+                });
             }
 
             function fullRender() {
@@ -1354,20 +1537,8 @@
             }
 
             function goToPage(page) {
-                let allDates = [];
-                if (allSessions.length > 0) {
-                    let earliest = new Date();
-                    allSessions.forEach(s => {
-                        const d = new Date(s.date + 'T00:00:00');
-                        if (d < earliest) earliest = d;
-                    });
-                    const today = new Date();
-                    let current = new Date(earliest);
-                    while (current <= today) {
-                        allDates.push(current.toISOString().split('T')[0]);
-                        current.setDate(current.getDate() + 1);
-                    }
-                }
+                const allDates = buildAllDates();
+                const PAGE_SIZE = getPageSize();
                 const totalPages = Math.max(1, Math.ceil(allDates.length / PAGE_SIZE));
                 if (page < 0) page = 0;
                 if (page >= totalPages) page = totalPages - 1;
@@ -1377,6 +1548,16 @@
 
             chartPrev.addEventListener('click', () => goToPage(chartPage + 1));
             chartNext.addEventListener('click', () => goToPage(chartPage - 1));
+
+            chartViewToggle.addEventListener('click', (e) => {
+                const btn = e.target.closest('.view-btn');
+                if (!btn) return;
+                chartViewToggle.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                chartView = btn.dataset.view;
+                chartPage = 0;
+                renderChart();
+            });
 
             const chartWrap = document.querySelector('.chart-section-wrap');
             chartWrap.addEventListener('touchstart', (e) => {
@@ -1411,6 +1592,19 @@
             // Init
             allSessions = loadSessions();
             fullRender();
+
+            // Refresh at local midnight so "Today" rolls over without needing a reload
+            function scheduleMidnightRefresh() {
+                const now = new Date();
+                const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+                const msUntil = next.getTime() - now.getTime();
+                setTimeout(() => {
+                    allSessions = loadSessions();
+                    fullRender();
+                    scheduleMidnightRefresh();
+                }, msUntil);
+            }
+            scheduleMidnightRefresh();
 
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
