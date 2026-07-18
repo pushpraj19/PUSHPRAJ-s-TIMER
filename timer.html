@@ -1241,15 +1241,18 @@
     <!-- ---- Session history panel ---- -->
     <div class="session-panel" id="sessionPanel">
         <div class="header">
-            <span>📊 Session History</span>
-            <button class="close-btn" id="closeSessionBtn">✕</button>
+            <span>📊 Today's Sessions</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <a href="time_history.html" class="close-btn" id="fullHistoryBtn" title="View full history" style="font-size:13px; text-decoration:none;">🗂️ Full history</a>
+                <button class="close-btn" id="closeSessionBtn">✕</button>
+            </div>
         </div>
         <ul class="session-list" id="sessionList">
             <li class="session-empty">No sessions yet. Start focusing!</li>
         </ul>
         <div class="footer-stats">
-            <span>Total sessions: <span class="stat-value" id="totalSessionsStat">0</span></span>
-            <span>Total time: <span class="stat-value" id="totalTimeStat">0m</span></span>
+            <span>Sessions today: <span class="stat-value" id="totalSessionsStat">0</span></span>
+            <span>Total time today: <span class="stat-value" id="totalTimeStat">0m</span></span>
         </div>
     </div>
 
@@ -1551,27 +1554,28 @@
             function updateSessionDisplay() {
                 const total = getTotalTimeForDay(getTodayKey());
                 todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
-                totalSessionsStat.textContent = sessions.length;
-                const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
-                totalTimeStat.textContent = formatDuration(totalAllTime);
+                const todaySessions = sessions.filter(s => s.date === getTodayKey());
+                totalSessionsStat.textContent = todaySessions.length;
+                totalTimeStat.textContent = formatDuration(total);
                 renderSessionList();
             }
 
             function renderSessionList() {
-                if (sessions.length === 0) {
-                    sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
+                const todaySessions = sessions.filter(s => s.date === getTodayKey());
+                if (todaySessions.length === 0) {
+                    sessionList.innerHTML = '<li class="session-empty">No sessions yet today. Start focusing!</li>';
                     return;
                 }
-                const sorted = [...sessions].reverse().slice(0, 50);
+                const sorted = [...todaySessions].reverse();
                 let html = '';
                 sorted.forEach(s => {
-                    const dateObj = new Date(s.date + 'T00:00:00');
-                    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const dateObj = new Date(s.timestamp);
+                    const timeStr = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                     const modeClass = s.mode === 'stopwatch' ? 'stopwatch' : 'timer';
                     const modeLabel = s.mode === 'stopwatch' ? '⏱️' : '⏲️';
                     html += `
                             <li>
-                                <span class="session-date">${dateStr}</span>
+                                <span class="session-date">${timeStr}</span>
                                 <span class="session-duration">${formatDuration(s.durationMs)}</span>
                                 <span class="session-mode ${modeClass}">${modeLabel} ${s.mode}</span>
                             </li>
@@ -2730,9 +2734,9 @@
                 sessionPanel.classList.toggle('open');
                 if (sessionPanel.classList.contains('open')) {
                     renderSessionList();
-                    totalSessionsStat.textContent = sessions.length;
-                    const totalAllTime = sessions.reduce((sum, s) => sum + s.durationMs, 0);
-                    totalTimeStat.textContent = formatDuration(totalAllTime);
+                    const todaySessions = sessions.filter(s => s.date === getTodayKey());
+                    totalSessionsStat.textContent = todaySessions.length;
+                    totalTimeStat.textContent = formatDuration(getTotalTimeForDay(getTodayKey()));
                 }
             }
 
