@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
+<head><meta charset="UTF-8"><title>Page 2</title></head>
 <body>
-  <p>Page 2: <span id="display"></span></p>
-  <a href="page1.html">Back</a>
-  <script>
-    const key = 'test_timer';
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const state = JSON.parse(raw);
-      const elapsed = (Date.now() - state.startTime) / 1000;
-      document.getElementById('display').textContent = elapsed.toFixed(1) + ' seconds passed';
-    }
-  </script>
+  <h2>Page 2</h2>
+  <div id="timerDisplay">00:00.00</div>
+  <button id="startPauseBtn">Start</button>
+  <button id="resetBtn">Reset</button>
+  <br><br>
+  <a href="page1.html">Back to Page 1</a>
+
+  <script src="stopwatch.js"></script>
 </body>
 </html>
