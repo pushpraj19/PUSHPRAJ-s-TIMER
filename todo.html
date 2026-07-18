@@ -28,7 +28,19 @@
             document.getElementById('manifestLink').href = url;
         })();
     </script>
-
+<script src="bg-timer.js"></script>
+<script>
+    const origUpdateClockTodo = updateClock;
+    updateClock = function() {
+        origUpdateClockTodo();
+        const bgState = BgTimer.getState();
+        if (bgState && bgState.isRunning) {
+            document.getElementById('runningTime').textContent = "⏱ " + BgTimer.formatTime(BgTimer.getElapsed(bgState));
+        }
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
     <style>
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
