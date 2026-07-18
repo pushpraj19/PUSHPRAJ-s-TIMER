@@ -3154,14 +3154,6 @@
     renderBgSessions();
 });
 
-// --- Reset Button Logic ---
-document.getElementById('resetBtn').addEventListener('click', () => {
-    if (typeof timerInterval !== 'undefined' && timerInterval) clearInterval(timerInterval);
-    BgTimer.reset(); 
-    document.getElementById('timerDisplay').textContent = '00:00.00';
-    document.getElementById('timerDisplay').classList.remove('running');
-    document.getElementById('startPauseBtn').textContent = 'Start';
-});
             
             // ---- init ----
             loadSessions();
