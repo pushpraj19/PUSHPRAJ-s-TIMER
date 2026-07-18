@@ -3054,7 +3054,55 @@
                     toggleSessionPanel();
                 }
             });
+// Restore UI if returning from index/todo
+(function initTimerUI() {
+    const state = BgTimer.getState();
+    if (state && state.isRunning) {
+        const elapsed = BgTimer.getElapsed(state);
+        timerDisplay.textContent = BgTimer.formatTime(state.mode === 'timer' ? Math.max(0, state.targetMs - elapsed) : elapsed, true);
+        
+        if (!state.isPaused) {
+            startPauseBtn.textContent = 'Pause';
+            timerDisplay.classList.add('running');
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimerDisplay, 50);
+        } else {
+            startPauseBtn.textContent = 'Resume';
+        }
+        
+        // Ensure correct mode toggle is highlighted
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        const correctModeBtn = document.querySelector(`.mode-btn[data-mode="${state.mode}"]`);
+        if (correctModeBtn) correctModeBtn.classList.add('active');
+    }
+    
+    // Update session history using the new BgTimer storage
+    function renderBgSessions() {
+        const sessions = BgTimer.getSessions();
+        document.getElementById('totalSessionsStat').textContent = sessions.length;
+        const totalMs = sessions.reduce((sum, s) => sum + s.ms, 0);
+        document.getElementById('totalTimeStat').textContent = Math.floor(totalMs / 60000) + 'm';
+        
+        const listEl = document.getElementById('sessionList');
+        if (sessions.length === 0) {
+            listEl.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
+            return;
+        }
+        listEl.innerHTML = sessions.map(s => `
+            <li>
+                <span class="session-date">${s.date}</span>
+                <span class="session-duration">${BgTimer.formatTime(s.ms)}</span>
+                <span class="session-mode ${s.mode}">${s.mode === 'timer' ? 'Timer' : 'Stopwatch'}</span>
+            </li>
+        `).join('');
+    }
+    
+    window.addEventListener('sessionSaved', renderBgSessions);
+    renderBgSessions();
+});
 
+
+            
             // ---- init ----
             loadSessions();
             updateTimerControlsVisibility();
@@ -3078,6 +3126,7 @@
             console.log('📲 Install button in top‑right corner');
 
         })();
+        
     </script>
 
 
