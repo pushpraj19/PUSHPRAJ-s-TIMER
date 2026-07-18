@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Page 1: <span id="counter">0</span></p>
+  <a href="page2.html">Go to Page 2</a>
+  <script>
+    const key = 'test_timer';
+    // save a dummy running state
+    const state = { startTime: Date.now(), running: true };
+    localStorage.setItem(key, JSON.stringify(state));
+  </script>
+</body>
+</html>
