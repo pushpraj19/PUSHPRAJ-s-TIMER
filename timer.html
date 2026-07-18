@@ -1517,12 +1517,16 @@
             </svg>
         </button>
     </div>
-    <script>
+  <script>
 (function() {
     'use strict';
 
-    // ---------- localStorage key ----------
+    // ---------- localStorage keys ----------
     const TIMER_STATE_KEY = 'focusTimerState';
+    const SESSIONS_KEY = 'focusSessions';
+    const TODOS_KEY = 'focusTodos';
+    const PRESETS_KEY = 'focusPresets';
+    const SCENE_KEY = 'sceneState';
 
     // ---- DOM refs ----
     const timerDisplay = document.getElementById('timerDisplay');
@@ -1544,12 +1548,11 @@
     const savedPresetsContainer = document.getElementById('savedPresets');
     const customMinutes = document.getElementById('customMinutes');
     const customSeconds = document.getElementById('customSeconds');
-    const setCustomTime = document.getElementById('setCustomTime');
+    const setCustomTimeBtn = document.getElementById('setCustomTime');
     const savePresetBtn = document.getElementById('savePresetBtn');
     const wakeIndicator = document.getElementById('wakeIndicator');
     const installBtn = document.getElementById('installBtn');
 
-    // History elements
     const historyToggle = document.getElementById('historyToggle');
     const sessionPanel = document.getElementById('sessionPanel');
     const sessionList = document.getElementById('sessionList');
@@ -1557,7 +1560,6 @@
     const totalTimeStat = document.getElementById('totalTimeStat');
     const closeSessionBtn = document.getElementById('closeSessionBtn');
 
-    // Todo elements
     const todoPanel = document.getElementById('todoPanel');
     const todoToggle = document.getElementById('todoToggle');
     const closeTodoBtn = document.getElementById('closeTodoBtn');
@@ -1565,15 +1567,16 @@
     const addTodoBtn = document.getElementById('addTodoBtn');
     const todoList = document.getElementById('todoList');
 
-    // scene elements
-    const sceneRain = document.getElementById('scene-rain');
-    const sceneForest = document.getElementById('scene-forest');
-    const sceneLake = document.getElementById('scene-lake');
-    const sceneCafe = document.getElementById('scene-cafe');
-    const sceneOcean = document.getElementById('scene-ocean');
-    const sceneNight = document.getElementById('scene-night');
-    const sceneCity = document.getElementById('scene-city');
-    const sceneCustom = document.getElementById('scene-custom');
+    const scenes = {
+        rain: document.getElementById('scene-rain'),
+        forest: document.getElementById('scene-forest'),
+        lake: document.getElementById('scene-lake'),
+        cafe: document.getElementById('scene-cafe'),
+        ocean: document.getElementById('scene-ocean'),
+        night: document.getElementById('scene-night'),
+        city: document.getElementById('scene-city'),
+        custom: document.getElementById('scene-custom')
+    };
 
     const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
     const customThumb = document.getElementById('customThumb');
@@ -1581,20 +1584,16 @@
     const customUrlInput = document.getElementById('customUrlInput');
     const applyUrlBtn = document.getElementById('applyUrlBtn');
     const fileInput = document.getElementById('fileInput');
-    const fileLabel = document.getElementById('fileLabel');
-    const customStatus = document.getElementById('customStatus');
     const clearCustomBtn = document.getElementById('clearCustomBtn');
+    const customStatus = document.getElementById('customStatus');
 
     // ---- Install Button ----
     let deferredPrompt = null;
     let isAppInstalled = false;
-
     if (window.matchMedia('(display-mode: standalone)').matches) {
         isAppInstalled = true;
-        installBtn.classList.remove('visible');
         installBtn.classList.add('hidden');
     }
-
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -1603,69 +1602,30 @@
             installBtn.classList.add('visible');
         }
     });
-
     window.addEventListener('appinstalled', () => {
         isAppInstalled = true;
-        installBtn.classList.remove('visible');
         installBtn.classList.add('hidden');
         deferredPrompt = null;
         stateLabel.textContent = '✅ App installed!';
-        setTimeout(() => {
-            if (stateLabel.textContent === '✅ App installed!') updateStateLabel();
-        }, 3000);
     });
-
     installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
             try {
-                const result = await deferredPrompt.prompt();
-                if (result.outcome === 'accepted') {
-                    isAppInstalled = true;
-                    installBtn.classList.add('hidden');
-                    installBtn.classList.remove('visible');
-                    stateLabel.textContent = '✅ Installing...';
-                } else {
-                    stateLabel.textContent = '❌ Installation cancelled';
-                    setTimeout(() => {
-                        if (stateLabel.textContent === '❌ Installation cancelled') updateStateLabel();
-                    }, 2000);
-                }
-            } catch (_) {
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'FOCUS Timer',
-                            text: 'Check out this focus timer app!',
-                            url: window.location.href
-                        });
-                    } catch (_2) {}
-                }
-            }
-        } else {
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'FOCUS Timer',
-                        text: 'Check out this focus timer app!',
-                        url: window.location.href
-                    });
-                } catch (_) {}
-            } else {
-                stateLabel.textContent = '📱 Use "Add to Home Screen"';
-                setTimeout(() => {
-                    if (stateLabel.textContent === '📱 Use "Add to Home Screen"') updateStateLabel();
-                }, 3000);
-            }
+                await deferredPrompt.prompt();
+            } catch (_) {}
+        } else if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'FOCUS Timer',
+                    text: 'Focus timer app',
+                    url: window.location.href
+                });
+            } catch (_) {}
         }
     });
 
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        installBtn.classList.add('hidden');
-        installBtn.classList.remove('visible');
-    }
-
     // ---- state ----
-    let mode = 'stopwatch';
+    let mode = 'stopwatch';   // 'stopwatch' or 'timer'
     let elapsedMs = 0;
     let remainingMs = 1500 * 1000;
     let initialMs = 1500 * 1000;
@@ -1676,12 +1636,9 @@
     let lastTickSecond = -1;
     let wakeLock = null;
     let wakeLockActive = false;
+    const MIN_SESSION_MS = 10 * 60 * 1000;   // 10 minutes
 
-    // ---- session tracking ----
-    let sessions = [];
-    const MIN_SESSION_MS = 10 * 60 * 1000;
-
-    // ---- Timer persistence helpers ----
+    // ---- Timer persistence (cross‑page) ----
     function saveTimerState() {
         const state = {
             running,
@@ -1691,7 +1648,9 @@
             initialMs,
             timestamp: Date.now()
         };
-        try { localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state)); } catch (_) {}
+        try {
+            localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
+        } catch (_) {}
     }
 
     function loadTimerState() {
@@ -1716,39 +1675,45 @@
         return null;
     }
 
+    // ---- Session storage ----
+    let sessions = [];
     function loadSessions() {
         try {
-            const data = localStorage.getItem('focusSessions');
-            if (data) sessions = JSON.parse(data);
-            else sessions = [];
+            const data = localStorage.getItem(SESSIONS_KEY);
+            sessions = data ? JSON.parse(data) : [];
         } catch (_) { sessions = []; }
         updateSessionDisplay();
     }
-
     function saveSessions() {
-        try { localStorage.setItem('focusSessions', JSON.stringify(sessions)); } catch (_) {}
+        try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); } catch (_) {}
         updateSessionDisplay();
     }
-
     function getTodayKey() { return new Date().toISOString().split('T')[0]; }
-    function getTotalTimeForDay(dateKey) { return sessions.filter(s => s.date === dateKey).reduce((sum, s) => sum + s.durationMs, 0); }
-
+    function getTotalTimeForDay(dateKey) {
+        return sessions.filter(s => s.date === dateKey).reduce((sum, s) => sum + s.durationMs, 0);
+    }
     function formatDuration(ms) {
         const totalSec = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSec / 60);
         const seconds = totalSec % 60;
-        if (minutes >= 60) { const h = Math.floor(minutes / 60); const m = minutes % 60; return `${h}h ${m}m`; }
+        if (minutes >= 60) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return `${h}h ${m}m`;
+        }
         if (minutes > 0) return `${minutes}m ${seconds}s`;
         return `${seconds}s`;
     }
-
     function formatDurationShort(ms) {
         const totalSec = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSec / 60);
-        if (minutes >= 60) { const h = Math.floor(minutes / 60); const m = minutes % 60; return `${h}h ${m}m`; }
+        if (minutes >= 60) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return `${h}h ${m}m`;
+        }
         return `${minutes}m`;
     }
-
     function updateSessionDisplay() {
         const total = getTotalTimeForDay(getTodayKey());
         todayTotal.innerHTML = `🎯 <span class="highlight">${formatDurationShort(total)}</span>`;
@@ -1757,7 +1722,6 @@
         totalTimeStat.textContent = formatDuration(totalAllTime);
         renderSessionList();
     }
-
     function renderSessionList() {
         if (sessions.length === 0) {
             sessionList.innerHTML = '<li class="session-empty">No sessions yet. Start focusing!</li>';
@@ -1778,38 +1742,294 @@
         });
         sessionList.innerHTML = html;
     }
-
     function recordSession(mode, durationMs) {
         const today = getTodayKey();
         sessions.push({ date: today, mode, durationMs, timestamp: Date.now() });
         saveSessions();
         stateLabel.textContent = `✅ Session saved! (${formatDurationShort(durationMs)})`;
-        setTimeout(() => {
-            if (stateLabel.textContent.includes('Session saved')) updateStateLabel();
-        }, 2500);
     }
 
     function updateTimerControlsVisibility() {
         timerControls.classList.toggle('visible', mode === 'timer');
     }
 
-    // ---- Ambient sounds (unchanged) ----
+    // ---- Update state label (was missing) ----
+    function updateStateLabel() {
+        if (running) {
+            stateLabel.textContent = mode === 'stopwatch' ? 'Focusing...' : 'Countdown running';
+        } else {
+            stateLabel.textContent = mode === 'stopwatch' ? 'Ready' : 'Timer paused';
+        }
+    }
+
+    // ---- Ambient sounds (full implementation) ----
     const Ambient = {
         context: null,
         nodes: [],
         currentType: 'none',
         isPlaying: false,
-        init() { try { this.context = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {} },
-        createNoiseBuffer(duration) { /* ... same as original ... */ },
-        createPinkBuffer(duration) { /* ... same as original ... */ },
-        createForest() { /* ... same as original ... */ },
-        createWaves() { /* ... same as original ... */ },
-        createWaterfall() { /* ... same as original ... */ },
-        createCafe() { /* ... same as original ... */ },
-        createNight() { /* ... same as original ... */ },
-        start(type) { /* ... same as original ... */ },
-        stop() { /* ... same as original ... */ },
-        toggle(type) { /* ... same as original ... */ }
+
+        init() {
+            try {
+                this.context = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (_) {}
+        },
+
+        createNoiseBuffer(duration) {
+            if (!this.context) return null;
+            const bufferSize = Math.floor(this.context.sampleRate * duration);
+            const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            return buffer;
+        },
+
+        createPinkBuffer(duration) {
+            if (!this.context) return null;
+            const bufferSize = Math.floor(this.context.sampleRate * duration);
+            const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+            const data = buffer.getChannelData(0);
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                data[i] *= 0.11;
+                b6 = white * 0.115926;
+            }
+            return buffer;
+        },
+
+        createForest() {
+            if (!this.context) return [];
+            const nodes = [];
+            const buffer = this.createPinkBuffer(4);
+            if (!buffer) return nodes;
+            const source = this.context.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            const filter = this.context.createBiquadFilter();
+            filter.type = 'bandpass'; filter.frequency.value = 500; filter.Q.value = 0.8;
+            const gain = this.context.createGain();
+            gain.gain.value = 0.15;
+            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+            source.start();
+            nodes.push(source, filter, gain);
+
+            const birds = [
+                { freq: 3000, dur: 0.15, delay: 0.5, bend: 800 },
+                { freq: 4200, dur: 0.1, delay: 1.2, bend: 600 },
+                { freq: 2500, dur: 0.2, delay: 2.0, bend: 1000 },
+                { freq: 5000, dur: 0.08, delay: 2.8, bend: 400 },
+                { freq: 3500, dur: 0.12, delay: 3.5, bend: 700 },
+                { freq: 2800, dur: 0.18, delay: 4.2, bend: 900 },
+                { freq: 4500, dur: 0.09, delay: 5.0, bend: 500 },
+                { freq: 3200, dur: 0.14, delay: 5.8, bend: 750 }
+            ];
+            birds.forEach((p, idx) => {
+                const osc = this.context.createOscillator();
+                osc.type = 'sine'; osc.frequency.value = p.freq;
+                const oscGain = this.context.createGain();
+                oscGain.gain.setValueAtTime(0, this.context.currentTime + p.delay);
+                oscGain.gain.linearRampToValueAtTime(0.04, this.context.currentTime + p.delay + 0.01);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + p.delay + p.dur);
+                osc.frequency.setValueAtTime(p.freq, this.context.currentTime + p.delay);
+                osc.frequency.linearRampToValueAtTime(p.freq + p.bend, this.context.currentTime + p.delay + p.dur * 0.3);
+                osc.frequency.linearRampToValueAtTime(p.freq + p.bend * 0.6, this.context.currentTime + p.delay + p.dur);
+                osc.connect(oscGain); oscGain.connect(this.context.destination);
+                osc.start(this.context.currentTime + p.delay);
+                osc.stop(this.context.currentTime + p.delay + p.dur + 0.05);
+                nodes.push(osc, oscGain);
+            });
+            return nodes;
+        },
+
+        createWaves() {
+            if (!this.context) return [];
+            const nodes = [];
+            const buffer = this.createPinkBuffer(6);
+            if (!buffer) return nodes;
+            const source = this.context.createBufferSource();
+            source.buffer = buffer; source.loop = true;
+            const filter = this.context.createBiquadFilter();
+            filter.type = 'lowpass'; filter.frequency.value = 250; filter.Q.value = 1;
+            const lfo = this.context.createOscillator();
+            lfo.frequency.value = 0.12;
+            const lfoGain = this.context.createGain();
+            lfoGain.gain.value = 0.08;
+            const gain = this.context.createGain();
+            gain.gain.value = 0.2;
+            lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+            lfo.start(); source.start();
+            nodes.push(source, filter, lfo, lfoGain, gain);
+
+            const buffer2 = this.createNoiseBuffer(3);
+            const source2 = this.context.createBufferSource();
+            source2.buffer = buffer2; source2.loop = true;
+            const filter2 = this.context.createBiquadFilter();
+            filter2.type = 'bandpass'; filter2.frequency.value = 800; filter2.Q.value = 0.5;
+            const gain2 = this.context.createGain();
+            gain2.gain.value = 0.06;
+            source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
+            source2.start();
+            nodes.push(source2, filter2, gain2);
+            return nodes;
+        },
+
+        createWaterfall() {
+            if (!this.context) return [];
+            const nodes = [];
+            const buffer = this.createPinkBuffer(5);
+            if (!buffer) return nodes;
+            const source = this.context.createBufferSource();
+            source.buffer = buffer; source.loop = true;
+            const filter = this.context.createBiquadFilter();
+            filter.type = 'lowpass'; filter.frequency.value = 800; filter.Q.value = 1.2;
+            const lfo = this.context.createOscillator();
+            lfo.frequency.value = 0.4;
+            const lfoGain = this.context.createGain();
+            lfoGain.gain.value = 150;
+            lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+            const gain = this.context.createGain();
+            gain.gain.value = 0.3;
+            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+            lfo.start(); source.start();
+            nodes.push(source, filter, lfo, lfoGain, gain);
+
+            const buffer2 = this.createNoiseBuffer(3);
+            const source2 = this.context.createBufferSource();
+            source2.buffer = buffer2; source2.loop = true;
+            const filter2 = this.context.createBiquadFilter();
+            filter2.type = 'highpass'; filter2.frequency.value = 2000;
+            const gain2 = this.context.createGain();
+            gain2.gain.value = 0.05;
+            source2.connect(filter2); filter2.connect(gain2); gain2.connect(this.context.destination);
+            source2.start();
+            nodes.push(source2, filter2, gain2);
+            return nodes;
+        },
+
+        createCafe() {
+            if (!this.context) return [];
+            const nodes = [];
+            const buffer = this.createPinkBuffer(4);
+            if (!buffer) return nodes;
+            const source = this.context.createBufferSource();
+            source.buffer = buffer; source.loop = true;
+            const filter = this.context.createBiquadFilter();
+            filter.type = 'lowpass'; filter.frequency.value = 250; filter.Q.value = 0.8;
+            const gain = this.context.createGain();
+            gain.gain.value = 0.2;
+            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+            source.start();
+            nodes.push(source, filter, gain);
+
+            for (let i = 0; i < 15; i++) {
+                const cs = this.context.createBufferSource();
+                const cb = this.createNoiseBuffer(0.1 + Math.random() * 0.15);
+                if (!cb) continue;
+                cs.buffer = cb;
+                const cf = this.context.createBiquadFilter();
+                cf.type = 'bandpass'; cf.frequency.value = 600 + Math.random() * 1200; cf.Q.value = 1.5;
+                const cg = this.context.createGain();
+                cg.gain.value = 0.02 + Math.random() * 0.03;
+                cs.connect(cf); cf.connect(cg); cg.connect(this.context.destination);
+                const st = this.context.currentTime + Math.random() * 8;
+                cs.start(st); cs.stop(st + 0.12 + Math.random() * 0.1);
+                nodes.push(cs, cf, cg);
+            }
+            return nodes;
+        },
+
+        createNight() {
+            if (!this.context) return [];
+            const nodes = [];
+            const buffer = this.createPinkBuffer(4);
+            if (!buffer) return nodes;
+            const source = this.context.createBufferSource();
+            source.buffer = buffer; source.loop = true;
+            const filter = this.context.createBiquadFilter();
+            filter.type = 'lowpass'; filter.frequency.value = 150; filter.Q.value = 0.6;
+            const gain = this.context.createGain();
+            gain.gain.value = 0.1;
+            source.connect(filter); filter.connect(gain); gain.connect(this.context.destination);
+            source.start();
+            nodes.push(source, filter, gain);
+
+            for (let i = 0; i < 12; i++) {
+                const osc = this.context.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = 4000 + Math.random() * 2000;
+                const oscGain = this.context.createGain();
+                oscGain.gain.setValueAtTime(0, this.context.currentTime + i * 0.4 + Math.random() * 0.5);
+                oscGain.gain.linearRampToValueAtTime(0.02 + Math.random() * 0.015, this.context.currentTime + i * 0.4 + 0.02);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + i * 0.4 + 0.2);
+                const lfo = this.context.createOscillator();
+                lfo.frequency.value = 5 + Math.random() * 10;
+                const lfoGain = this.context.createGain();
+                lfoGain.gain.value = 200 + Math.random() * 300;
+                lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+                osc.connect(oscGain); oscGain.connect(this.context.destination);
+                osc.start(this.context.currentTime + i * 0.4);
+                osc.stop(this.context.currentTime + i * 0.4 + 0.3);
+                lfo.start(); lfo.stop();
+                nodes.push(osc, oscGain, lfo, lfoGain);
+            }
+            return nodes;
+        },
+
+        start(type) {
+            this.stop();
+            if (type === 'none' || !this.context) {
+                this.currentType = 'none';
+                this.isPlaying = false;
+                return;
+            }
+            try {
+                let nodes = [];
+                switch (type) {
+                    case 'forest': nodes = this.createForest(); break;
+                    case 'waves': nodes = this.createWaves(); break;
+                    case 'waterfall': nodes = this.createWaterfall(); break;
+                    case 'cafe': nodes = this.createCafe(); break;
+                    case 'night': nodes = this.createNight(); break;
+                }
+                this.nodes = nodes;
+                this.currentType = type;
+                this.isPlaying = true;
+                if (this.context.state === 'suspended') this.context.resume();
+            } catch (_) {
+                this.currentType = 'none';
+                this.isPlaying = false;
+            }
+        },
+
+        stop() {
+            try {
+                this.nodes.forEach(n => {
+                    try { n.stop(); } catch (_) {}
+                    try { n.disconnect(); } catch (_) {}
+                });
+                this.nodes = [];
+            } catch (_) {}
+            this.currentType = 'none';
+            this.isPlaying = false;
+        },
+
+        toggle(type) {
+            if (!this.context) this.init();
+            if (this.currentType === type) {
+                this.stop();
+                return;
+            }
+            this.start(type);
+        }
     };
 
     // ---- ambient popover ----
@@ -1843,7 +2063,21 @@
 
     // ---- weather ----
     async function fetchWeather() {
-        /* ... same as original ... */
+        try {
+            if (!navigator.geolocation) throw new Error();
+            const pos = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+            });
+            const { latitude, longitude } = pos.coords;
+            const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+            const data = await resp.json();
+            if (data.current_weather) {
+                const temp = Math.round(data.current_weather.temperature);
+                weatherDisplay.innerHTML = `⛅ <span class="temp">${temp}°</span>`;
+            }
+        } catch (_) {
+            weatherDisplay.innerHTML = `⛅ <span class="temp">--°</span>`;
+        }
     }
     fetchWeather();
     setInterval(fetchWeather, 600000);
@@ -1851,14 +2085,17 @@
     // ---- format ----
     function formatTime(ms) {
         const totalSec = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSec / 60);
-        const seconds = totalSec % 60;
-        const centiseconds = Math.floor((ms % 1000) / 10);
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+        const min = Math.floor(totalSec / 60);
+        const sec = totalSec % 60;
+        const cs = Math.floor((ms % 1000) / 10);
+        return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${cs.toString().padStart(2, '0')}`;
     }
-    function getDisplayTime() { return mode === 'stopwatch' ? formatTime(elapsedMs) : formatTime(remainingMs); }
-    function updateDisplay() { timerDisplay.textContent = getDisplayTime(); }
-    function setLabel(text) { stateLabel.textContent = text; }
+    function getDisplayTime() {
+        return mode === 'stopwatch' ? formatTime(elapsedMs) : formatTime(remainingMs);
+    }
+    function updateDisplay() {
+        timerDisplay.textContent = getDisplayTime();
+    }
 
     // ---- tick sound ----
     function playTick() {
@@ -1884,12 +2121,17 @@
                 wakeLock = await navigator.wakeLock.request('screen');
                 wakeLockActive = true;
                 wakeIndicator.classList.add('active');
-                wakeLock.addEventListener('release', () => { wakeLockActive = false; wakeIndicator.classList.remove('active'); });
+                wakeLock.addEventListener('release', () => {
+                    wakeLockActive = false;
+                    wakeIndicator.classList.remove('active');
+                });
             }
         } catch (_) {}
     }
     function releaseWakeLock() {
-        try { if (wakeLock) { wakeLock.release(); wakeLock = null; wakeLockActive = false; wakeIndicator.classList.remove('active'); } } catch (_) {}
+        try {
+            if (wakeLock) { wakeLock.release(); wakeLock = null; wakeLockActive = false; wakeIndicator.classList.remove('active'); }
+        } catch (_) {}
     }
 
     // ---- core timer logic ----
@@ -1899,7 +2141,7 @@
         timerDisplay.classList.remove('running');
         clearInterval(intervalId);
         releaseWakeLock();
-        setLabel('Complete 🎯');
+        updateStateLabel();
         playTick();
         if (initialMs >= MIN_SESSION_MS) recordSession('timer', initialMs);
         saveTimerState();
@@ -1936,6 +2178,7 @@
         timerDisplay.classList.add('running');
         lastTickSecond = -1;
         intervalId = setInterval(tick, 10);
+        updateStateLabel();
         requestWakeLock();
         if (Ambient.context && Ambient.context.state === 'suspended') Ambient.context.resume();
         saveTimerState();
@@ -1946,6 +2189,7 @@
         startPauseBtn.textContent = 'Start';
         timerDisplay.classList.remove('running');
         clearInterval(intervalId);
+        updateStateLabel();
         releaseWakeLock();
         saveTimerState();
     }
@@ -1957,7 +2201,7 @@
         else remainingMs = initialMs;
         lastTickSecond = -1;
         updateDisplay();
-        releaseWakeLock();
+        updateStateLabel();
         saveTimerState();
     }
 
@@ -1977,6 +2221,7 @@
         }
         lastTickSecond = -1;
         updateDisplay();
+        updateStateLabel();
         startPauseBtn.textContent = 'Start';
         timerDisplay.classList.remove('running');
         presetBtns.forEach(b => b.classList.remove('active'));
@@ -1997,21 +2242,88 @@
             btn.classList.add('active');
             document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
             updateDisplay();
+            updateStateLabel();
             customMinutes.value = ''; customSeconds.value = '';
             saveTimerState();
         });
     });
 
     // ---- custom time set ----
-    setCustomTime.addEventListener('click', () => { /* ... same as original ... */ });
-    customMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
-    customSeconds.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCustomTime.click(); });
+    setCustomTimeBtn.addEventListener('click', () => {
+        if (mode !== 'timer') return;
+        const mins = parseInt(customMinutes.value) || 0;
+        const secs = parseInt(customSeconds.value) || 0;
+        if (mins === 0 && secs === 0) return;
+        const totalSecs = mins * 60 + secs;
+        if (running) pause();
+        initialMs = totalSecs * 1000;
+        remainingMs = initialMs;
+        presetBtns.forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+        updateDisplay();
+        updateStateLabel();
+        saveTimerState();
+    });
 
     // ---- saved presets ----
-    function loadSavedPresets() { /* ... same as original ... */ }
-    function saveSavedPresets(presets) { /* ... same as original ... */ }
-    function renderSavedPresets() { /* ... same as original ... */ }
-    savePresetBtn.addEventListener('click', () => { /* ... same as original ... */ });
+    function loadSavedPresets() {
+        try {
+            const data = localStorage.getItem(PRESETS_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (_) { return []; }
+    }
+    function saveSavedPresets(presets) {
+        try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); } catch (_) {}
+    }
+    function renderSavedPresets() {
+        const presets = loadSavedPresets();
+        let html = '';
+        presets.forEach((p, i) => {
+            const active = (p.seconds === initialMs / 1000 && mode === 'timer') ? 'active' : '';
+            html += `<button class="preset-btn saved-preset ${active}" data-seconds="${p.seconds}">
+                ${p.name} <span class="delete-preset" data-index="${i}">✕</span>
+            </button>`;
+        });
+        savedPresetsContainer.innerHTML = html;
+        savedPresetsContainer.querySelectorAll('.preset-btn.saved-preset').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-preset')) return;
+                if (mode !== 'timer') return;
+                if (running) pause();
+                const secs = parseInt(btn.dataset.seconds);
+                initialMs = secs * 1000;
+                remainingMs = initialMs;
+                presetBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.saved-preset').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateDisplay();
+                updateStateLabel();
+                saveTimerState();
+            });
+        });
+        savedPresetsContainer.querySelectorAll('.delete-preset').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(el.dataset.index);
+                const presets = loadSavedPresets();
+                presets.splice(idx, 1);
+                saveSavedPresets(presets);
+                renderSavedPresets();
+            });
+        });
+    }
+    savePresetBtn.addEventListener('click', () => {
+        if (mode !== 'timer') return;
+        const totalSecs = Math.floor(initialMs / 1000);
+        const name = prompt('Preset name:', 'Focus');
+        if (!name) return;
+        const presets = loadSavedPresets();
+        const existing = presets.find(p => p.name === name);
+        if (existing) existing.seconds = totalSecs;
+        else presets.push({ name, seconds: totalSecs });
+        saveSavedPresets(presets);
+        renderSavedPresets();
+    });
 
     // ---- mode toggle click ----
     modeToggle.addEventListener('click', (e) => {
@@ -2029,53 +2341,138 @@
     soundToggle.addEventListener('click', () => {
         soundOn = !soundOn;
         soundToggle.classList.toggle('on', soundOn);
-        if (soundOn && !audioCtx) try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {}
     });
 
-    // ---- scene picker toggle ----
+    // ---- scene picker ----
     sceneToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         scenePicker.classList.toggle('open');
         ambientPopover.classList.remove('open');
     });
-    document.addEventListener('click', (e) => { if (!scenePicker.contains(e.target) && e.target !== sceneToggle) scenePicker.classList.remove('open'); });
+    document.addEventListener('click', (e) => {
+        if (!scenePicker.contains(e.target) && e.target !== sceneToggle) scenePicker.classList.remove('open');
+    });
 
     // ---- scene persistence ----
-    function saveSceneState(sceneId, customUrl) { /* ... same as original ... */ }
-    function loadSceneState() { /* ... same as original ... */ }
-    function activateScene(sceneId) { /* ... same as original ... */ }
-    thumbs.forEach(thumb => { thumb.addEventListener('click', () => { /* ... same as original ... */ }); });
+    function saveSceneState(sceneId, customUrl) {
+        try { localStorage.setItem(SCENE_KEY, JSON.stringify({ sceneId, customUrl })); } catch (_) {}
+    }
+    function loadSceneState() {
+        try {
+            const raw = localStorage.getItem(SCENE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (_) { return null; }
+    }
+    function activateScene(sceneId) {
+        Object.values(scenes).forEach(s => s.classList.remove('active'));
+        if (scenes[sceneId]) scenes[sceneId].classList.add('active');
+        if (sceneId !== 'custom') scenes.custom.style.display = 'none';
+        thumbs.forEach(t => t.classList.remove('active'));
+        customThumb.classList.remove('active');
+        customPanel.classList.remove('open');
+        document.querySelector(`.scene-thumb[data-scene="scene-${sceneId}"]`)?.classList.add('active');
+        saveSceneState(sceneId, null);
+    }
+    thumbs.forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            const sceneId = thumb.dataset.scene.replace('scene-', '');
+            activateScene(sceneId);
+            scenePicker.classList.remove('open');
+        });
+    });
 
     // ---- custom background ----
-    function applyCustomBackground(url) { /* ... same as original ... */ }
-    function handleFileUpload(file) { /* ... same as original ... */ }
-    function restoreScene() { /* ... same as original ... */ }
-    customThumb.addEventListener('click', () => { /* ... same as original ... */ });
-    applyUrlBtn.addEventListener('click', () => { /* ... same as original ... */ });
-    customUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyUrlBtn.click(); });
-    fileInput.addEventListener('change', (e) => { /* ... same as original ... */ });
-    clearCustomBtn.addEventListener('click', () => { /* ... same as original ... */ });
+    function applyCustomBackground(url) {
+        document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+        scenes.custom.style.display = '';
+        scenes.custom.style.backgroundImage = `url('${url}')`;
+        scenes.custom.classList.add('active');
+        thumbs.forEach(t => t.classList.remove('active'));
+        customThumb.classList.add('active');
+        saveSceneState('custom', url);
+    }
+    customThumb.addEventListener('click', () => customPanel.classList.toggle('open'));
+    applyUrlBtn.addEventListener('click', () => {
+        const url = customUrlInput.value.trim();
+        if (url) applyCustomBackground(url);
+    });
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => applyCustomBackground(ev.target.result);
+            reader.readAsDataURL(file);
+        }
+    });
+    clearCustomBtn.addEventListener('click', () => activateScene('rain'));
 
     // ---- Session panel toggle ----
-    function toggleSessionPanel() { /* ... same as original ... */ }
-    historyToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSessionPanel(); });
-    closeSessionBtn.addEventListener('click', () => { sessionPanel.classList.remove('open'); });
-    document.addEventListener('click', (e) => { /* ... same as original ... */ });
+    historyToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sessionPanel.classList.toggle('open');
+    });
+    closeSessionBtn.addEventListener('click', () => sessionPanel.classList.remove('open'));
+    document.addEventListener('click', (e) => {
+        if (sessionPanel.classList.contains('open') && !sessionPanel.contains(e.target) && e.target !== historyToggle)
+            sessionPanel.classList.remove('open');
+    });
 
     // ---- Todo list ----
     let todos = [];
-    function loadTodos() { /* ... same as original ... */ }
-    function saveTodos() { /* ... same as original ... */ }
-    function addTodo() { /* ... same as original ... */ }
-    function toggleTodo(id) { /* ... same as original ... */ }
-    function deleteTodo(id) { /* ... same as original ... */ }
-    function editTodo(id, newText) { /* ... same as original ... */ }
-    function renderTodos() { /* ... same as original ... */ }
-    function escapeHtml(text) { /* ... same as original ... */ }
-    function toggleTodoPanel() { /* ... same as original ... */ }
-    todoToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleTodoPanel(); });
-    closeTodoBtn.addEventListener('click', () => { todoPanel.classList.remove('open'); });
-    document.addEventListener('click', (e) => { /* ... same as original ... */ });
+    function loadTodos() {
+        try { todos = JSON.parse(localStorage.getItem(TODOS_KEY)) || []; } catch (_) { todos = []; }
+        renderTodos();
+    }
+    function saveTodos() { localStorage.setItem(TODOS_KEY, JSON.stringify(todos)); }
+    function addTodo() {
+        const text = todoInput.value.trim();
+        if (!text) return;
+        todos.push({ id: Date.now(), text, completed: false });
+        todoInput.value = '';
+        saveTodos(); renderTodos();
+    }
+    function toggleTodo(id) {
+        const todo = todos.find(t => t.id === id);
+        if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); }
+    }
+    function deleteTodo(id) {
+        todos = todos.filter(t => t.id !== id);
+        saveTodos(); renderTodos();
+    }
+    function editTodo(id, newText) {
+        const todo = todos.find(t => t.id === id);
+        if (todo) { todo.text = newText; saveTodos(); renderTodos(); }
+    }
+    function renderTodos() {
+        let html = '';
+        todos.forEach(todo => {
+            html += `<li>
+                <div class="checkbox ${todo.completed ? 'checked' : ''}" data-id="${todo.id}"></div>
+                <span class="task-text ${todo.completed ? 'done' : ''}" data-id="${todo.id}">${todo.text}</span>
+                <button class="delete-btn" data-id="${todo.id}">✕</button>
+            </li>`;
+        });
+        todoList.innerHTML = html || '<li class="todo-empty">No tasks yet</li>';
+        todoList.querySelectorAll('.checkbox').forEach(el => el.addEventListener('click', () => toggleTodo(parseFloat(el.dataset.id))));
+        todoList.querySelectorAll('.delete-btn').forEach(el => el.addEventListener('click', () => deleteTodo(parseFloat(el.dataset.id))));
+        todoList.querySelectorAll('.task-text').forEach(el => {
+            el.addEventListener('dblclick', () => {
+                const id = parseFloat(el.dataset.id);
+                const input = document.createElement('input');
+                input.value = el.textContent;
+                input.className = 'task-text editing';
+                input.addEventListener('blur', () => {
+                    editTodo(id, input.value);
+                    renderTodos();
+                });
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+                el.replaceWith(input);
+                input.focus();
+            });
+        });
+    }
+    todoToggle.addEventListener('click', (e) => { e.stopPropagation(); todoPanel.classList.toggle('open'); });
+    closeTodoBtn.addEventListener('click', () => todoPanel.classList.remove('open'));
     addTodoBtn.addEventListener('click', addTodo);
     todoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTodo(); });
 
@@ -2084,61 +2481,67 @@
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (e.code === 'Space') { e.preventDefault(); running ? pause() : start(); }
         if (e.code === 'KeyR') reset();
-        if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); soundToggle.click(); }
+        if (e.code === 'KeyS' && !e.metaKey && !e.ctrlKey) soundToggle.click();
         if (e.code === 'KeyB') sceneToggle.click();
         if (e.code === 'KeyM') {
             const btns = document.querySelectorAll('.mode-btn');
             const active = document.querySelector('.mode-btn.active');
             const idx = Array.from(btns).indexOf(active);
-            const next = (idx + 1) % btns.length;
-            setMode(btns[next].dataset.mode);
+            setMode(btns[(idx + 1) % btns.length].dataset.mode);
             renderSavedPresets();
         }
-        if (e.code === 'KeyA' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); ambientToggle.click(); }
-        if (e.code === 'KeyH' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); toggleSessionPanel(); }
     });
 
-    // ---- init ----
+    // ---- Initialisation ----
     loadSessions();
-    updateTimerControlsVisibility();
     loadTodos();
     renderSavedPresets();
-    document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
+    updateTimerControlsVisibility();
     updateDisplay();
-    setLabel('Ready');
-    if (!restoreScene()) activateScene('scene-rain');
+    updateStateLabel();
 
-    // ---- Apply saved timer state (cross-page persistence) ----
-    const savedState = loadTimerState();
-    if (savedState) {
-        mode = savedState.mode;
-        elapsedMs = savedState.elapsedMs;
-        remainingMs = savedState.remainingMs;
-        initialMs = savedState.initialMs;
-        running = savedState.running;
+    // Restore scene
+    const savedScene = loadSceneState();
+    if (savedScene && savedScene.sceneId === 'custom' && savedScene.customUrl) {
+        applyCustomBackground(savedScene.customUrl);
+    } else if (savedScene && scenes[savedScene.sceneId]) {
+        activateScene(savedScene.sceneId);
+    } else {
+        activateScene('rain');
+    }
+
+    // Restore timer state (cross‑page persistence)
+    const savedTimer = loadTimerState();
+    if (savedTimer) {
+        mode = savedTimer.mode;
+        elapsedMs = savedTimer.elapsedMs;
+        remainingMs = savedTimer.remainingMs;
+        initialMs = savedTimer.initialMs;
+        running = savedTimer.running;
         if (running && mode === 'timer' && remainingMs <= 0) {
             running = false;
             handleTimerFinish();
         }
-        // Update UI to match recovered state
+        // Update UI
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
         updateTimerControlsVisibility();
         updateDisplay();
+        updateStateLabel();
         startPauseBtn.textContent = running ? 'Pause' : 'Start';
         if (running) {
             timerDisplay.classList.add('running');
-            start(); // will also save state
-        } else {
-            timerDisplay.classList.remove('running');
+            start(); // resumes the interval
         }
+    } else {
+        // Fresh start, ensure default preset active
+        document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
     }
 
-    // Save state whenever page is hidden or unloaded
+    // Save timer state whenever the page is about to be hidden
     window.addEventListener('pagehide', saveTimerState);
     window.addEventListener('beforeunload', saveTimerState);
 
-    console.log('⏱️ Focus Timer · persists across pages (localStorage)');
 })();
 </script>
 </body>
