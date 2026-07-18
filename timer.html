@@ -2258,31 +2258,51 @@
             }
 
             function reset() {
-                if (running) pause();
-
-                // Record stopwatch session if any time has elapsed
-                if (mode === 'stopwatch' && elapsedMs > 0) {
-                    recordSession('stopwatch', elapsedMs);
+                // Capture current elapsed BEFORE stopping anything
+                let sessionElapsed = 0;
+                if (running && startTimestamp !== null) {
+                    const nowMs = computeCurrentMs();
+                    if (mode === 'stopwatch') {
+                        sessionElapsed = nowMs;
+                    } else {
+                        sessionElapsed = initialMs - Math.max(0, initialMs - nowMs);
+                    }
+                } else {
+                    // Was already paused
+                    if (mode === 'stopwatch') sessionElapsed = elapsedMs;
+                    else sessionElapsed = initialMs - remainingMs;
                 }
-                // Record timer session if any time was used
-                if (mode === 'timer' && (initialMs - remainingMs) > 0) {
-                    recordSession('timer', initialMs - remainingMs);
+
+                // Stop the interval directly (don't call pause so we don't saveTimerState)
+                running = false;
+                startTimestamp = null;
+                clearInterval(intervalId);
+                intervalId = null;
+                startPauseBtn.textContent = 'Start';
+                timerDisplay.classList.remove('running');
+                releaseWakeLock();
+
+                // Save session if any time was used
+                if (sessionElapsed > 0) {
+                    if (mode === 'stopwatch') recordSession('stopwatch', sessionElapsed);
+                    else recordSession('timer', sessionElapsed);
                 }
 
-                // Reset values
+                // Zero everything out
                 elapsedMs = 0;
                 accumulatedMs = 0;
                 startTimestamp = null;
-                if (mode === 'timer') {
-                    remainingMs = initialMs;
-                }
+                remainingMs = initialMs;   // timer goes back to full duration
                 lastTickSecond = -1;
+
+                // Clear stored state so restore logic doesn't resurrect old time
                 clearTimerState();
+
                 updateDisplay();
                 updateStateLabel();
                 updateDocTitle();
-                releaseWakeLock();
             }
+
 
             // Save state when navigating away
             window.addEventListener('beforeunload', () => {
