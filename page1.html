@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
+<head><meta charset="UTF-8"><title>Page 1</title></head>
 <body>
-  <p>Page 1: <span id="counter">0</span></p>
+  <h2>Page 1</h2>
+  <div id="timerDisplay">00:00.00</div>
+  <button id="startPauseBtn">Start</button>
+  <button id="resetBtn">Reset</button>
+  <br><br>
   <a href="page2.html">Go to Page 2</a>
-  <script>
-    const key = 'test_timer';
-    // save a dummy running state
-    const state = { startTime: Date.now(), running: true };
-    localStorage.setItem(key, JSON.stringify(state));
-  </script>
+
+  <script src="stopwatch.js"></script>
 </body>
 </html>
