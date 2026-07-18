@@ -2046,6 +2046,12 @@
             // ---- format ----
             function formatTime(ms) {
                 const totalSec = Math.floor(ms / 1000);
+                if (totalSec >= 3600) {
+                    const hours = Math.floor(totalSec / 3600);
+                    const minutes = Math.floor((totalSec % 3600) / 60);
+                    const seconds = totalSec % 60;
+                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
                 const minutes = Math.floor(totalSec / 60);
                 const seconds = totalSec % 60;
                 const centiseconds = Math.floor((ms % 1000) / 10);
