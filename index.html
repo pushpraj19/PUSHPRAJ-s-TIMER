@@ -27,6 +27,20 @@
             document.getElementById('manifestLink').href = url;
         })();
     </script>
+    <script src="bg-timer.js"></script>
+<script>
+    // Override the clock update to show the timer if it's running in the background
+    const origUpdateClock = updateClock;
+    updateClock = function() {
+        origUpdateClock();
+        const bgState = BgTimer.getState();
+        if (bgState && bgState.isRunning) {
+            document.getElementById('runningTime').textContent = "⏱ " + BgTimer.formatTime(BgTimer.getElapsed(bgState));
+        }
+    };
+    updateClock(); // Run once immediately
+    setInterval(updateClock, 1000);
+</script>
     <style>
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
