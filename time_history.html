@@ -1426,9 +1426,9 @@
                 return allDates;
             }
 
-            function getPageSize() {
+            function getPageSize(totalDatesCount) {
                 if (chartView === '30') return 30;
-                if (chartView === 'all') return Infinity;
+                if (chartView === 'all') return Math.max(totalDatesCount || 1, 1);
                 return 7;
             }
 
@@ -1444,7 +1444,7 @@
                     return;
                 }
 
-                const PAGE_SIZE = getPageSize();
+                const PAGE_SIZE = getPageSize(allDates.length);
                 const totalPages = Math.max(1, Math.ceil(allDates.length / PAGE_SIZE));
                 if (chartPage >= totalPages) chartPage = totalPages - 1;
                 if (chartPage < 0) chartPage = 0;
@@ -1538,7 +1538,7 @@
 
             function goToPage(page) {
                 const allDates = buildAllDates();
-                const PAGE_SIZE = getPageSize();
+                const PAGE_SIZE = getPageSize(allDates.length);
                 const totalPages = Math.max(1, Math.ceil(allDates.length / PAGE_SIZE));
                 if (page < 0) page = 0;
                 if (page >= totalPages) page = totalPages - 1;
