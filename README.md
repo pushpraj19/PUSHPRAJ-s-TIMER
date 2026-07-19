@@ -1,10 +1,6 @@
 # FOCUS: guest mode and account sync
 
-## Email OTP template
-
-The app sends passwordless codes with `signInWithOtp({ email })` and verifies them with `verifyOtp({ email, token, type: 'email' })`. In Supabase **Authentication → Email Templates**, paste the contents of `supabase-email-otp-template.html` into both **Magic Link** and **Confirm signup**. The code must be written as `{{ .Token }}` — not `{}` and not `{{ Token }}`. This displays the OTP for the user to enter in the app instead of requiring a link click.
-
-Visitors start on a dedicated, polished login page and can choose **Continue without an account** (fully local and offline) or sign in to sync across devices. The Profile page shows the user's name, email, focus totals, recent time history, sync status, and logout option.
+Visitors can choose **Continue without an account** (fully local and offline) or sign in to sync across devices. The Profile page shows the user's name, email, focus totals, recent time history, sync status, and logout option.
 
 ## One-time Supabase setup
 
