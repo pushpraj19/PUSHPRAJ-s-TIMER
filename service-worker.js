@@ -1,4 +1,4 @@
-const CACHE_NAME = 'focus-timer-offline-v1';
+const CACHE_NAME = 'focus-timer-account-sync-v1';
 const APP_SHELL = [
   '',
   'index.html',
@@ -7,7 +7,9 @@ const APP_SHELL = [
   'todo.html',
   'logo.png',
   'manifest.webmanifest',
-  'pwa-register.js'
+  'pwa-register.js',
+  'supabase-config.js',
+  'account-sync.js'
 ].map(path => new URL(path, self.registration.scope).href);
 const FALLBACK_PAGE = new URL('index.html', self.registration.scope).href;
 
@@ -33,7 +35,12 @@ self.addEventListener('fetch', event => {
     if (cached) return cached;
 
     try {
-      return await fetch(event.request);
+      const response = await fetch(event.request);
+      if (new URL(event.request.url).origin === 'https://cdn.jsdelivr.net') {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(event.request, response.clone());
+      }
+      return response;
     } catch (error) {
       if (event.request.mode === 'navigate') return caches.match(FALLBACK_PAGE);
       throw error;
