@@ -1,15 +1,17 @@
-const CACHE_NAME = 'focus-timer-account-sync-v1';
+const CACHE_NAME = 'focus-timer-account-profile-v1';
 const APP_SHELL = [
   '',
   'index.html',
   'timer.html',
   'time_history.html',
   'todo.html',
+  'profile.html',
   'logo.png',
   'manifest.webmanifest',
   'pwa-register.js',
   'supabase-config.js',
-  'account-sync.js'
+  'account-sync.js',
+  'profile.js'
 ].map(path => new URL(path, self.registration.scope).href);
 const FALLBACK_PAGE = new URL('index.html', self.registration.scope).href;
 
