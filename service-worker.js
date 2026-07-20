@@ -2,12 +2,15 @@ const CACHE_NAME = 'focus-timer-offline-v1';
 const APP_SHELL = [
   '',
   'index.html',
+  'dashboard.html',
   'timer.html',
   'time_history.html',
   'todo.html',
   'logo.png',
   'manifest.webmanifest',
-  'pwa-register.js'
+  'pwa-register.js',
+  'supabase-config.js',
+  'supabase-db.js'
 ].map(path => new URL(path, self.registration.scope).href);
 const FALLBACK_PAGE = new URL('index.html', self.registration.scope).href;
 

@@ -9,6 +9,11 @@
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" href="manifest.webmanifest" />
     <script src="pwa-register.js" defer></script>
+
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-db.js"></script>
     <style>
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
@@ -1572,6 +1577,19 @@
             // Init
             allSessions = loadSessions();
             fullRender();
+
+            (async () => {
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        const onlineSessions = await window.supabaseDb.fetchSessions();
+                        localStorage.setItem('focusSessions', JSON.stringify(onlineSessions));
+                        allSessions = onlineSessions;
+                        fullRender();
+                    } catch (e) {
+                        console.error("Failed to load online history:", e);
+                    }
+                }
+            })();
 
             // Refresh at local midnight so "Today" rolls over without needing a reload
             function scheduleMidnightRefresh() {

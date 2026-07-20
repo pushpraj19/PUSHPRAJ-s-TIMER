@@ -11,6 +11,11 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <script src="pwa-register.js" defer></script>
 
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-db.js"></script>
+
     <style>
         :root {
             --text-hi: rgba(255, 255, 255, 0.96);
@@ -1199,7 +1204,7 @@
     </div>
     
  <!-- ---- Home Button (bottom left) ---- -->
-    <a href="index.html" class="home-btn" title="Home">
+    <a href="dashboard.html" class="home-btn" title="Home">
         <svg viewBox="0 0 24 24">
             <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
@@ -1477,25 +1482,41 @@
 
             // ---- No minimum session duration – save any non-zero session ----
 
-            function loadSessions() {
-                try {
-                    const data = localStorage.getItem('focusSessions');
-                    if (data) {
-                        sessions = JSON.parse(data);
-                    } else {
-                        sessions = [];
+            async function loadSessions() {
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        const onlineSessions = await window.supabaseDb.fetchSessions();
+                        localStorage.setItem('focusSessions', JSON.stringify(onlineSessions));
+                        sessions = onlineSessions;
+                    } catch (e) {
+                        console.error("Failed to load online sessions, falling back:", e);
+                        try {
+                            const data = localStorage.getItem('focusSessions');
+                            sessions = data ? JSON.parse(data) : [];
+                        } catch (_) { sessions = []; }
                     }
-                } catch (_) {
-                    sessions = [];
+                } else {
+                    try {
+                        const data = localStorage.getItem('focusSessions');
+                        sessions = data ? JSON.parse(data) : [];
+                    } catch (_) { sessions = []; }
                 }
                 updateSessionDisplay();
             }
 
-            function saveSessions() {
+            async function saveSessions() {
                 try {
                     localStorage.setItem('focusSessions', JSON.stringify(sessions));
                 } catch (_) {}
                 updateSessionDisplay();
+
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        await window.supabaseDb.syncSessions(sessions);
+                    } catch (e) {
+                        console.error("Failed to sync sessions online:", e);
+                    }
+                }
             }
 
             function getTodayKey() {
@@ -2429,10 +2450,18 @@
                 return [];
             }
 
-            function saveSavedPresets(presets) {
+            async function saveSavedPresets(presets) {
                 try {
                     localStorage.setItem('focusPresets', JSON.stringify(presets));
                 } catch (_) {}
+
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        await window.supabaseDb.syncPresets(presets);
+                    } catch (e) {
+                        console.error("Failed to sync presets online:", e);
+                    }
+                }
             }
 
             function renderSavedPresets() {
@@ -2557,6 +2586,15 @@
             function saveSceneState(sceneId, customUrl) {
                 const state = { sceneId, customUrl: customUrl || null };
                 try { localStorage.setItem('sceneState', JSON.stringify(state)); } catch (_) {}
+
+                // Sync online if logged in
+                if (window.supabaseClient && window.supabaseDb && window.supabaseDb.isConfigured()) {
+                    window.supabaseDb.isLoggedIn().then(loggedIn => {
+                        if (loggedIn) {
+                            window.supabaseDb.saveSceneState(state);
+                        }
+                    });
+                }
             }
 
             function loadSceneState() {
@@ -2778,10 +2816,31 @@
                 }
             });
 
+            // Export background controls for database sync utility
+            window.activateScene = activateScene;
+            window.applyCustomBackground = applyCustomBackground;
+
             // ---- init ----
             loadSessions();
             updateTimerControlsVisibility();
             renderSavedPresets();
+
+            (async () => {
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        const onlineSessions = await window.supabaseDb.fetchSessions();
+                        localStorage.setItem('focusSessions', JSON.stringify(onlineSessions));
+                        sessions = onlineSessions;
+                        updateSessionDisplay();
+
+                        const onlinePresets = await window.supabaseDb.fetchPresets();
+                        localStorage.setItem('focusPresets', JSON.stringify(onlinePresets));
+                        renderSavedPresets();
+                    } catch (e) {
+                        console.error("Failed to load online timer data:", e);
+                    }
+                }
+            })();
 
             document.querySelector('.preset-btn[data-seconds="1500"]')?.classList.add('active');
 

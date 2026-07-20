@@ -11,6 +11,11 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <script src="pwa-register.js" defer></script>
 
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-db.js"></script>
+
     
     <style>
         :root {
@@ -773,7 +778,7 @@
     </div>
 
     <!-- ---- Home Button (bottom left) ---- -->
-    <a href="index.html" class="home-btn" title="Home">
+    <a href="dashboard.html" class="home-btn" title="Home">
         <svg viewBox="0 0 24 24">
             <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
@@ -896,19 +901,41 @@
             // ---- Todo data ----
             let todos = [];
 
-            function loadTodos() {
-                try {
-                    const data = localStorage.getItem('todos');
-                    todos = data ? JSON.parse(data) : [];
-                } catch (_) { todos = []; }
+            async function loadTodos() {
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        const onlineTodos = await window.supabaseDb.fetchTodos();
+                        localStorage.setItem('todos', JSON.stringify(onlineTodos));
+                        todos = onlineTodos;
+                    } catch (e) {
+                        console.error("Failed to load online todos, falling back:", e);
+                        try {
+                            const data = localStorage.getItem('todos');
+                            todos = data ? JSON.parse(data) : [];
+                        } catch (_) { todos = []; }
+                    }
+                } else {
+                    try {
+                        const data = localStorage.getItem('todos');
+                        todos = data ? JSON.parse(data) : [];
+                    } catch (_) { todos = []; }
+                }
                 renderTodos();
             }
 
-            function saveTodos() {
+            async function saveTodos() {
                 try {
                     localStorage.setItem('todos', JSON.stringify(todos));
                 } catch (_) {}
                 updateTaskCount();
+
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        await window.supabaseDb.syncTodos(todos);
+                    } catch (e) {
+                        console.error("Failed to sync todos online:", e);
+                    }
+                }
             }
 
             function updateTaskCount() {
@@ -1320,6 +1347,10 @@
                 }
             });
 
+            // Export background controls for database sync utility
+            window.activateScene = activateScene;
+            window.applyCustomBackground = setCustomBackground;
+
             // ---- init ----
             loadTodos();
             todoInput.focus();
@@ -1327,6 +1358,19 @@
             if (!loadSavedBackground()) {
                 activateScene('scene-rain');
             }
+
+            (async () => {
+                if (window.supabaseClient && await window.supabaseDb.isLoggedIn()) {
+                    try {
+                        const onlineTodos = await window.supabaseDb.fetchTodos();
+                        localStorage.setItem('todos', JSON.stringify(onlineTodos));
+                        todos = onlineTodos;
+                        renderTodos();
+                    } catch (e) {
+                        console.error("Failed to load online todos:", e);
+                    }
+                }
+            })();
 
             addTodoBtn.addEventListener('click', addTodo);
 
