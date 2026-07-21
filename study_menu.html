@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FOCUS · by pushpraj</title>
+
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <script src="pwa-register.js" defer></script>
+
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-db.js"></script>
+
+    <style>
+        :root {
+            --text-hi: rgba(255, 255, 255, 0.96);
+            --text-lo: rgba(255, 255, 255, 0.65);
+            --glass: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --accent: rgba(255, 255, 255, 0.22);
+            --accent-active: rgba(255, 255, 255, 0.35);
+            --card-radius: 20px;
+            --card-elevation: 0 8px 32px rgba(0, 0, 0, 0.25);
+            --card-elevation-hover: 0 20px 56px rgba(0, 0, 0, 0.40);
+            --transition-bounce: cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', "SF Pro Display", "Segoe UI", sans-serif;
+        }
+
+        body {
+            position: relative;
+        }
+
+        /* ---- scenic background ---- */
+        .scene {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+            z-index: -3;
+        }
+        .scene.active {
+            opacity: 1;
+        }
+        .scene.custom-bg {
+            transition: opacity 0.8s ease;
+        }
+
+        .scene-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(10, 12, 16, 0.38) 0%,
+                    rgba(10, 12, 16, 0.12) 30%,
+                    rgba(10, 12, 16, 0.28) 68%,
+                    rgba(10, 12, 16, 0.55) 100%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ---- top bar ---- */
+        .top-bar {
+            position: fixed;
+            top: 20px;
+            left: 26px;
+            right: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 5;
+            color: var(--text-hi);
+        }
+
+        .logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: clamp(36px, 6vw, 76px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+            line-height: 1.1;
+            text-decoration: none;
+            color: inherit;
+        }
+        .logo:hover {
+            color: var(--text-hi);
+        }
+        .logo-sub {
+            font-weight: 400;
+            font-size: 0.32em;
+            opacity: 0.8;
+            letter-spacing: 0.15em;
+            margin-top: -4px;
+            text-transform: lowercase;
+        }
+
+        .top-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            line-height: 1.4;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .weather {
+            font-size: clamp(13px, 1.2vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.02em;
+            opacity: 0.9;
+            min-height: 22px;
+        }
+        .weather .temp {
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+        .weather .condition {
+            font-weight: 400;
+            color: var(--text-lo);
+        }
+
+        .clock {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+        .running-time {
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 500;
+            color: var(--text-lo);
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---- Install button ---- */
+        .install-top {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 2px;
+        }
+        .install-top .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            padding: 0;
+        }
+        .install-top .icon-btn.visible {
+            display: flex;
+        }
+        .install-top .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #6bcbff;
+            border-color: rgba(107, 203, 255, 0.3);
+        }
+        .install-top .icon-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ---- hero ---- */
+        .hero {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hero-tagline {
+            font-size: clamp(18px, 2.2vw, 32px);
+            font-weight: 400;
+            color: var(--text-lo);
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.06em;
+            margin-bottom: clamp(28px, 4vh, 50px);
+            max-width: 700px;
+            line-height: 1.6;
+        }
+        .hero-tagline strong {
+            color: var(--text-hi);
+            font-weight: 600;
+        }
+
+        /* ---- tool grid (material cards) ---- */
+        .tool-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(16px, 2vw, 28px);
+            max-width: 600px;
+            width: 100%;
+            padding: 0 8px;
+        }
+
+        /* -------- Material Card -------- */
+        .tool-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(24px, 3vw, 42px) clamp(20px, 2.5vw, 38px);
+            border-radius: var(--card-radius);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            text-decoration: none;
+            color: var(--text-hi);
+            transition: all 0.35s var(--transition-bounce);
+            min-width: 150px;
+            flex: 1 0 auto;
+            max-width: 260px;
+            box-shadow: var(--card-elevation);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .tool-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--card-radius);
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.04), transparent 70%);
+            pointer-events: none;
+            transition: opacity 0.4s;
+            opacity: 0;
+        }
+        .tool-card:hover::after {
+            opacity: 1;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.40);
+            box-shadow: var(--card-elevation-hover);
+        }
+        .tool-card:active {
+            transform: translateY(-2px) scale(0.97);
+            transition-duration: 0.12s;
+        }
+
+        .tool-card .icon {
+            font-size: clamp(38px, 4.8vw, 60px);
+            line-height: 1;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s var(--transition-bounce);
+        }
+        .tool-card:hover .icon {
+            transform: scale(1.08) rotate(-2deg);
+        }
+
+        .tool-card .label {
+            font-size: clamp(17px, 1.6vw, 24px);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 2px;
+        }
+        .tool-card .sub {
+            font-size: clamp(11px, 0.9vw, 14px);
+            font-weight: 400;
+            color: var(--text-lo);
+            letter-spacing: 0.02em;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* ---- status badge (material chip) ---- */
+        .tool-card .badge {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 3px 14px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-lo);
+            margin-top: 8px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(4px);
+        }
+        .tool-card .badge.active {
+            background: rgba(94, 240, 138, 0.18);
+            color: #8ef0a5;
+            border-color: rgba(94, 240, 138, 0.20);
+        }
+        .tool-card .badge.coming {
+            background: rgba(255, 200, 50, 0.12);
+            color: #f5d77b;
+            border-color: rgba(255, 200, 50, 0.15);
+        }
+
+        /* coming-soon cards are slightly dimmed but still interactive */
+        .tool-card.coming {
+            opacity: 0.7;
+            pointer-events: none;
+            cursor: default;
+        }
+        .tool-card.coming:hover {
+            transform: none;
+            background: var(--glass);
+            box-shadow: var(--card-elevation);
+        }
+        .tool-card.coming:hover .icon {
+            transform: none;
+        }
+
+        /* ---- control bar ---- */
+        .control-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 16px);
+            padding: clamp(8px, 0.8vw, 14px) clamp(12px, 1.2vw, 20px);
+            border-radius: 22px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-btn {
+            width: clamp(36px, 3.5vw, 46px);
+            height: clamp(36px, 3.5vw, 46px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+        }
+        .icon-btn.on {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.20);
+        }
+        .icon-btn svg {
+            width: clamp(14px, 1.3vw, 18px);
+            height: clamp(14px, 1.3vw, 18px);
+        }
+
+        /* ---- scene picker ---- */
+        .scene-picker {
+            position: fixed;
+            bottom: clamp(140px, 15vh, 170px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px 14px 14px 14px;
+            border-radius: 18px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            min-width: 280px;
+            max-width: 92vw;
+        }
+        .scene-picker.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .scene-picker .thumbs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .scene-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+            opacity: 0.75;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .scene-thumb:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        .scene-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            opacity: 1;
+        }
+        .scene-thumb.custom-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.7);
+            border-style: dashed;
+        }
+        .scene-thumb.custom-thumb:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .scene-thumb.custom-thumb.active {
+            border-color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
+        .custom-panel {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.10);
+            margin-top: 2px;
+        }
+        .custom-panel.open {
+            display: flex;
+        }
+
+        .custom-panel .input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.2s;
+            min-width: 0;
+        }
+        .custom-panel input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .custom-panel input[type="text"]:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-panel .file-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .custom-panel .file-label {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .custom-panel .file-label:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+        .custom-panel .file-label input[type="file"] {
+            display: none;
+        }
+        .custom-panel .apply-btn {
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .custom-panel .apply-btn:hover {
+            background: rgba(255, 255, 255, 0.24);
+        }
+        .custom-panel .apply-btn:active {
+            transform: scale(0.96);
+        }
+
+        .custom-panel .status-msg {
+            font-size: 11px;
+            color: var(--text-lo);
+            text-align: center;
+            min-height: 18px;
+            margin-top: 2px;
+        }
+        .custom-panel .status-msg.error {
+            color: #ffa59e;
+        }
+        .custom-panel .status-msg.success {
+            color: #9ed9b0;
+        }
+
+        /* ---- responsive ---- */
+        @media (max-width: 600px) {
+            .top-bar {
+                top: 14px;
+                left: 16px;
+                right: 16px;
+            }
+            .logo {
+                font-size: clamp(28px, 5vw, 42px);
+            }
+            .logo-sub {
+                font-size: 0.3em;
+                margin-top: -3px;
+            }
+            .tool-card {
+                padding: 20px 16px;
+                min-width: 110px;
+                flex: 1 1 38%;
+                max-width: 200px;
+            }
+            .tool-card .icon {
+                font-size: 30px;
+            }
+            .tool-card .label {
+                font-size: 15px;
+            }
+            .tool-card .sub {
+                font-size: 11px;
+            }
+            .weather {
+                font-size: 12px;
+                min-height: 18px;
+            }
+            .clock {
+                font-size: 12px;
+            }
+            .running-time {
+                font-size: 12px;
+            }
+            .hero-tagline {
+                font-size: 15px;
+                margin-bottom: 22px;
+            }
+            .install-top .icon-btn {
+                width: 28px;
+                height: 28px;
+            }
+            .install-top .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .control-bar {
+                padding: 8px 12px;
+                gap: 6px;
+                bottom: 20px;
+                border-radius: 18px;
+            }
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+            }
+            .icon-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .scene-picker {
+                bottom: clamp(120px, 14vh, 140px);
+                padding: 10px 12px 12px 12px;
+                min-width: unset;
+                width: calc(100vw - 28px);
+            }
+            .scene-thumb {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .tool-card {
+                padding: 16px 12px;
+                min-width: 90px;
+                flex: 1 1 42%;
+                max-width: 160px;
+            }
+            .tool-card .icon {
+                font-size: 26px;
+            }
+            .tool-card .label {
+                font-size: 13px;
+            }
+            .tool-card .sub {
+                font-size: 10px;
+            }
+            .hero-tagline {
+                font-size: 13px;
+            }
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+            }
+            .scene-thumb {
+                width: 34px;
+                height: 34px;
+            }
+        }
+
+        ::selection {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---- Floating badge (timer indicator) ---- */
+        #bgTimerBadge {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 30, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-radius: 40px;
+            padding: 8px 18px 8px 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.92);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.45s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.3s;
+            user-select: none;
+        }
+        #bgTimerBadge.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        #bgTimerBadge:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+        }
+        #bgTimerBadge .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #5ef08a;
+            box-shadow: 0 0 8px #5ef08a;
+            flex-shrink: 0;
+            animation: badgePulse 1.4s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.55;
+                transform: scale(0.8);
+            }
+        }
+        #bgTimerBadge .badge-label {
+            opacity: 0.65;
+            margin-right: 2px;
+        }
+        #bgTimerBadge .badge-time {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+        #bgTimerBadge .badge-goto {
+            opacity: 0.55;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ---- scenes ---- -->
+    <div class="scene active" id="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');"></div>
+    <div class="scene" id="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene" id="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1600&auto=format&fit=crop');"></div>
+    <div class="scene custom-bg" id="scene-custom" style="display:none; background-image:none;"></div>
+
+    <div class="scene-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- ---- top bar ---- -->
+    <div class="top-bar">
+        <a href="/" class="logo">
+            FOCUS
+            <span class="logo-sub">by pushpraj</span>
+        </a>
+        <div class="top-right">
+            <div class="install-top">
+                <button class="icon-btn hidden" id="installBtn" title="Install App">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="info-row">
+                <div class="weather" id="weatherDisplay">⛅ <span class="condition">--</span> <span class="temp">--°</span></div>
+            </div>
+            <div class="clock" id="clock">--:--</div>
+            <div class="running-time" id="runningTime">--:--:--</div>
+        </div>
+    </div>
+
+    <!-- ---- hero ---- -->
+    <div class="hero">
+        <div class="hero-tagline">
+            <strong>Focus</strong> on your studies.<br />
+            Tools for precision &amp; growth.
+        </div>
+
+        <!-- ---- Material Tool Grid (Study Tools only) ---- -->
+        <div class="tool-grid">
+            <!-- 1. Vernier Calliper (active) -->
+            <a href="/study/vernier_calliper/vernier_calliper.html" class="tool-card">
+                <span class="icon">📐</span>
+                <span class="label">Vernier Calliper</span>
+                <span class="sub">Precision measurement</span>
+                <span class="badge active">● active</span>
+            </a>
+
+            <!-- 2. More study tools (coming soon) -->
+            <a href="#" class="tool-card coming">
+                <span class="icon">📚</span>
+                <span class="label">More Tools</span>
+                <span class="sub">Coming soon</span>
+                <span class="badge coming">⌛ coming</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ---- control bar ---- -->
+    <div class="control-bar">
+        <button class="icon-btn" id="sceneToggle" title="Change background theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ---- scene picker popover ---- -->
+    <div class="scene-picker" id="scenePicker">
+        <div class="thumbs">
+            <div class="scene-thumb active" data-scene="scene-rain" style="background-image:url('https://flocus.com/aesthetic-stopwatch/resources/images/themes/b075c800cadd3c9d930f.jpg');" title="Default"></div>
+            <div class="scene-thumb" data-scene="scene-forest" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=200&auto=format&fit=crop');" title="Forest"></div>
+            <div class="scene-thumb" data-scene="scene-lake" style="background-image:url('https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=200&auto=format&fit=crop');" title="Lake"></div>
+            <div class="scene-thumb" data-scene="scene-cafe" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=200&auto=format&fit=crop');" title="Cafe"></div>
+            <div class="scene-thumb" data-scene="scene-ocean" style="background-image:url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=200&auto=format&fit=crop');" title="Ocean"></div>
+            <div class="scene-thumb" data-scene="scene-night" style="background-image:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=200&auto=format&fit=crop');" title="Night"></div>
+            <div class="scene-thumb" data-scene="scene-city" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=200&auto=format&fit=crop');" title="City"></div>
+            <div class="scene-thumb custom-thumb" id="customThumb" title="Custom background">+</div>
+        </div>
+
+        <div class="custom-panel" id="customPanel">
+            <div class="input-row">
+                <input type="text" id="customUrlInput" placeholder="Image URL …" spellcheck="false" />
+                <button class="apply-btn" id="applyUrlBtn">Apply</button>
+            </div>
+            <div class="file-row">
+                <label class="file-label" id="fileLabel">
+                    📁 Upload photo
+                    <input type="file" id="fileInput" accept="image/*" />
+                </label>
+                <span style="font-size:11px; color:var(--text-lo);">or</span>
+                <button class="apply-btn" id="clearCustomBtn">Reset preset</button>
+            </div>
+            <div class="status-msg" id="customStatus"></div>
+        </div>
+    </div>
+
+    <!-- ---- Floating timer badge ---- -->
+    <a href="timer.html" id="bgTimerBadge" title="Timer running in background – click to go back">
+        <span class="badge-dot"></span>
+        <span class="badge-label">⏱</span>
+        <span class="badge-time" id="bgTimerTime">--:--</span>
+        <span class="badge-goto">→ timer</span>
+    </a>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---- Install ----
+            let deferredPrompt = null;
+            let isAppInstalled = false;
+            const installBtn = document.getElementById('installBtn');
+
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                isAppInstalled = true;
+                installBtn.classList.remove('visible');
+                installBtn.classList.add('hidden');
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!isAppInstalled) {
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('visible');
+                }
+            });
+
+            window.addEventListener('appinstalled', () => {
+                isAppInstalled = true;
+                installBtn.classList.remove('visible');
+                installBtn.classList.add('hidden');
+                deferredPrompt = null;
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    try {
+                        const result = await deferredPrompt.prompt();
+                        if (result.outcome === 'accepted') {
+                            isAppInstalled = true;
+                            installBtn.classList.add('hidden');
+                            installBtn.classList.remove('visible');
+                        }
+                    } catch (_) {
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({
+                                    title: 'FOCUS',
+                                    text: 'Check out this focus timer app!',
+                                    url: window.location.href
+                                });
+                            } catch (_2) {}
+                        }
+                    }
+                } else {
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: 'FOCUS',
+                                text: 'Check out this focus timer app!',
+                                url: window.location.href
+                            });
+                        } catch (_) {}
+                    }
+                }
+            });
+
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.classList.add('hidden');
+                installBtn.classList.remove('visible');
+            }
+
+            // ---- clock ----
+            function updateClock() {
+                const now = new Date();
+                const dateOptions = { month: 'short', day: '2-digit', year: 'numeric' };
+                const dateStr = now.toLocaleString('en-US', dateOptions);
+                document.getElementById('clock').textContent = dateStr;
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                const timeStr = now.toLocaleString('en-US', timeOptions);
+                document.getElementById('runningTime').textContent = timeStr;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ---- weather ----
+            async function fetchWeather() {
+                const el = document.getElementById('weatherDisplay');
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        if (!navigator.geolocation) reject('Geolocation not supported');
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+                    });
+                    const { latitude, longitude } = pos.coords;
+                    const url =
+                        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
+                    const resp = await fetch(url);
+                    const data = await resp.json();
+                    if (data.current_weather) {
+                        const temp = Math.round(data.current_weather.temperature);
+                        let tempStr = temp.toString();
+                        if (tempStr.startsWith('+')) tempStr = tempStr.substring(1);
+                        el.innerHTML = `⛅ <span class="temp">${tempStr}°</span>`;
+                    }
+                } catch (_) {
+                    try {
+                        const resp = await fetch('https://wttr.in/?format=%t&lang=en');
+                        const text = await resp.text();
+                        const match = text.match(/([+-]?\d+°C)/);
+                        if (match) {
+                            const tempNum = parseFloat(match[1]);
+                            el.innerHTML = `⛅ <span class="temp">${tempNum}°</span>`;
+                        } else {
+                            throw new Error('No temp');
+                        }
+                    } catch (_2) {
+                        el.innerHTML = `⛅ <span class="temp">--°</span>`;
+                    }
+                }
+            }
+            fetchWeather();
+            setInterval(fetchWeather, 600000);
+
+            // ---- scene persistence ----
+            function saveSceneState(sceneId, customUrl) {
+                const state = { sceneId, customUrl: customUrl || null };
+                try { localStorage.setItem('sceneState', JSON.stringify(state)); } catch (_) {}
+
+                if (window.supabaseClient && window.supabaseDb && window.supabaseDb.isConfigured()) {
+                    window.supabaseDb.isLoggedIn().then(loggedIn => {
+                        if (loggedIn) {
+                            window.supabaseDb.saveSceneState(state);
+                        }
+                    });
+                }
+            }
+
+            function loadSceneState() {
+                try {
+                    const raw = localStorage.getItem('sceneState');
+                    if (raw) return JSON.parse(raw);
+                } catch (_) {}
+                return null;
+            }
+
+            // ---- DOM refs ----
+            const sceneToggle = document.getElementById('sceneToggle');
+            const scenePicker = document.getElementById('scenePicker');
+            const thumbs = document.querySelectorAll('.scene-thumb:not(.custom-thumb)');
+            const customThumb = document.getElementById('customThumb');
+            const customPanel = document.getElementById('customPanel');
+            const customUrlInput = document.getElementById('customUrlInput');
+            const applyUrlBtn = document.getElementById('applyUrlBtn');
+            const fileInput = document.getElementById('fileInput');
+            const fileLabel = document.getElementById('fileLabel');
+            const customStatus = document.getElementById('customStatus');
+            const clearCustomBtn = document.getElementById('clearCustomBtn');
+            const sceneCustom = document.getElementById('scene-custom');
+            const allScenes = document.querySelectorAll('.scene');
+
+            // ---- scene switching ----
+            function activateScene(sceneId) {
+                allScenes.forEach(s => s.classList.remove('active'));
+                sceneCustom.style.display = 'none';
+                sceneCustom.classList.remove('active');
+                let target = document.getElementById(sceneId);
+                if (target) {
+                    target.classList.add('active');
+                    target.style.display = '';
+                }
+                thumbs.forEach(t => t.classList.remove('active'));
+                const thumb = document.querySelector(`.scene-thumb[data-scene="${sceneId}"]`);
+                if (thumb) thumb.classList.add('active');
+                customThumb.classList.remove('active');
+                customPanel.classList.remove('open');
+                customStatus.textContent = '';
+                customStatus.className = 'status-msg';
+                saveSceneState(sceneId, null);
+            }
+
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const sceneId = thumb.dataset.scene;
+                    activateScene(sceneId);
+                    scenePicker.classList.remove('open');
+                });
+            });
+
+            // ---- custom background ----
+            function applyCustomBackground(url) {
+                if (!url || url.trim() === '') {
+                    customStatus.textContent = 'Please enter a valid URL.';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                const clean = url.trim();
+                try { new URL(clean); } catch (_) {
+                    customStatus.textContent = 'Invalid URL. Include http:// or https://';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                allScenes.forEach(s => s.classList.remove('active'));
+                sceneCustom.style.display = '';
+                sceneCustom.style.backgroundImage = `url('${clean}')`;
+                sceneCustom.classList.add('active');
+                thumbs.forEach(t => t.classList.remove('active'));
+                customThumb.classList.add('active');
+                customStatus.textContent = '✓ Background applied!';
+                customStatus.className = 'status-msg success';
+                sceneCustom.dataset.customUrl = clean;
+                saveSceneState('scene-custom', clean);
+            }
+
+            function handleFileUpload(file) {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    customStatus.textContent = 'Please select an image file.';
+                    customStatus.className = 'status-msg error';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    allScenes.forEach(s => s.classList.remove('active'));
+                    sceneCustom.style.display = '';
+                    sceneCustom.style.backgroundImage = `url('${dataUrl}')`;
+                    sceneCustom.classList.add('active');
+                    thumbs.forEach(t => t.classList.remove('active'));
+                    customThumb.classList.add('active');
+                    customStatus.textContent = '✓ Photo uploaded!';
+                    customStatus.className = 'status-msg success';
+                    sceneCustom.dataset.customUrl = dataUrl;
+                    customUrlInput.value = '';
+                    saveSceneState('scene-custom', dataUrl);
+                };
+                reader.onerror = () => {
+                    customStatus.textContent = 'Error reading file.';
+                    customStatus.className = 'status-msg error';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function restoreScene() {
+                const saved = loadSceneState();
+                if (!saved) return false;
+                if (saved.sceneId === 'scene-custom' && saved.customUrl) {
+                    applyCustomBackground(saved.customUrl);
+                    return true;
+                } else if (saved.sceneId && document.getElementById(saved.sceneId)) {
+                    activateScene(saved.sceneId);
+                    return true;
+                }
+                return false;
+            }
+
+            // ---- toggle scene picker ----
+            sceneToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                scenePicker.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!scenePicker.contains(e.target) && e.target !== sceneToggle) {
+                    scenePicker.classList.remove('open');
+                }
+            });
+
+            // ---- custom thumb ----
+            customThumb.addEventListener('click', () => {
+                const isOpen = customPanel.classList.toggle('open');
+                if (isOpen) {
+                    thumbs.forEach(t => t.classList.remove('active'));
+                    customThumb.classList.add('active');
+                    if (!sceneCustom.classList.contains('active')) {
+                        if (sceneCustom.dataset.customUrl) {
+                            allScenes.forEach(s => s.classList.remove('active'));
+                            sceneCustom.style.display = '';
+                            sceneCustom.style.backgroundImage = `url('${sceneCustom.dataset.customUrl}')`;
+                            sceneCustom.classList.add('active');
+                            customStatus.textContent = '✓ Using saved background.';
+                            customStatus.className = 'status-msg success';
+                        } else {
+                            customStatus.textContent = 'Paste a URL or upload a photo.';
+                            customStatus.className = 'status-msg';
+                        }
+                    }
+                } else {
+                    if (!document.querySelector('.scene.active')) {
+                        activateScene('scene-rain');
+                    }
+                }
+            });
+
+            applyUrlBtn.addEventListener('click', () => {
+                const url = customUrlInput.value.trim();
+                if (url) applyCustomBackground(url);
+                else {
+                    customStatus.textContent = 'Enter an image URL first.';
+                    customStatus.className = 'status-msg error';
+                }
+            });
+            customUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyUrlBtn.click(); });
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleFileUpload(file);
+                fileInput.value = '';
+            });
+            clearCustomBtn.addEventListener('click', () => {
+                sceneCustom.style.display = 'none';
+                sceneCustom.classList.remove('active');
+                sceneCustom.dataset.customUrl = '';
+                customUrlInput.value = '';
+                customStatus.textContent = 'Reset to preset scene.';
+                customStatus.className = 'status-msg';
+                activateScene('scene-rain');
+                customThumb.classList.remove('active');
+                customPanel.classList.remove('open');
+                saveSceneState('scene-rain', null);
+            });
+
+            // Export for db sync
+            window.activateScene = activateScene;
+            window.applyCustomBackground = applyCustomBackground;
+
+            // ---- init ----
+            if (!restoreScene()) {
+                activateScene('scene-rain');
+            }
+
+            console.log('🌿 FOCUS · by pushpraj · study tools dashboard loaded');
+            console.log('📐 Vernier Calliper → /study/vernier_calliper/vernier_calliper.html');
+
+            // ---- timer badge ----
+            const badge = document.getElementById('bgTimerBadge');
+            const timeEl = document.getElementById('bgTimerTime');
+            const KEY = 'focusTimerState';
+
+            function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
+
+            function fmt(ms) {
+                const totalSec = Math.max(0, Math.floor(ms / 1000));
+                const h = Math.floor(totalSec / 3600);
+                const m = Math.floor((totalSec % 3600) / 60);
+                const s = totalSec % 60;
+                return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+            }
+
+            function updateBadge() {
+                try {
+                    const raw = localStorage.getItem(KEY);
+                    if (!raw) { badge.classList.remove('visible'); return; }
+                    const st = JSON.parse(raw);
+                    if (!st || !st.running) { badge.classList.remove('visible'); return; }
+
+                    const passedMs = Date.now() - st.startTimestamp;
+                    const totalElapsed = (st.accumulatedMs || 0) + passedMs;
+
+                    let display;
+                    if (st.mode === 'stopwatch') {
+                        display = fmt(totalElapsed);
+                    } else {
+                        const left = Math.max(0, st.initialMs - totalElapsed);
+                        display = fmt(left);
+                        if (left <= 0) { badge.classList.remove('visible'); return; }
+                    }
+
+                    timeEl.textContent = display;
+                    badge.classList.add('visible');
+                } catch (_) {
+                    badge.classList.remove('visible');
+                }
+            }
+
+            updateBadge();
+            setInterval(updateBadge, 500);
+
+        })();
+    </script>
+
+</body>
+</html>
