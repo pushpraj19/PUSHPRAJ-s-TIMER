@@ -1,4 +1,4 @@
-const CACHE_NAME = 'focus-timer-offline-v1';
+const CACHE_NAME = 'focus-v2';
 const APP_SHELL = [
   '',
   'index.html',
@@ -7,6 +7,8 @@ const APP_SHELL = [
   'time_history.html',
   'todo.html',
   'logo.png',
+  'study_menu.html',
+  'vernier_calliper.html',
   'manifest.webmanifest',
   'pwa-register.js',
   'supabase-config.js',
