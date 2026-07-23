@@ -244,7 +244,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: clamp(28px, 3.5vw, 48px) clamp(24px, 3vw, 44px);
+            padding: clamp(20px, 2.5vw, 32px) clamp(16px, 2vw, 24px);
             border-radius: 24px;
             background: var(--glass);
             border: 1px solid var(--glass-border);
@@ -253,11 +253,13 @@
             text-decoration: none;
             color: var(--text-hi);
             transition: all 0.35s cubic-bezier(.4, 0, .2, 1);
-            min-width: 160px;
-            flex: 1 0 auto;
-            max-width: 280px;
+            flex: 0 0 clamp(160px, 19vw, 210px);
+            width: clamp(160px, 19vw, 210px);
+            aspect-ratio: 1 / 1;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             cursor: pointer;
+            text-align: center;
+            overflow: hidden;
         }
         .nav-card:hover {
             transform: translateY(-6px);
@@ -538,9 +540,10 @@
                 margin-top: -3px;
             }
             .nav-card {
-                padding: 22px 18px;
-                min-width: 120px;
-                flex: 1 1 40%;
+                padding: 16px 14px;
+                flex: 0 0 calc(50% - 10px);
+                width: calc(50% - 10px);
+                aspect-ratio: 1 / 1;
             }
             .nav-card .icon {
                 font-size: 32px;
@@ -599,8 +602,10 @@
 
         @media (max-width: 380px) {
             .nav-card {
-                padding: 16px 14px;
-                min-width: 100px;
+                padding: 12px 10px;
+                flex: 0 0 calc(50% - 8px);
+                width: calc(50% - 8px);
+                aspect-ratio: 1 / 1;
             }
             .nav-card .icon {
                 font-size: 26px;
@@ -686,7 +691,7 @@
             </a>
 
             <a href="/study_menu.html" class="nav-card">
-                <span class="icon">📗</span>
+                <span class="icon">🧘</span>
                 <span class="label">MATERIALS</span>
                 <span class="sub">Study Materials</span>
             </a>
@@ -694,7 +699,7 @@
              <a href="#" class="nav-card coming">
                 <span class="icon">🧘</span>
                 <span class="label">more</span>
-                <span class="sub">Coming Soon</span>
+                <span class="sub">moretools</span>
             </a>
         </div>
     </div>
