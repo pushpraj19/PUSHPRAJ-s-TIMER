@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/study", "destination": "/study_menu.html" }
-  ],
-  "rewrites": [
-    { "source": "/vernier", "destination": "/vernier_calliper.html" }
-  ]
-}
