@@ -305,12 +305,11 @@
             margin-top: 6px;
         }
 
-        /* ---- control bar (bottom) ---- */
+        /* ---- control bar (bottom-right corner) ---- */
         .control-bar {
             position: fixed;
             bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 26px;
             z-index: 5;
             display: flex;
             align-items: center;
@@ -355,9 +354,8 @@
         /* ---- scene picker ---- */
         .scene-picker {
             position: fixed;
-            bottom: clamp(140px, 15vh, 170px);
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
+            bottom: clamp(90px, 12vh, 100px);
+            right: 26px;
             z-index: 6;
             display: flex;
             flex-direction: column;
@@ -372,13 +370,14 @@
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+            transform: translateY(10px);
             min-width: 280px;
             max-width: 92vw;
         }
         .scene-picker.open {
             opacity: 1;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
         }
 
         .scene-picker .thumbs {
@@ -577,6 +576,7 @@
                 padding: 8px 12px;
                 gap: 6px;
                 bottom: 20px;
+                right: 16px;
                 border-radius: 18px;
             }
             .icon-btn {
@@ -588,10 +588,11 @@
                 height: 14px;
             }
             .scene-picker {
-                bottom: clamp(120px, 14vh, 140px);
+                bottom: clamp(76px, 10vh, 90px);
+                right: 16px;
                 padding: 10px 12px 12px 12px;
                 min-width: unset;
-                width: calc(100vw - 28px);
+                width: calc(100vw - 32px);
             }
             .scene-thumb {
                 width: 38px;
