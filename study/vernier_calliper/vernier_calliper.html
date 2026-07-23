@@ -3,10 +3,16 @@
 
 <head>
     <title>Vernier Caliper Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="keywords" content="vernier simulation physics measurement">
     <meta name="author" content="Mahesh Kurmi">
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
+        html, body {
+            overscroll-behavior: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             background: white;
             color: #323232;
@@ -18,6 +24,15 @@
             justify-content: center;
             text-align: center;
             font-family: Helvetica neue, roboto;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #myCanvas {
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         img {
@@ -197,6 +212,95 @@
             font-size: 25px;
         }
 
+        /* --- Mobile responsiveness --- */
+        @media (max-width: 700px) {
+            #topToolbar {
+                top: max(6px, env(safe-area-inset-top));
+                gap: 6px;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 92%;
+            }
+
+            .top-toolbar-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+                border-width: 2px;
+            }
+
+            .top-toolbar-btn.small-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            #gui {
+                transform: scale(1);
+                transform-origin: top right;
+                right: max(2px, env(safe-area-inset-right));
+                top: max(2px, env(safe-area-inset-top));
+            }
+
+            #toggleGuiBtn {
+                display: inline-block !important;
+            }
+
+            #gui.gui-hidden {
+                display: none;
+            }
+        }
+
+        @media (min-width: 701px) {
+            #toggleGuiBtn {
+                display: none !important;
+            }
+
+            .trigger_popup_fricc {
+                width: 26px;
+                height: 26px;
+                font-size: 20px;
+                line-height: 26px;
+                top: max(5px, env(safe-area-inset-top));
+                left: max(5px, env(safe-area-inset-left));
+            }
+
+            .hover_bkgr_fricc > div {
+                width: 90%;
+                max-width: none;
+                padding: 15px 6%;
+                font-size: 14px;
+            }
+
+            .objectLibraryTile {
+                width: 78px;
+                font-size: 11px;
+            }
+
+            .objectLibraryTile img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .popupCloseButton {
+                width: 26px;
+                height: 26px;
+                font-size: 20px;
+                line-height: 26px;
+                top: -13px;
+                right: -13px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            #gui {
+                transform: scale(0.85);
+            }
+
+            .top-toolbar-btn {
+                padding: 5px 9px;
+                font-size: 11px;
+            }
+        }
+
         :root {
             --tp-base-background-color: hsla(200, 6%, 15%, 0.8);
             --tp-base-shadow-color: hsla(0, 0%, 0%, 0.26);
@@ -239,6 +343,7 @@
         <div id="topToolbar">
             <button id="chooseObjectBtn" class="top-toolbar-btn">Choose Object 🖼️</button>
             <button id="resizeObjectBtn" class="top-toolbar-btn small-btn">↔ Resize</button>
+            <button id="toggleGuiBtn" class="top-toolbar-btn small-btn" style="display:none;">⚙ Settings</button>
         </div>
         <input type="file" id="customImageInput" accept="image/png, image/jpeg" style="display:none">
         <div id="uploadHint" style="position:absolute; left:5px; bottom:5px; z-index:2; font-family:arial; font-size:13px; color:#888; display:none;">Custom object loaded ✓</div>
@@ -405,6 +510,17 @@
 
         document.getElementById('chooseObjectBtn').onclick = function () {
             openObjectLibrary();
+        };
+
+        //--- mobile: settings panel takes up a lot of a small screen, so let it be
+        //hidden by default on narrow viewports, with a toolbar button to bring it back
+        var guiEl = document.getElementById('gui');
+        var toggleGuiBtn = document.getElementById('toggleGuiBtn');
+        if (window.innerWidth <= 700) {
+            guiEl.classList.add('gui-hidden');
+        }
+        toggleGuiBtn.onclick = function () {
+            guiEl.classList.toggle('gui-hidden');
         };
 
         //--- resize control: re-randomizes the current object's size (kept hidden -
