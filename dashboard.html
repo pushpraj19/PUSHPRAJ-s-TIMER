@@ -630,6 +630,42 @@
         ::selection {
             background: rgba(255, 255, 255, 0.3);
         }
+
+        /* the auto-injected top-right account widget (avatar + dropdown with
+           email/mode/upload/logout) from supabase-db.js is replaced below with
+           a plain avatar that links straight to profile.html */
+        #profileWidget {
+            display: none !important;
+        }
+        .topbar-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-hi);
+            text-transform: uppercase;
+            transition: all 0.25s ease;
+            flex: 0 0 auto;
+        }
+        .topbar-avatar:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+        }
+        .topbar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -654,6 +690,10 @@
             <span class="logo-sub">by pushpraj</span>
         </a>
         <div class="top-right">
+            <a href="profile.html" class="topbar-avatar" id="topbarAvatar" title="View Profile">
+                <span id="topbarAvatarInitial">U</span>
+                <img id="topbarAvatarImg" style="display:none;" alt="Avatar" />
+            </a>
             <div class="install-top">
                 <button class="icon-btn hidden" id="installBtn" title="Install App">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1191,6 +1231,34 @@
 
         update();
         setInterval(update, 500);
+    })();
+    </script>
+
+    <!-- ---- populate the simple top-right avatar link (no dropdown, just links to profile.html) ---- -->
+    <script>
+    (function() {
+        async function loadTopbarAvatar() {
+            const initialEl = document.getElementById('topbarAvatarInitial');
+            const imgEl = document.getElementById('topbarAvatarImg');
+            const db = window.supabaseDb;
+            if (!db || !db.isConfigured()) return;
+
+            const loggedIn = await db.isLoggedIn();
+            if (!loggedIn) return;
+
+            const user = await db.getCurrentUser();
+            if (user && user.email) {
+                initialEl.textContent = user.email.charAt(0).toUpperCase();
+            }
+
+            const profile = await db.fetchProfile();
+            if (profile && profile.avatar_data) {
+                imgEl.src = profile.avatar_data;
+                imgEl.style.display = 'block';
+                initialEl.style.display = 'none';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadTopbarAvatar);
     })();
     </script>
 
