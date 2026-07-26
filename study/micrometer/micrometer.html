@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Micrometer Simulator</title>
     <meta name="keywords" content="screw gauge simulation physics measurement">
-    <meta name="author" content="Mahesh Kurmi">
+    <meta name="author" content="Pushpraj Budha">
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
         body {
@@ -903,8 +903,6 @@
             if (objectTobeMeasured.state > 0) {
                 if (objectTobeMeasured.useImage && objectTobeMeasured.img) {
                     ctx.drawImage(objectTobeMeasured.img, objectTobeMeasured.x + 1, objectTobeMeasured.y, objectTobeMeasured.w, objectTobeMeasured.h);
-                    ctx.strokeStyle = scaleColor;
-                    ctx.strokeRect(objectTobeMeasured.x + 1, objectTobeMeasured.y, objectTobeMeasured.w, objectTobeMeasured.h);
                 } else {
                     let grd = ctx.createLinearGradient(objectTobeMeasured.x, objectTobeMeasured.y, objectTobeMeasured.x + objectTobeMeasured.w, objectTobeMeasured.y);
                     grd.addColorStop(0, "rgb(120,120,120)")
