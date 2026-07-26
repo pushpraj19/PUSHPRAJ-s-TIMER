@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About · FOCUS by pushpraj</title>
+
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <script src="pwa-register.js" defer></script>
+
+    <style>
+        :root {
+            --text-hi: rgba(255, 255, 255, 0.96);
+            --text-lo: rgba(255, 255, 255, 0.65);
+            --glass: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --accent-blue: #6bcbff;
+            --accent-gold: #ffd93d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', "SF Pro Display", "Segoe UI", sans-serif;
+        }
+
+        body {
+            position: relative;
+            background: linear-gradient(160deg, #14161c 0%, #1b1e27 55%, #14161c 100%);
+            color: var(--text-hi);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 90px 20px 60px;
+        }
+
+        /* ---- top bar ---- */
+        .top-bar {
+            position: fixed;
+            top: 20px;
+            left: 26px;
+            right: 26px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-size: clamp(22px, 3vw, 30px);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            line-height: 1.1;
+            text-decoration: none;
+            color: var(--text-hi);
+        }
+        .logo-sub {
+            font-weight: 400;
+            font-size: 0.4em;
+            opacity: 0.7;
+            letter-spacing: 0.12em;
+            margin-top: 2px;
+            text-transform: lowercase;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-lo);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.25s ease;
+        }
+        .back-link:hover {
+            color: var(--text-hi);
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        /* ---- hero ---- */
+        .hero {
+            text-align: center;
+            max-width: 640px;
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            margin-bottom: 12px;
+        }
+        .hero h1 span {
+            color: var(--accent-blue);
+        }
+        .hero p {
+            font-size: clamp(14px, 1.4vw, 17px);
+            color: var(--text-lo);
+            line-height: 1.6;
+        }
+
+        /* ---- cards ---- */
+        .card {
+            width: 100%;
+            max-width: 640px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            padding: clamp(24px, 4vw, 40px);
+            margin-bottom: 24px;
+        }
+
+        /* ---- profile card ---- */
+        .profile-head {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+        .avatar {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            object-fit: cover;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.08);
+        }
+        .profile-name {
+            font-size: clamp(19px, 2vw, 23px);
+            font-weight: 700;
+        }
+        .profile-tag {
+            font-size: 13px;
+            color: var(--text-lo);
+            margin-top: 3px;
+            letter-spacing: 0.02em;
+        }
+
+        .bio-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .bio-list li {
+            font-size: 14.5px;
+            line-height: 1.55;
+            color: var(--text-lo);
+            padding-left: 22px;
+            position: relative;
+        }
+        .bio-list li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            top: 1px;
+            color: var(--accent-blue);
+            font-size: 12px;
+        }
+
+        /* ---- socials ---- */
+        .social-row {
+            display: flex;
+            gap: 14px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-hi);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+        .social-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-2px);
+        }
+        .social-btn.instagram:hover { color: #e1306c; border-color: rgba(225,48,108,0.4); }
+        .social-btn.facebook:hover { color: #4267ff; border-color: rgba(66,103,255,0.4); }
+        .social-btn.tiktok:hover { color: var(--text-hi); border-color: rgba(255,255,255,0.5); }
+
+        /* ---- about app card ---- */
+        .card h2 {
+            font-size: clamp(17px, 1.8vw, 20px);
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card p {
+            font-size: 14.5px;
+            line-height: 1.65;
+            color: var(--text-lo);
+            margin-bottom: 12px;
+        }
+        .card p:last-child { margin-bottom: 0; }
+        .card p strong { color: var(--text-hi); }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+        }
+        .feature .icon { font-size: 22px; margin-bottom: 6px; }
+        .feature .label { font-size: 12.5px; color: var(--text-lo); font-weight: 500; }
+
+        /* ---- back cta ---- */
+        .back-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 14px 28px;
+            border-radius: 100px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-hi);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        .back-cta:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-3px);
+        }
+
+        footer {
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.35);
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .profile-head { flex-direction: column; text-align: center; }
+            .social-row { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="/" class="logo">
+            FOCUS
+            <span class="logo-sub">by pushpraj</span>
+        </a>
+        <a href="/dashboard.html" class="back-link">← Dashboard</a>
+    </div>
+
+    <div class="hero">
+        <h1>About <span>Focus16</span></h1>
+        <p>A distraction‑free space built by a student, for students — and the person behind it.</p>
+    </div>
+
+    <!-- Profile card -->
+    <div class="card">
+        <div class="profile-head">
+            <img src="logo.png" alt="Pushpraj Budha" class="avatar" />
+            <div>
+                <div class="profile-name">Pushpraj Budha</div>
+                <div class="profile-tag">Student · Nepal · Builder of Focus16</div>
+            </div>
+        </div>
+
+        <ul class="bio-list">
+            <li>A student from Nepal who is still learning, growing, and figuring things out.</li>
+            <li>Someone who likes understanding how things work, not just memorizing them.</li>
+            <li>Interested in math, coding, problem solving, and practical thinking.</li>
+            <li>Not just a developer — also someone who thinks a lot about focus, discipline, and self‑growth.</li>
+            <li>Believes small effort every day matters more than big motivation once in a while.</li>
+            <li>Has a mindset of learning from mistakes and getting better over time.</li>
+            <li>Wants to use his skills to make something meaningful, not just something flashy.</li>
+        </ul>
+
+        <div class="social-row">
+            <a href="https://www.instagram.com/mr_pushpraj16/" target="_blank" rel="noopener" class="social-btn instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+                Instagram
+            </a>
+            <a href="https://www.facebook.com/pushpraj.budha.2025" target="_blank" rel="noopener" class="social-btn facebook">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
+                Facebook
+            </a>
+            <a href="https://www.tiktok.com/@mr.pushpraj?lang=en" target="_blank" rel="noopener" class="social-btn tiktok">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M16.6 5.82a4.28 4.28 0 0 1-3.75-4.42h-3.32v14.5a2.5 2.5 0 1 1-2.11-2.47v-3.3a5.82 5.82 0 1 0 5.43 5.8V9.06a7.6 7.6 0 0 0 4.45 1.43V7.19a4.24 4.24 0 0 1-.7-1.37z"/>
+                </svg>
+                TikTok
+            </a>
+        </div>
+    </div>
+
+    <!-- About the app -->
+    <div class="card">
+        <h2>🎯 About this website</h2>
+        <p><strong>Focus16</strong> is a distraction‑free focus timer and study companion, built out of a very simple, personal need: Pushpraj wanted a better way to study and stay organized — so he built one.</p>
+        <p>It's not meant to be flashy. It's meant to be useful — a calm space with a timer, a todo list, and study materials, designed to make focusing feel a little less like a fight and studying feel a little less stressful.</p>
+        <p>It's also a work in progress, built step by step, the same way its creator likes to learn: by experimenting, improving, and getting a little better each time.</p>
+
+        <div class="feature-grid">
+            <div class="feature">
+                <div class="icon">⏱️</div>
+                <div class="label">Focus Timer</div>
+            </div>
+            <div class="feature">
+                <div class="icon">📋</div>
+                <div class="label">Todo List</div>
+            </div>
+            <div class="feature">
+                <div class="icon">🧘</div>
+                <div class="label">Study Materials</div>
+            </div>
+            <div class="feature">
+                <div class="icon">🌱</div>
+                <div class="label">Always Growing</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="/dashboard.html" class="back-cta">← Back to Dashboard</a>
+
+    <footer>FOCUS · by pushpraj · Nepal</footer>
+
+</body>
+</html>
