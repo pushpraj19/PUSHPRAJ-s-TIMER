@@ -37,6 +37,18 @@
     overflow-x:hidden;
   }
 
+  body::after{
+    content:'';
+    position:fixed;
+    top:30%; left:50%;
+    width:500px; height:500px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(201,162,75,.03) 0%, transparent 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ===== INTRO ===== */
   #intro{
     position:fixed; inset:0; z-index:100;
     display:flex; align-items:center; justify-content:center;
@@ -50,7 +62,6 @@
     max-width:360px;
     padding:0 24px;
   }
-
   .intro-emblem{
     width:52px; height:52px;
     margin:0 auto 24px;
@@ -148,17 +159,115 @@
   .intro-btn:active{ transform:scale(.97); }
   .intro-btn:focus-visible{ outline:2px solid var(--brass-light); outline-offset:4px; }
 
-  body::after{
-    content:'';
-    position:fixed;
-    top:30%; left:50%;
-    width:500px; height:500px;
-    transform:translate(-50%,-50%);
-    background:radial-gradient(circle, rgba(201,162,75,.03) 0%, transparent 70%);
-    pointer-events:none;
-    z-index:0;
+  /* ===== LOGIN MODAL ===== */
+  #loginModal{
+    position:fixed; inset:0; z-index:200;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(10,12,18,.94);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition: opacity .5s ease, visibility .5s ease;
+  }
+  #loginModal.visible{ opacity:1; visibility:visible; pointer-events:auto; }
+
+  .login-card{
+    width:100%; max-width:360px;
+    padding:0 24px;
+    text-align:center;
+    transform:translateY(14px) scale(.97);
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  #loginModal.visible .login-card{ transform:translateY(0) scale(1); }
+
+  .login-icon{
+    width:50px; height:50px;
+    margin:0 auto 20px;
+    opacity:.5;
+  }
+  .login-icon svg{ width:100%; height:100%; }
+
+  .login-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px; letter-spacing:.4em;
+    color:var(--error);
+    border:1px solid var(--error);
+    display:inline-block;
+    padding:4px 16px;
+    margin:0 0 18px;
+    opacity:.75;
+  }
+  .login-heading{
+    font-family:'JetBrains Mono', monospace;
+    font-size:clamp(16px,4.5vw,20px);
+    font-weight:800;
+    letter-spacing:.1em;
+    color:var(--brass-light);
+    margin:0 0 6px;
+  }
+  .login-desc{
+    font-size:13px; color:var(--muted);
+    margin:0 0 28px; line-height:1.65;
   }
 
+  #loginForm{
+    display:flex; flex-direction:column; gap:11px;
+    width:100%;
+  }
+  #loginForm input[type=email],
+  #loginForm input[type=password]{
+    width:100%;
+    background:#10131a;
+    border:1px solid var(--panel-edge);
+    border-radius:8px;
+    padding:14px 14px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:var(--text);
+    outline:none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  #loginForm input:focus{
+    border-color:var(--brass);
+    box-shadow:0 0 0 3px rgba(201,162,75,.15);
+  }
+  #loginForm input::placeholder{ color:#4a4f5c; }
+  #loginForm button{
+    width:100%;
+    background:linear-gradient(180deg, var(--brass-light), var(--brass));
+    color:#14171f;
+    border:none; border-radius:8px;
+    padding:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:12px; letter-spacing:.2em;
+    cursor:pointer;
+    transition: transform .15s, opacity .15s;
+  }
+  #loginForm button:active{ transform:scale(.97); }
+  #loginForm button:disabled{ opacity:.45; cursor:default; transform:none; }
+
+  .login-msg{
+    min-height:18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:.04em;
+    line-height:1.5;
+  }
+  .login-msg.error{ color:var(--error); }
+  .login-msg.info{ color:var(--brass); }
+
+  .login-footer{
+    font-size:12.5px; color:var(--muted);
+    margin-top:22px;
+  }
+  .login-footer a{
+    color:var(--brass);
+    text-decoration:none;
+    cursor:pointer;
+    transition: color .2s;
+  }
+  .login-footer a:hover{ color:var(--brass-light); text-decoration:underline; }
+
+  /* ===== GAME STAGE ===== */
   .stage{
     width:100%; max-width:420px;
     padding:28px 20px 40px;
@@ -184,7 +293,7 @@
   .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
   .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
   .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
-  .shackle{ fill:none; stroke:var(--brass); stroke-width:3; }
+  .shackle-path{ fill:none; stroke:var(--brass); stroke-width:3; }
   .keyhole{ fill:var(--brass-dim); }
 
   h1.eyebrow{
@@ -220,8 +329,8 @@
     margin:0;
   }
 
-  form{ width:100%; display:flex; flex-direction:column; gap:12px; }
-  input[type=text]{
+  #answerForm{ width:100%; display:flex; flex-direction:column; gap:12px; }
+  #answerForm input[type=text]{
     width:100%;
     background:#10131a;
     border:1px solid var(--panel-edge);
@@ -235,9 +344,9 @@
     outline:none;
     transition: border-color .2s, box-shadow .2s;
   }
-  input[type=text]::placeholder{ color:#4a4f5c; letter-spacing:.05em; text-transform:none; font-size:14px;}
-  input[type=text]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,75,.15); }
-  input.shake{ animation: shake .4s; border-color:var(--error); }
+  #answerForm input[type=text]::placeholder{ color:#4a4f5c; letter-spacing:.05em; text-transform:none; font-size:14px;}
+  #answerForm input[type=text]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,75,.15); }
+  #answerForm input.shake{ animation: shake .4s; border-color:var(--error); }
   @keyframes shake{
     0%,100%{transform:translateX(0);}
     20%{transform:translateX(-8px);}
@@ -246,7 +355,7 @@
     80%{transform:translateX(5px);}
   }
 
-  button{
+  .submit-btn{
     width:100%;
     background:linear-gradient(180deg, var(--brass-light), var(--brass));
     color:#14171f;
@@ -257,8 +366,8 @@
     cursor:pointer;
     transition: transform .15s, filter .15s;
   }
-  button:active{ transform:scale(.97); }
-  button:disabled{ opacity:.5; cursor:default; }
+  .submit-btn:active{ transform:scale(.97); }
+  .submit-btn:disabled{ opacity:.5; cursor:default; transform:none; }
 
   .msg{
     min-height:18px;
@@ -282,8 +391,34 @@
 </head>
 <body>
 
-<!-- ===== INTRO SCREEN ===== -->
-<div id="intro" role="dialog" aria-label="Welcome">
+<!-- ===== LOGIN MODAL ===== -->
+<div id="loginModal" role="dialog" aria-label="Sign in required">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c0463a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c0463a" stroke-width="2"/>
+        <circle cx="32" cy="38" r="3" fill="#c0463a" opacity=".5"/>
+        <rect x="30.5" y="40" width="3" height="6" rx="1" fill="#c0463a" opacity=".5"/>
+      </svg>
+    </div>
+    <p class="login-eyebrow">ACCESS DENIED</p>
+    <h2 class="login-heading">AUTHENTICATION REQUIRED</h2>
+    <p class="login-desc">You must be signed in to enter The Vault.<br>Authenticate below to proceed.</p>
+    <form id="loginForm" novalidate>
+      <input type="email" id="loginEmail" placeholder="Email address" required autocomplete="email">
+      <input type="password" id="loginPass" placeholder="Password" required autocomplete="current-password">
+      <button type="submit" id="loginBtn">SIGN IN</button>
+    </form>
+    <div class="login-msg" id="loginMsg"></div>
+    <p class="login-footer">
+      No account? <a href="#" id="toggleMode">Create one</a>
+    </p>
+  </div>
+</div>
+
+<!-- ===== INTRO SCREEN (starts hidden via .gone) ===== -->
+<div id="intro" class="gone" role="dialog" aria-label="Welcome">
   <div class="intro-inner">
     <div class="intro-emblem" id="introEmblem">
       <svg viewBox="0 0 64 64" fill="none">
@@ -303,12 +438,12 @@
   </div>
 </div>
 
-<!-- ===== EXISTING GAME (completely untouched) ===== -->
+<!-- ===== GAME STAGE ===== -->
 <div class="stage" id="stage">
   <span class="eyebrow">The Vault</span>
   <div class="lock-wrap" id="lockIcon">
     <svg viewBox="0 0 64 64">
-      <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
+      <path class="shackle-path" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
       <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
       <circle class="keyhole" cx="32" cy="38" r="3.5"/>
       <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
@@ -323,7 +458,7 @@
     </div>
     <form id="answerForm">
       <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
-      <button type="submit" id="submitBtn">Unlock</button>
+      <button type="submit" class="submit-btn" id="submitBtn">Unlock</button>
     </form>
     <div class="msg" id="msg"></div>
   </div>
@@ -331,67 +466,223 @@
   <span class="mode-tag" id="modeTag">checking session…</span>
 </div>
 
+<!-- ===== SHARED SUPABASE CLIENT ===== -->
 <script>
-// ===== Single Supabase client — shared by intro AND game =====
 const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
+<!-- ===== BOOT SEQUENCE + LOGIN MODAL + INTRO ===== -->
 <script>
-// ===== INTRO — uses the shared `sb` client, no duplicates =====
 (function(){
-  const greetEl = document.getElementById('introGreet');
-  const emblem  = document.getElementById('introEmblem');
-  const title   = document.getElementById('introTitle');
-  const line    = document.getElementById('introLine');
-  const d1      = document.getElementById('introD1');
-  const d2      = document.getElementById('introD2');
-  const stamp   = document.getElementById('introStamp');
-  const btn     = document.getElementById('introBtn');
-  const intro   = document.getElementById('intro');
+  var gameInitialized = false;
+  var isSignUpMode = false;
+  var introDismissed = false;
 
-  // Check session using the shared client — no second createClient
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session && session.user && session.user.email) {
-      const name = session.user.email.split('@')[0];
-      greetEl.textContent = 'Welcome, ' + name + '.';
+  var loginModal  = document.getElementById('loginModal');
+  var loginForm   = document.getElementById('loginForm');
+  var loginEmail  = document.getElementById('loginEmail');
+  var loginPass   = document.getElementById('loginPass');
+  var loginBtn    = document.getElementById('loginBtn');
+  var loginMsg    = document.getElementById('loginMsg');
+  var toggleMode  = document.getElementById('toggleMode');
+  var intro       = document.getElementById('intro');
+  var introBtn    = document.getElementById('introBtn');
+  var introEmblem = document.getElementById('introEmblem');
+  var introGreet  = document.getElementById('introGreet');
+  var introTitle  = document.getElementById('introTitle');
+  var introLine   = document.getElementById('introLine');
+  var introD1     = document.getElementById('introD1');
+  var introD2     = document.getElementById('introD2');
+  var introStamp  = document.getElementById('introStamp');
+
+  /* ---------- Auth state listener ---------- */
+  sb.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_IN' && session) {
+      hideLoginModal();
+      handleAuthenticatedUser(session);
     }
   });
 
-  setTimeout(() => emblem.classList.add('show'), 300);
-  setTimeout(() => greetEl.classList.add('show'), 700);
-  setTimeout(() => title.classList.add('show'), 1000);
-  setTimeout(() => line.classList.add('show'), 1350);
-  setTimeout(() => d1.classList.add('show'), 1550);
-  setTimeout(() => d2.classList.add('show'), 1800);
-  setTimeout(() => stamp.classList.add('show'), 2100);
-  setTimeout(() => { btn.classList.add('show'); btn.focus(); }, 2400);
+  /* ---------- Boot ---------- */
+  async function boot() {
+    var result;
+    try {
+      result = await sb.auth.getSession();
+    } catch(e) {
+      showLoginModal();
+      return;
+    }
 
-  function dismissIntro(){
-    btn.style.pointerEvents = 'none';
+    var session = result.data && result.data.session;
+
+    if (!session || !session.user) {
+      showLoginModal();
+      return;
+    }
+
+    handleAuthenticatedUser(session);
+  }
+
+  /* ---------- Handle authenticated user ---------- */
+  function handleAuthenticatedUser(session) {
+    if (gameInitialized) return;
+
+    var introDone = localStorage.getItem('vault_intro_done');
+
+    if (introDone) {
+      /* Returning user — skip intro, go straight to game */
+      gameInitialized = true;
+      initGame();
+    } else {
+      /* First visit — show intro */
+      gameInitialized = true;
+      showIntro(session.user.email);
+    }
+  }
+
+  /* ---------- Show / hide login modal ---------- */
+  function showLoginModal() {
+    loginModal.classList.add('visible');
+    setTimeout(function(){ loginEmail.focus(); }, 500);
+  }
+
+  function hideLoginModal() {
+    loginModal.classList.remove('visible');
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+    loginForm.reset();
+  }
+
+  /* ---------- Login / Sign-up form ---------- */
+  loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var email = loginEmail.value.trim();
+    var pass  = loginPass.value;
+
+    if (!email || !pass) {
+      loginMsg.textContent = 'Please fill in all fields.';
+      loginMsg.className = 'login-msg error';
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+
+    var result;
+
+    if (isSignUpMode) {
+      result = await sb.auth.signUp({ email: email, password: pass });
+    } else {
+      result = await sb.auth.signInWithPassword({ email: email, password: pass });
+    }
+
+    loginBtn.disabled = false;
+
+    if (result.error) {
+      var msg = result.error.message;
+      /* Clean up common Supabase messages */
+      if (msg.indexOf('Invalid login') !== -1 || msg.indexOf('Invalid credentials') !== -1) {
+        msg = 'Invalid email or password.';
+      } else if (msg.indexOf('already registered') !== -1) {
+        msg = 'This email is already registered. Try signing in.';
+      } else if (msg.indexOf('Password should be') !== -1) {
+        msg = 'Password must be at least 6 characters.';
+      }
+      loginMsg.textContent = msg;
+      loginMsg.className = 'login-msg error';
+      return;
+    }
+
+    /* Sign-up without immediate session = email confirmation required */
+    if (isSignUpMode && !result.data.session) {
+      loginMsg.textContent = 'Account created! Check your email to confirm, then sign in.';
+      loginMsg.className = 'login-msg info';
+      /* Switch back to sign-in mode */
+      isSignUpMode = false;
+      loginBtn.textContent = 'SIGN IN';
+      toggleMode.textContent = 'Create one';
+      loginForm.reset();
+      return;
+    }
+
+    /* Session established — onAuthStateChange will handle the rest */
+  });
+
+  /* ---------- Toggle sign-in / sign-up ---------- */
+  toggleMode.addEventListener('click', function(e) {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    loginMsg.textContent = '';
+    loginMsg.className = 'login-msg';
+    if (isSignUpMode) {
+      loginBtn.textContent = 'CREATE ACCOUNT';
+      toggleMode.textContent = 'Sign in instead';
+      loginPass.setAttribute('autocomplete', 'new-password');
+    } else {
+      loginBtn.textContent = 'SIGN IN';
+      toggleMode.textContent = 'Create one';
+      loginPass.setAttribute('autocomplete', 'current-password');
+    }
+  });
+
+  /* ---------- Show intro with animations ---------- */
+  function showIntro(email) {
+    var name = email.split('@')[0];
+    introGreet.textContent = 'Welcome, ' + name + '.';
+
+    /* Remove .gone to reveal intro (triggers fade-in transition) */
+    intro.classList.remove('gone');
+
+    /* Staggered animations */
+    setTimeout(function(){ introEmblem.classList.add('show'); }, 300);
+    setTimeout(function(){ introGreet.classList.add('show'); }, 700);
+    setTimeout(function(){ introTitle.classList.add('show'); }, 1000);
+    setTimeout(function(){ introLine.classList.add('show'); }, 1350);
+    setTimeout(function(){ introD1.classList.add('show'); }, 1550);
+    setTimeout(function(){ introD2.classList.add('show'); }, 1800);
+    setTimeout(function(){ introStamp.classList.add('show'); }, 2100);
+    setTimeout(function(){
+      introBtn.classList.add('show');
+      introBtn.focus();
+    }, 2400);
+  }
+
+  /* ---------- Dismiss intro ---------- */
+  function dismissIntro() {
+    if (introDismissed) return;
+    introDismissed = true;
+    introBtn.style.pointerEvents = 'none';
+    localStorage.setItem('vault_intro_done', '1');
     intro.classList.add('gone');
-    setTimeout(() => {
-      const inp = document.getElementById('answerInput');
-      if(inp) inp.focus();
+    initGame();
+    setTimeout(function(){
+      var inp = document.getElementById('answerInput');
+      if (inp) inp.focus();
     }, 1000);
   }
 
-  btn.addEventListener('click', dismissIntro);
-  document.addEventListener('keydown', function handler(e){
-    if(e.key === 'Enter' && btn.classList.contains('show') && !intro.classList.contains('gone')){
+  introBtn.addEventListener('click', dismissIntro);
+
+  document.addEventListener('keydown', function handler(e) {
+    if (e.key === 'Enter' && introBtn.classList.contains('show') && !intro.classList.contains('gone') && !introDismissed) {
       dismissIntro();
       document.removeEventListener('keydown', handler);
     }
   });
+
+  /* ---------- Start boot ---------- */
+  boot();
 })();
 </script>
 
+<!-- ===== GAME LOGIC (unchanged) ===== -->
 <script>
-// ===== GAME — uses the same shared `sb` client =====
-const LOCAL_KEY = 'vault_puzzle_level';
+var LOCAL_KEY = 'vault_puzzle_level';
 
-let state = {
+var state = {
   userId: null,
   isOffline: true,
   currentLevel: 1,
@@ -399,7 +690,7 @@ let state = {
   levelRow: null,
 };
 
-const el = {
+var el = {
   dots: document.getElementById('dots'),
   levelTag: document.getElementById('levelTag'),
   hintText: document.getElementById('hintText'),
@@ -413,20 +704,20 @@ const el = {
   stage: document.getElementById('stage'),
 };
 
-async function init() {
-  const { count } = await sb
+async function initGame() {
+  var { count } = await sb
     .from('puzzle_levels_public')
     .select('*', { count: 'exact', head: true });
   state.totalLevels = count || 0;
 
-  const { data: { session } } = await sb.auth.getSession();
+  var { data: { session } } = await sb.auth.getSession();
 
   if (session && session.user) {
     state.userId = session.user.id;
     state.isOffline = false;
     el.modeTag.textContent = 'signed in · progress synced';
 
-    let { data: progress } = await sb
+    var { data: progress } = await sb
       .from('puzzle_progress')
       .select('current_level')
       .eq('user_id', state.userId)
@@ -450,8 +741,8 @@ async function init() {
 
 function renderDots() {
   el.dots.innerHTML = '';
-  for (let i = 1; i <= state.totalLevels; i++) {
-    const d = document.createElement('div');
+  for (var i = 1; i <= state.totalLevels; i++) {
+    var d = document.createElement('div');
     d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
     el.dots.appendChild(d);
   }
@@ -462,7 +753,7 @@ async function loadLevel() {
     showDoneScreen();
     return;
   }
-  const { data, error } = await sb
+  var { data, error } = await sb
     .from('puzzle_levels_public')
     .select('id, level_number, hint')
     .eq('level_number', state.currentLevel)
@@ -473,7 +764,7 @@ async function loadLevel() {
     return;
   }
   state.levelRow = data;
-  el.levelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
+  el.levelTag.textContent = 'LEVEL ' + state.currentLevel + ' / ' + state.totalLevels;
   el.hintText.textContent = data.hint;
   el.input.value = '';
   el.msg.textContent = '';
@@ -482,20 +773,20 @@ async function loadLevel() {
 
 function showDoneScreen() {
   el.lockIcon.classList.add('open');
-  el.gameArea.innerHTML = `
-    <div class="done-screen">
-      <h2>VAULT CLEARED</h2>
-      <p>You solved all ${state.totalLevels} levels. Nicely done.</p>
-    </div>`;
+  el.gameArea.innerHTML =
+    '<div class="done-screen">' +
+    '<h2>VAULT CLEARED</h2>' +
+    '<p>You solved all ' + state.totalLevels + ' levels. Nicely done.</p>' +
+    '</div>';
 }
 
-el.form.addEventListener('submit', async (e) => {
+el.form.addEventListener('submit', async function(e) {
   e.preventDefault();
-  const guess = el.input.value.trim().toUpperCase();
+  var guess = el.input.value.trim().toUpperCase();
   if (!guess) return;
   el.submitBtn.disabled = true;
 
-  const { data: correct, error } = await sb
+  var { data: correct, error } = await sb
     .rpc('check_puzzle_answer', {
       level_num: state.currentLevel,
       guess: guess
@@ -524,7 +815,7 @@ el.form.addEventListener('submit', async (e) => {
         .eq('user_id', state.userId);
     }
 
-    setTimeout(async () => {
+    setTimeout(async function() {
       el.lockIcon.classList.remove('open');
       renderDots();
       await loadLevel();
@@ -534,12 +825,10 @@ el.form.addEventListener('submit', async (e) => {
     el.msg.textContent = 'INCORRECT — TRY AGAIN';
     el.msg.className = 'msg error';
     el.input.classList.add('shake');
-    setTimeout(() => el.input.classList.remove('shake'), 400);
+    setTimeout(function() { el.input.classList.remove('shake'); }, 400);
     el.submitBtn.disabled = false;
   }
 });
-
-init();
 </script>
 </body>
 </html>
