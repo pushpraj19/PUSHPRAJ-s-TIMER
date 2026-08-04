@@ -31,68 +31,92 @@
     overflow-x:hidden;
   }
 
-  /* ===== INTRO OVERLAY ===== */
   #intro{
     position:fixed; inset:0; z-index:100;
     display:flex; align-items:center; justify-content:center;
     background: var(--bg);
-    transition: opacity .9s ease, visibility .9s ease;
+    transition: opacity 1s ease, visibility 1s ease;
   }
   #intro.gone{ opacity:0; visibility:hidden; pointer-events:none; }
 
   .intro-inner{
     text-align:center;
-    max-width:380px;
+    max-width:360px;
     padding:0 24px;
   }
+
   .intro-emblem{
-    width:56px; height:56px;
-    margin:0 auto 28px;
+    width:52px; height:52px;
+    margin:0 auto 24px;
     opacity:0;
-    transform:scale(.85);
+    transform:scale(.8);
     transition: opacity .8s ease, transform .8s cubic-bezier(.34,1.56,.64,1);
   }
   .intro-emblem.show{ opacity:1; transform:scale(1); }
   .intro-emblem svg{ width:100%; height:100%; }
 
+  .intro-greet{
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:.06em;
+    color:var(--muted);
+    margin:0 0 10px;
+    opacity:0;
+    transform:translateY(8px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .intro-greet.show{ opacity:1; transform:translateY(0); }
+
   .intro-title{
     font-family:'JetBrains Mono', monospace;
-    font-size:clamp(18px,5vw,22px);
+    font-size:clamp(20px,5.5vw,26px);
     font-weight:800;
-    letter-spacing:.18em;
+    letter-spacing:.2em;
     color:var(--brass-light);
-    margin:0 0 6px;
+    margin:0 0 24px;
     opacity:0;
     transform:translateY(10px);
-    transition: opacity .7s ease .2s, transform .7s ease .2s;
+    transition: opacity .7s ease .15s, transform .7s ease .15s;
   }
   .intro-title.show{ opacity:1; transform:translateY(0); }
+
+  .intro-line{
+    width:40px; height:1px;
+    background:var(--brass-dim);
+    margin:0 auto 24px;
+    opacity:0;
+    transition: opacity .6s ease;
+  }
+  .intro-line.show{ opacity:1; }
+
+  .intro-desc{
+    font-size:13.5px;
+    line-height:1.75;
+    color:var(--muted);
+    margin:0 0 10px;
+    opacity:0;
+    transform:translateY(6px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .intro-desc.show{ opacity:1; transform:translateY(0); }
+  .intro-desc.last{ margin-bottom:28px; }
+  .intro-desc strong{ color:var(--text); font-weight:600; }
 
   .intro-stamp{
     display:inline-block;
     font-family:'JetBrains Mono', monospace;
     font-size:9px;
-    letter-spacing:.45em;
+    letter-spacing:.4em;
     color:var(--error);
     border:1px solid var(--error);
-    padding:5px 20px;
-    margin:18px 0 28px;
+    padding:5px 18px;
+    margin-bottom:32px;
     opacity:0;
-    transform:rotate(-2deg) scale(.9);
-    transition: opacity .6s ease, transform .6s cubic-bezier(.34,1.56,.64,1);
+    transform:rotate(-2deg) scale(.88);
+    transition: opacity .5s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
   }
-  .intro-stamp.show{ opacity:.85; transform:rotate(0) scale(1); }
-
-  .intro-sub{
-    font-size:14px;
-    line-height:1.65;
-    color:var(--muted);
-    margin:0 0 36px;
-    opacity:0;
-    transform:translateY(8px);
-    transition: opacity .7s ease, transform .7s ease;
-  }
-  .intro-sub.show{ opacity:1; transform:translateY(0); }
+  .intro-stamp.show{ opacity:.8; transform:rotate(0) scale(1); }
 
   .intro-btn{
     background:transparent;
@@ -118,19 +142,17 @@
   .intro-btn:active{ transform:scale(.97); }
   .intro-btn:focus-visible{ outline:2px solid var(--brass-light); outline-offset:4px; }
 
-  /* ===== SUBTLE BG GLOW (always on) ===== */
   body::after{
     content:'';
     position:fixed;
     top:30%; left:50%;
     width:500px; height:500px;
     transform:translate(-50%,-50%);
-    background:radial-gradient(circle, rgba(201,162,75,.035) 0%, transparent 70%);
+    background:radial-gradient(circle, rgba(201,162,75,.03) 0%, transparent 70%);
     pointer-events:none;
     z-index:0;
   }
 
-  /* ===== EXISTING GAME STYLES (untouched) ===== */
   .stage{
     width:100%; max-width:420px;
     padding:28px 20px 40px;
@@ -265,10 +287,13 @@
         <rect x="30.5" y="40" width="3" height="7" fill="#7a6633"/>
       </svg>
     </div>
+    <p class="intro-greet" id="introGreet">Welcome, stranger.</p>
     <p class="intro-title" id="introTitle">THE VAULT</p>
+    <div class="intro-line" id="introLine"></div>
+    <p class="intro-desc" id="introD1">This is a sealed puzzle. Each level hides a secret behind a clue — <strong>decode it and you advance</strong>.</p>
+    <p class="intro-desc last" id="introD2">Solve them all and the vault opens. Most won't. Let's see if you do.</p>
     <div class="intro-stamp" id="introStamp">CLASSIFIED</div>
-    <p class="intro-sub" id="introSub">Not everything is meant to be found.<br>But you're here anyway.</p>
-    <button class="intro-btn" id="introBtn" aria-label="Enter the vault">ENTER</button>
+    <button class="intro-btn" id="introBtn" aria-label="Enter the vault">ENTER THE VAULT</button>
   </div>
 </div>
 
@@ -301,25 +326,44 @@
 </div>
 
 <script>
-// ===== INTRO ANIMATION =====
+// ===== INTRO — checks session and greets by email =====
 (function(){
+  const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
+
+  const greetEl = document.getElementById('introGreet');
   const emblem = document.getElementById('introEmblem');
   const title  = document.getElementById('introTitle');
+  const line   = document.getElementById('introLine');
+  const d1     = document.getElementById('introD1');
+  const d2     = document.getElementById('introD2');
   const stamp  = document.getElementById('introStamp');
-  const sub    = document.getElementById('introSub');
   const btn    = document.getElementById('introBtn');
   const intro  = document.getElementById('intro');
 
+  // Kick off session check immediately — it'll resolve well before greeting appears
+  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    .auth.getSession()
+    .then(({ data: { session } }) => {
+      if (session && session.user && session.user.email) {
+        // Show just the name part before @, e.g. "alex" from "alex@gmail.com"
+        const name = session.user.email.split('@')[0];
+        greetEl.textContent = 'Welcome, ' + name + '.';
+      }
+    });
+
   setTimeout(() => emblem.classList.add('show'), 300);
-  setTimeout(() => title.classList.add('show'), 600);
-  setTimeout(() => stamp.classList.add('show'), 1100);
-  setTimeout(() => sub.classList.add('show'), 1500);
-  setTimeout(() => { btn.classList.add('show'); btn.focus(); }, 1900);
+  setTimeout(() => greet.classList.add('show'), 700);
+  setTimeout(() => title.classList.add('show'), 1000);
+  setTimeout(() => line.classList.add('show'), 1350);
+  setTimeout(() => d1.classList.add('show'), 1550);
+  setTimeout(() => d2.classList.add('show'), 1800);
+  setTimeout(() => stamp.classList.add('show'), 2100);
+  setTimeout(() => { btn.classList.add('show'); btn.focus(); }, 2400);
 
   function dismissIntro(){
     btn.style.pointerEvents = 'none';
     intro.classList.add('gone');
-    // Focus the game input after transition
     setTimeout(() => {
       const inp = document.getElementById('answerInput');
       if(inp) inp.focus();
@@ -327,7 +371,6 @@
   }
 
   btn.addEventListener('click', dismissIntro);
-  // Also allow Enter to dismiss
   document.addEventListener('keydown', function handler(e){
     if(e.key === 'Enter' && btn.classList.contains('show') && !intro.classList.contains('gone')){
       dismissIntro();
@@ -352,7 +395,7 @@ let state = {
   isOffline: true,
   currentLevel: 1,
   totalLevels: 0,
-  levelRow: null,   // contains only: id, level_number, hint — NO answer
+  levelRow: null,
 };
 
 const el = {
@@ -370,13 +413,11 @@ const el = {
 };
 
 async function init() {
-  // 1. Figure out how many levels exist
   const { count } = await sb
     .from('puzzle_levels_public')
     .select('*', { count: 'exact', head: true });
   state.totalLevels = count || 0;
 
-  // 2. Check for a logged-in session (reuses your site's existing auth)
   const { data: { session } } = await sb.auth.getSession();
 
   if (session && session.user) {
@@ -384,7 +425,6 @@ async function init() {
     state.isOffline = false;
     el.modeTag.textContent = 'signed in · progress synced';
 
-    // fetch or create progress row
     let { data: progress } = await sb
       .from('puzzle_progress')
       .select('current_level')
@@ -454,7 +494,6 @@ el.form.addEventListener('submit', async (e) => {
   if (!guess) return;
   el.submitBtn.disabled = true;
 
-  // Answer is checked server-side — the answer never comes to the browser.
   const { data: correct, error } = await sb
     .rpc('check_puzzle_answer', {
       level_num: state.currentLevel,
