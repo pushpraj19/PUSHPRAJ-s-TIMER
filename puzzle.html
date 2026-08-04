@@ -186,7 +186,7 @@ const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 // =========================================================================
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const LOCAL_KEY = 'vault_puzzle_level';
 
@@ -214,13 +214,13 @@ const el = {
 
 async function init() {
   // 1. Figure out how many levels exist
-  const { count } = await supabase
+  const { count } = await sb
     .from('puzzle_levels_public')
     .select('*', { count: 'exact', head: true });
   state.totalLevels = count || 0;
 
   // 2. Check for a logged-in session (reuses your site's existing auth)
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
 
   if (session && session.user) {
     state.userId = session.user.id;
@@ -228,14 +228,14 @@ async function init() {
     el.modeTag.textContent = 'signed in · progress synced';
 
     // fetch or create progress row
-    let { data: progress } = await supabase
+    let { data: progress } = await sb
       .from('puzzle_progress')
       .select('current_level')
       .eq('user_id', state.userId)
       .maybeSingle();
 
     if (!progress) {
-      await supabase.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
+      await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
       state.currentLevel = 1;
     } else {
       state.currentLevel = progress.current_level;
@@ -264,7 +264,7 @@ async function loadLevel() {
     showDoneScreen();
     return;
   }
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('puzzle_levels_public')
     .select('id, level_number, hint')
     .eq('level_number', state.currentLevel)
@@ -298,7 +298,7 @@ el.form.addEventListener('submit', async (e) => {
   el.submitBtn.disabled = true;
 
   // Answer is checked server-side — the answer never comes to the browser.
-  const { data: correct, error } = await supabase
+  const { data: correct, error } = await sb
     .rpc('check_puzzle_answer', {
       level_num: state.currentLevel,
       guess: guess
@@ -321,7 +321,7 @@ el.form.addEventListener('submit', async (e) => {
     if (state.isOffline) {
       localStorage.setItem(LOCAL_KEY, state.currentLevel);
     } else {
-      await supabase
+      await sb
         .from('puzzle_progress')
         .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
         .eq('user_id', state.userId);
