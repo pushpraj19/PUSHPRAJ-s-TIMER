@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>The Vault · Puzzle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Make sure supabase-config.js (defines window.SUPABASE_URL / window.SUPABASE_ANON_KEY) loads BEFORE this file -->
-<script src="supabase-config.js"></script>
 <style>
   :root{
     --bg: #14171f;
@@ -24,11 +22,9 @@
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
   html,body{
-    margin:0; padding:0; min-height:100%;
+    margin:0; padding:0; height:100%;
     background:
-      radial-gradient(ellipse 600px 400px at 50% -5%, #2a3142 0%, transparent 60%),
-      radial-gradient(ellipse 500px 500px at 100% 100%, #1e2330 0%, transparent 55%),
-      var(--bg);
+      radial-gradient(ellipse at 50% -10%, #232938 0%, var(--bg) 55%);
     color:var(--text);
     font-family:'Inter', sans-serif;
     display:flex; align-items:center; justify-content:center;
@@ -36,39 +32,13 @@
   }
   .stage{
     width:100%; max-width:420px;
-    padding:32px 22px 44px;
+    padding:28px 20px 40px;
     min-height:100dvh;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:24px;
-  }
-  .screen{
-    width:100%;
-    display:flex; flex-direction:column; align-items:center; gap:22px;
-    animation: fadeUp .5s ease both;
-  }
-  .screen[hidden]{ display:none; }
-  @keyframes fadeUp{
-    from{ opacity:0; transform:translateY(10px); }
-    to{ opacity:1; transform:translateY(0); }
+    gap:22px;
   }
 
-  /* Brand mark */
-  .brand{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; letter-spacing:.32em; text-transform:uppercase;
-    color:var(--brass); margin:0; font-weight:700;
-  }
-
-  /* Lock icon */
-  .lock-wrap{ position:relative; width:60px; height:60px; }
-  .lock-wrap svg{ width:100%; height:100%; }
-  .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); fill:none; stroke:var(--brass); stroke-width:3; }
-  .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
-  .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
-  .keyhole{ fill:var(--brass-dim); }
-
-  /* Dots */
+  /* Level dots */
   .dots{ display:flex; gap:9px; }
   .dot{
     width:8px; height:8px; border-radius:50%;
@@ -79,43 +49,21 @@
   .dot.done{ background:var(--brass); border-color:var(--brass); box-shadow:0 0 8px rgba(201,162,75,.6); }
   .dot.active{ background:var(--brass-light); border-color:var(--brass-light); box-shadow:0 0 10px rgba(230,200,119,.8); transform:scale(1.3); }
 
-  /* Intro card */
-  .intro-card{
-    width:100%;
-    background:linear-gradient(180deg, var(--panel) 0%, #171b23 100%);
-    border:1px solid var(--panel-edge);
-    border-radius:14px;
-    padding:26px 22px;
-    text-align:center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 16px 32px rgba(0,0,0,.4);
-  }
-  .greeting{
+  /* Lock icon */
+  .lock-wrap{ position:relative; width:64px; height:64px; }
+  .lock-wrap svg{ width:100%; height:100%; }
+  .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
+  .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
+  .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
+  .shackle{ fill:none; stroke:var(--brass); stroke-width:3; }
+  .keyhole{ fill:var(--brass-dim); }
+
+  h1.eyebrow{
     font-family:'JetBrains Mono', monospace;
-    font-size:13px; color:var(--brass-light);
-    letter-spacing:.05em; margin:0 0 10px;
-  }
-  .intro-title{
-    font-size:21px; font-weight:700; margin:0 0 10px; color:var(--text);
-  }
-  .intro-copy{
-    font-size:14px; line-height:1.6; color:var(--muted); margin:0;
-  }
-  .intro-stats{
-    display:flex; justify-content:center; gap:22px;
-    margin-top:18px; padding-top:16px;
-    border-top:1px solid var(--panel-edge);
-  }
-  .stat{ text-align:center; }
-  .stat b{
-    display:block; font-family:'JetBrains Mono', monospace;
-    font-size:17px; color:var(--brass-light);
-  }
-  .stat span{
-    display:block; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
-    color:var(--muted); margin-top:2px;
+    font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+    color:var(--brass); margin:0; font-weight:700;
   }
 
-  /* Puzzle plaque */
   .plaque{
     width:100%;
     background:linear-gradient(180deg, var(--panel) 0%, #171b23 100%);
@@ -137,7 +85,11 @@
     font-size:11px; color:var(--muted); letter-spacing:.12em;
     margin-bottom:10px; display:block;
   }
-  .hint-text{ font-size:17px; line-height:1.55; color:var(--text); margin:0; }
+  .hint-text{
+    font-family:'Inter', sans-serif;
+    font-size:17px; line-height:1.55; color:var(--text);
+    margin:0;
+  }
 
   form{ width:100%; display:flex; flex-direction:column; gap:12px; }
   input[type=text]{
@@ -176,7 +128,6 @@
     cursor:pointer;
     transition: transform .15s, filter .15s;
   }
-  button:hover{ filter:brightness(1.06); }
   button:active{ transform:scale(.97); }
   button:disabled{ opacity:.5; cursor:default; }
 
@@ -203,73 +154,40 @@
 <body>
 
 <div class="stage" id="stage">
+  <span class="eyebrow">The Vault</span>
+  <div class="lock-wrap" id="lockIcon">
+    <svg viewBox="0 0 64 64">
+      <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
+      <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
+      <circle class="keyhole" cx="32" cy="38" r="3.5"/>
+      <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
+    </svg>
+  </div>
+  <div class="dots" id="dots"></div>
 
-  <!-- INTRO SCREEN -->
-  <div class="screen" id="introScreen">
-    <div class="brand">
-      <div class="lock-wrap"><svg viewBox="0 0 64 64">
-        <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
-        <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
-        <circle class="keyhole" cx="32" cy="38" r="3.5"/>
-        <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
-      </svg></div>
-      <span class="eyebrow">The Vault</span>
+  <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
+    <div class="plaque">
+      <span class="level-tag" id="levelTag">LEVEL —</span>
+      <p class="hint-text" id="hintText">Loading...</p>
     </div>
-
-    <div class="intro-card">
-      <p class="greeting" id="greetingText">Welcome…</p>
-      <h1 class="intro-title">Every level, one riddle</h1>
-      <p class="intro-copy">Read the clue, crack the code, unlock the next door. No timers, no pressure — just you and the vault.</p>
-      <div class="intro-stats">
-        <div class="stat"><b id="statLevels">–</b><span>Levels</span></div>
-        <div class="stat"><b id="statProgress">–</b><span>Your spot</span></div>
-      </div>
-    </div>
-
-    <button id="startBtn" type="button">Start</button>
-    <span class="mode-tag" id="modeTag">checking session…</span>
+    <form id="answerForm">
+      <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
+      <button type="submit" id="submitBtn">Unlock</button>
+    </form>
+    <div class="msg" id="msg"></div>
   </div>
 
-  <!-- PLAY SCREEN -->
-  <div class="screen" id="playScreen" hidden>
-    <div class="lock-wrap" id="lockIcon">
-      <svg viewBox="0 0 64 64">
-        <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
-        <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
-        <circle class="keyhole" cx="32" cy="38" r="3.5"/>
-        <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
-      </svg>
-    </div>
-    <div class="dots" id="dots"></div>
-
-    <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
-      <div class="plaque">
-        <span class="level-tag" id="levelTag">LEVEL —</span>
-        <p class="hint-text" id="hintText">Loading…</p>
-      </div>
-      <form id="answerForm">
-        <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
-        <button type="submit" id="submitBtn">Unlock</button>
-      </form>
-      <div class="msg" id="msg"></div>
-    </div>
-  </div>
-
+  <span class="mode-tag" id="modeTag">checking session…</span>
 </div>
 
 <script>
-// ====== CONFIG — pulled from your existing supabase-config.js ======
-const SUPABASE_URL = window.SUPABASE_URL;
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  document.getElementById('greetingText').textContent =
-    'Missing Supabase config — load supabase-config.js before puzzle.html.';
-  throw new Error('SUPABASE_URL / SUPABASE_ANON_KEY not found on window.');
-}
+// ====== CONFIG — fill these in with your Supabase project details ======
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 // =========================================================================
 
-const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const LOCAL_KEY = 'vault_puzzle_level';
 
 let state = {
@@ -277,16 +195,10 @@ let state = {
   isOffline: true,
   currentLevel: 1,
   totalLevels: 0,
-  levelRow: null,
+  levelRow: null,   // contains only: id, level_number, hint — NO answer
 };
 
 const el = {
-  introScreen: document.getElementById('introScreen'),
-  playScreen: document.getElementById('playScreen'),
-  greetingText: document.getElementById('greetingText'),
-  statLevels: document.getElementById('statLevels'),
-  statProgress: document.getElementById('statProgress'),
-  startBtn: document.getElementById('startBtn'),
   dots: document.getElementById('dots'),
   levelTag: document.getElementById('levelTag'),
   hintText: document.getElementById('hintText'),
@@ -297,54 +209,45 @@ const el = {
   modeTag: document.getElementById('modeTag'),
   lockIcon: document.getElementById('lockIcon'),
   gameArea: document.getElementById('gameArea'),
+  stage: document.getElementById('stage'),
 };
 
-function greetingByTime() {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
-}
-
-async function prepare() {
-  // total level count
-  const { count } = await sbClient
-    .from('puzzle_levels')
+async function init() {
+  // 1. Figure out how many levels exist
+  const { count } = await supabase
+    .from('puzzle_levels_public')
     .select('*', { count: 'exact', head: true });
   state.totalLevels = count || 0;
-  el.statLevels.textContent = state.totalLevels;
 
-  // session check (reuses your site's existing auth)
-  const { data: { session } } = await sbClient.auth.getSession();
+  // 2. Check for a logged-in session (reuses your site's existing auth)
+  const { data: { session } } = await supabase.auth.getSession();
 
   if (session && session.user) {
     state.userId = session.user.id;
     state.isOffline = false;
-    const name = (session.user.email || 'friend').split('@')[0];
-    el.greetingText.textContent = `${greetingByTime()}, ${name}`;
     el.modeTag.textContent = 'signed in · progress synced';
 
-    let { data: progress } = await sbClient
+    // fetch or create progress row
+    let { data: progress } = await supabase
       .from('puzzle_progress')
       .select('current_level')
       .eq('user_id', state.userId)
       .maybeSingle();
 
     if (!progress) {
-      await sbClient.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
+      await supabase.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
       state.currentLevel = 1;
     } else {
       state.currentLevel = progress.current_level;
     }
   } else {
     state.isOffline = true;
-    el.greetingText.textContent = `${greetingByTime()}, explorer`;
-    el.modeTag.textContent = 'playing offline · saved on this device';
+    el.modeTag.textContent = 'playing offline · progress saved on this device';
     state.currentLevel = parseInt(localStorage.getItem(LOCAL_KEY) || '1', 10);
   }
 
-  const shown = Math.min(state.currentLevel, state.totalLevels || 1);
-  el.statProgress.textContent = `${shown} / ${state.totalLevels}`;
+  renderDots();
+  await loadLevel();
 }
 
 function renderDots() {
@@ -361,14 +264,14 @@ async function loadLevel() {
     showDoneScreen();
     return;
   }
-  const { data, error } = await sbClient
-    .from('puzzle_levels')
-    .select('*')
+  const { data, error } = await supabase
+    .from('puzzle_levels_public')
+    .select('id, level_number, hint')
     .eq('level_number', state.currentLevel)
     .single();
 
   if (error || !data) {
-    el.hintText.textContent = 'Could not load this level — check Supabase table contents.';
+    el.hintText.textContent = 'Could not load this level. Check your Supabase config / table contents.';
     return;
   }
   state.levelRow = data;
@@ -388,22 +291,27 @@ function showDoneScreen() {
     </div>`;
 }
 
-el.startBtn.addEventListener('click', async () => {
-  el.introScreen.hidden = true;
-  el.playScreen.hidden = false;
-  renderDots();
-  await loadLevel();
-});
-
 el.form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const guess = el.input.value.trim().toUpperCase();
-  const correctAnswer = (state.levelRow.answer || '').trim().toUpperCase();
-
   if (!guess) return;
   el.submitBtn.disabled = true;
 
-  if (guess === correctAnswer) {
+  // Answer is checked server-side — the answer never comes to the browser.
+  const { data: correct, error } = await supabase
+    .rpc('check_puzzle_answer', {
+      level_num: state.currentLevel,
+      guess: guess
+    });
+
+  if (error) {
+    el.msg.textContent = 'CONNECTION ERROR — TRY AGAIN';
+    el.msg.className = 'msg error';
+    el.submitBtn.disabled = false;
+    return;
+  }
+
+  if (correct) {
     el.msg.textContent = 'CORRECT';
     el.msg.className = 'msg success';
     el.lockIcon.classList.add('open');
@@ -413,7 +321,7 @@ el.form.addEventListener('submit', async (e) => {
     if (state.isOffline) {
       localStorage.setItem(LOCAL_KEY, state.currentLevel);
     } else {
-      await sbClient
+      await supabase
         .from('puzzle_progress')
         .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
         .eq('user_id', state.userId);
@@ -434,7 +342,7 @@ el.form.addEventListener('submit', async (e) => {
   }
 });
 
-prepare();
+init();
 </script>
 </body>
 </html>
