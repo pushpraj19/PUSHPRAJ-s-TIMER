@@ -1,834 +1,1154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>The Vault · Puzzle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>The Vault · Puzzle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <link rel="icon" type="image/png" href="logo.png" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" href="manifest.webmanifest" />
     <script src="pwa-register.js" defer></script>
-  
-<style>
-  :root{
-    --bg: #14171f;
-    --panel: #1b2029;
-    --panel-edge: #262c38;
-    --brass: #c9a24b;
-    --brass-light: #e6c877;
-    --brass-dim: #7a6633;
-    --text: #ece7da;
-    --muted: #8b8f9b;
-    --error: #c0463a;
-    --success: #4c8c62;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-  html,body{
-    margin:0; padding:0; height:100%;
-    background:
-      radial-gradient(ellipse at 50% -10%, #232938 0%, var(--bg) 55%);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
-    display:flex; align-items:center; justify-content:center;
-    overflow-x:hidden;
-  }
 
-  body::after{
-    content:'';
-    position:fixed;
-    top:30%; left:50%;
-    width:500px; height:500px;
-    transform:translate(-50%,-50%);
-    background:radial-gradient(circle, rgba(201,162,75,.03) 0%, transparent 70%);
-    pointer-events:none;
-    z-index:0;
-  }
+    <style>
+        :root {
+            --bg: #0a0e15;
+            --bg-lift: #0f141d;
+            --panel: #131922;
+            --panel-edge: #1e2633;
+            --panel-edge-light: #293241;
+            --brass: #c9a24b;
+            --brass-light: #e8cc7a;
+            --brass-dim: #7a6633;
+            --brass-dark: #5c4a1f;
+            --text: #e7e2d6;
+            --text-dim: #b8b4a8;
+            --muted: #7b8090;
+            --error: #c0463a;
+            --error-glow: rgba(192, 70, 58, 0.25);
+            --success: #4c8c62;
+            --success-glow: rgba(76, 140, 98, 0.2);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+        }
 
-  /* ===== INTRO ===== */
-  #intro{
-    position:fixed; inset:0; z-index:100;
-    display:flex; align-items:center; justify-content:center;
-    background: var(--bg);
-    transition: opacity 1s ease, visibility 1s ease;
-  }
-  #intro.gone{ opacity:0; visibility:hidden; pointer-events:none; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  .intro-inner{
-    text-align:center;
-    max-width:360px;
-    padding:0 24px;
-  }
-  .intro-emblem{
-    width:52px; height:52px;
-    margin:0 auto 24px;
-    opacity:0;
-    transform:scale(.8);
-    transition: opacity .8s ease, transform .8s cubic-bezier(.34,1.56,.64,1);
-  }
-  .intro-emblem.show{ opacity:1; transform:scale(1); }
-  .intro-emblem svg{ width:100%; height:100%; }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 50% -15%, #1c2435 0%, #0d1119 40%, var(--bg) 70%),
+                radial-gradient(ellipse at 25% 60%, rgba(201, 162, 75, 0.015) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 30%, rgba(201, 162, 75, 0.01) 0%, transparent 40%);
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-  .intro-greet{
-    font-family:'Inter', sans-serif;
-    font-size:13px;
-    font-weight:500;
-    letter-spacing:.06em;
-    color:var(--muted);
-    margin:0 0 10px;
-    opacity:0;
-    transform:translateY(8px);
-    transition: opacity .7s ease, transform .7s ease;
-  }
-  .intro-greet.show{ opacity:1; transform:translateY(0); }
+        /* Subtle grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 180px 180px;
+        }
 
-  .intro-title{
-    font-family:'JetBrains Mono', monospace;
-    font-size:clamp(20px,5.5vw,26px);
-    font-weight:800;
-    letter-spacing:.2em;
-    color:var(--brass-light);
-    margin:0 0 24px;
-    opacity:0;
-    transform:translateY(10px);
-    transition: opacity .7s ease .15s, transform .7s ease .15s;
-  }
-  .intro-title.show{ opacity:1; transform:translateY(0); }
+        /* Ambient glow behind the stage */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 35%;
+            left: 50%;
+            width: 520px;
+            height: 520px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(201, 162, 75, 0.04) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            animation: ambientPulse 8s ease-in-out infinite;
+        }
+        @keyframes ambientPulse {
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.12);
+            }
+        }
 
-  .intro-line{
-    width:40px; height:1px;
-    background:var(--brass-dim);
-    margin:0 auto 24px;
-    opacity:0;
-    transition: opacity .6s ease;
-  }
-  .intro-line.show{ opacity:1; }
+        /* ===== STAGE (game area) ===== */
+        .stage {
+            width: 100%;
+            max-width: 420px;
+            padding: 28px 20px 40px;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 22px;
+            position: relative;
+            z-index: 1;
+        }
 
-  .intro-desc{
-    font-size:13.5px;
-    line-height:1.75;
-    color:var(--muted);
-    margin:0 0 10px;
-    opacity:0;
-    transform:translateY(6px);
-    transition: opacity .6s ease, transform .6s ease;
-  }
-  .intro-desc.show{ opacity:1; transform:translateY(0); }
-  .intro-desc.last{ margin-bottom:28px; }
-  .intro-desc strong{ color:var(--text); font-weight:600; }
+        .dots {
+            display: flex;
+            gap: 9px;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1a1f2b;
+            border: 1px solid var(--brass-dim);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .dot.done {
+            background: var(--brass);
+            border-color: var(--brass);
+            box-shadow: 0 0 10px rgba(201, 162, 75, 0.5), 0 0 2px rgba(201, 162, 75, 0.7);
+        }
+        .dot.active {
+            background: var(--brass-light);
+            border-color: var(--brass-light);
+            box-shadow: 0 0 14px rgba(232, 204, 122, 0.7), 0 0 4px rgba(232, 204, 122, 0.9);
+            transform: scale(1.35);
+            animation: dotPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 14px rgba(232, 204, 122, 0.7), 0 0 4px rgba(232, 204, 122, 0.9);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(232, 204, 122, 1), 0 0 8px rgba(232, 204, 122, 1);
+            }
+        }
 
-  .intro-stamp{
-    display:inline-block;
-    font-family:'JetBrains Mono', monospace;
-    font-size:9px;
-    letter-spacing:.4em;
-    color:var(--error);
-    border:1px solid var(--error);
-    padding:5px 18px;
-    margin-bottom:32px;
-    opacity:0;
-    transform:rotate(-2deg) scale(.88);
-    transition: opacity .5s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
-  }
-  .intro-stamp.show{ opacity:.8; transform:rotate(0) scale(1); }
+        .lock-wrap {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            transition: transform 0.3s ease;
+        }
+        .lock-wrap svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+        }
+        .shackle {
+            transform-origin: 32px 24px;
+            transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .lock-wrap.open .shackle {
+            transform: translateY(-6px) rotate(-25deg);
+        }
+        .lock-body {
+            fill: var(--panel);
+            stroke: var(--brass);
+            stroke-width: 2;
+        }
+        .shackle {
+            fill: none;
+            stroke: var(--brass);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .keyhole {
+            fill: var(--brass-dim);
+            transition: fill 0.3s;
+        }
+        .lock-wrap.open .keyhole {
+            fill: var(--brass-light);
+        }
 
-  .intro-btn{
-    background:transparent;
-    border:1px solid var(--brass-dim);
-    color:var(--brass);
-    font-family:'JetBrains Mono', monospace;
-    font-weight:700;
-    font-size:12px;
-    letter-spacing:.3em;
-    padding:14px 52px;
-    cursor:pointer;
-    opacity:0;
-    transform:translateY(8px);
-    transition: opacity .6s ease, transform .6s ease, background .25s, color .25s, border-color .25s, box-shadow .25s;
-  }
-  .intro-btn.show{ opacity:1; transform:translateY(0); }
-  .intro-btn:hover{
-    background:var(--brass);
-    color:var(--bg);
-    border-color:var(--brass);
-    box-shadow:0 0 30px rgba(201,162,75,.2);
-  }
-  .intro-btn:active{ transform:scale(.97); }
-  .intro-btn:focus-visible{ outline:2px solid var(--brass-light); outline-offset:4px; }
+        h1.eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--brass);
+            margin: 0;
+            font-weight: 700;
+            opacity: 0.85;
+        }
 
-  /* ===== LOGIN MODAL ===== */
-  #loginModal{
-    position:fixed; inset:0; z-index:200;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(10,12,18,.94);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-    opacity:0; visibility:hidden; pointer-events:none;
-    transition: opacity .5s ease, visibility .5s ease;
-  }
-  #loginModal.visible{ opacity:1; visibility:visible; pointer-events:auto; }
+        .plaque {
+            width: 100%;
+            background: linear-gradient(185deg, #151c27 0%, #111720 100%);
+            border: 1px solid var(--panel-edge);
+            border-radius: 12px;
+            padding: 24px 20px;
+            position: relative;
+            box-shadow: var(--shadow-inner), var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .plaque::before {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border: 1px solid var(--panel-edge-light);
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .plaque::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.25), transparent);
+            pointer-events: none;
+        }
+        .level-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            color: var(--muted);
+            letter-spacing: 0.14em;
+            margin-bottom: 12px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        .hint-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 17px;
+            line-height: 1.6;
+            color: var(--text);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
 
-  .login-card{
-    width:100%; max-width:360px;
-    padding:0 24px;
-    text-align:center;
-    transform:translateY(14px) scale(.97);
-    transition: transform .5s cubic-bezier(.34,1.56,.64,1);
-  }
-  #loginModal.visible .login-card{ transform:translateY(0) scale(1); }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        input[type=text] {
+            width: 100%;
+            background: #0c1018;
+            border: 1px solid var(--panel-edge);
+            border-radius: 10px;
+            padding: 16px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            letter-spacing: 0.1em;
+            color: var(--brass-light);
+            text-transform: uppercase;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            position: relative;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+        input[type=text]::placeholder {
+            color: #3d4352;
+            letter-spacing: 0.06em;
+            text-transform: none;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+        }
+        input[type=text]:focus {
+            border-color: var(--brass);
+            box-shadow: 0 0 0 4px rgba(201, 162, 75, 0.1), inset 0 2px 6px rgba(0, 0, 0, 0.5);
+            background: #0e121b;
+        }
+        input.shake {
+            animation: shake 0.45s ease;
+            border-color: var(--error);
+            box-shadow: 0 0 0 4px var(--error-glow);
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-8px);
+            }
+            40% {
+                transform: translateX(8px);
+            }
+            60% {
+                transform: translateX(-5px);
+            }
+            80% {
+                transform: translateX(5px);
+            }
+        }
 
-  .login-icon{
-    width:50px; height:50px;
-    margin:0 auto 20px;
-    opacity:.5;
-  }
-  .login-icon svg{ width:100%; height:100%; }
+        button[type=submit] {
+            width: 100%;
+            background: linear-gradient(180deg, #dbb854 0%, #b89234 50%, #9a7a2a 100%);
+            color: #0d0f14;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.12s ease, filter 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 162, 75, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        button[type=submit]::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%);
+            pointer-events: none;
+            border-radius: 10px;
+        }
+        button[type=submit]:hover {
+            filter: brightness(1.08);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 162, 75, 0.35), 0 0 30px rgba(201, 162, 75, 0.15);
+        }
+        button[type=submit]:active {
+            transform: scale(0.96);
+            filter: brightness(0.95);
+            transition: transform 0.08s ease;
+        }
+        button[type=submit]:disabled {
+            opacity: 0.45;
+            cursor: default;
+            filter: grayscale(0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        button[type=submit]:focus-visible {
+            outline: 2px solid var(--brass-light);
+            outline-offset: 3px;
+        }
 
-  .login-eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:9px; letter-spacing:.4em;
-    color:var(--error);
-    border:1px solid var(--error);
-    display:inline-block;
-    padding:4px 16px;
-    margin:0 0 18px;
-    opacity:.75;
-  }
-  .login-heading{
-    font-family:'JetBrains Mono', monospace;
-    font-size:clamp(16px,4.5vw,20px);
-    font-weight:800;
-    letter-spacing:.1em;
-    color:var(--brass-light);
-    margin:0 0 6px;
-  }
-  .login-desc{
-    font-size:13px; color:var(--muted);
-    margin:0 0 28px; line-height:1.65;
-  }
+        .msg {
+            min-height: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            letter-spacing: 0.06em;
+            text-align: center;
+            transition: color 0.2s;
+        }
+        .msg.error {
+            color: var(--error);
+        }
+        .msg.success {
+            color: var(--success);
+        }
 
-  #loginForm{
-    display:flex; flex-direction:column; gap:11px;
-    width:100%;
-  }
-  #loginForm input[type=email],
-  #loginForm input[type=password]{
-    width:100%;
-    background:#10131a;
-    border:1px solid var(--panel-edge);
-    border-radius:8px;
-    padding:14px 14px;
-    font-family:'Inter', sans-serif;
-    font-size:14px;
-    color:var(--text);
-    outline:none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  #loginForm input:focus{
-    border-color:var(--brass);
-    box-shadow:0 0 0 3px rgba(201,162,75,.15);
-  }
-  #loginForm input::placeholder{ color:#4a4f5c; }
-  #loginForm button{
-    width:100%;
-    background:linear-gradient(180deg, var(--brass-light), var(--brass));
-    color:#14171f;
-    border:none; border-radius:8px;
-    padding:14px;
-    font-family:'JetBrains Mono', monospace;
-    font-weight:700; font-size:12px; letter-spacing:.2em;
-    cursor:pointer;
-    transition: transform .15s, opacity .15s;
-  }
-  #loginForm button:active{ transform:scale(.97); }
-  #loginForm button:disabled{ opacity:.45; cursor:default; transform:none; }
+        .mode-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+            text-align: center;
+        }
 
-  .login-msg{
-    min-height:18px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; letter-spacing:.04em;
-    line-height:1.5;
-  }
-  .login-msg.error{ color:var(--error); }
-  .login-msg.info{ color:var(--brass); }
+        .done-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .done-screen h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--brass-light);
+            letter-spacing: 0.06em;
+            margin: 0;
+            font-size: 20px;
+        }
+        .done-screen p {
+            color: var(--text-dim);
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
 
-  .login-footer{
-    font-size:12.5px; color:var(--muted);
-    margin-top:22px;
-  }
-  .login-footer a{
-    color:var(--brass);
-    text-decoration:none;
-    cursor:pointer;
-    transition: color .2s;
-  }
-  .login-footer a:hover{ color:var(--brass-light); text-decoration:underline; }
+        /* ===== INTRO OVERLAY ===== */
+        #intro {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            transition: opacity 0.9s ease, visibility 0.9s ease;
+        }
+        #intro.gone {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #intro.hidden-initially {
+            display: none;
+        }
 
-  /* ===== GAME STAGE ===== */
-  .stage{
-    width:100%; max-width:420px;
-    padding:28px 20px 40px;
-    min-height:100dvh;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:22px;
-    position:relative;
-    z-index:1;
-  }
+        .intro-inner {
+            text-align: center;
+            max-width: 380px;
+            padding: 0 24px;
+        }
 
-  .dots{ display:flex; gap:9px; }
-  .dot{
-    width:8px; height:8px; border-radius:50%;
-    background:var(--panel-edge);
-    border:1px solid var(--brass-dim);
-    transition: all .3s ease;
-  }
-  .dot.done{ background:var(--brass); border-color:var(--brass); box-shadow:0 0 8px rgba(201,162,75,.6); }
-  .dot.active{ background:var(--brass-light); border-color:var(--brass-light); box-shadow:0 0 10px rgba(230,200,119,.8); transform:scale(1.3); }
+        .intro-emblem {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 24px;
+            opacity: 0;
+            transform: scale(0.75);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 4px 10px rgba(201, 162, 75, 0.3));
+        }
+        .intro-emblem.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .intro-emblem svg {
+            width: 100%;
+            height: 100%;
+        }
 
-  .lock-wrap{ position:relative; width:64px; height:64px; }
-  .lock-wrap svg{ width:100%; height:100%; }
-  .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
-  .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
-  .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
-  .shackle-path{ fill:none; stroke:var(--brass); stroke-width:3; }
-  .keyhole{ fill:var(--brass-dim); }
+        .intro-greet {
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 10px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .intro-greet.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-  h1.eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; letter-spacing:.28em; text-transform:uppercase;
-    color:var(--brass); margin:0; font-weight:700;
-  }
+        .intro-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(22px, 5.8vw, 28px);
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            color: var(--brass-light);
+            margin: 0 0 24px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
+            text-shadow: 0 0 40px rgba(201, 162, 75, 0.3);
+        }
+        .intro-title.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-  .plaque{
-    width:100%;
-    background:linear-gradient(180deg, var(--panel) 0%, #171b23 100%);
-    border:1px solid var(--panel-edge);
-    border-radius:10px;
-    padding:22px 20px;
-    position:relative;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 12px 28px rgba(0,0,0,.35);
-  }
-  .plaque::before{
-    content:'';
-    position:absolute; inset:6px;
-    border:1px solid var(--panel-edge);
-    border-radius:6px;
-    pointer-events:none;
-  }
-  .level-tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; color:var(--muted); letter-spacing:.12em;
-    margin-bottom:10px; display:block;
-  }
-  .hint-text{
-    font-family:'Inter', sans-serif;
-    font-size:17px; line-height:1.55; color:var(--text);
-    margin:0;
-  }
+        .intro-line {
+            width: 44px;
+            height: 1.5px;
+            background: var(--brass-dim);
+            margin: 0 auto 24px;
+            opacity: 0;
+            border-radius: 1px;
+            transition: opacity 0.6s ease;
+        }
+        .intro-line.show {
+            opacity: 1;
+        }
 
-  #answerForm{ width:100%; display:flex; flex-direction:column; gap:12px; }
-  #answerForm input[type=text]{
-    width:100%;
-    background:#10131a;
-    border:1px solid var(--panel-edge);
-    border-radius:8px;
-    padding:16px 14px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:18px; letter-spacing:.08em;
-    color:var(--brass-light);
-    text-transform:uppercase;
-    text-align:center;
-    outline:none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  #answerForm input[type=text]::placeholder{ color:#4a4f5c; letter-spacing:.05em; text-transform:none; font-size:14px;}
-  #answerForm input[type=text]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,75,.15); }
-  #answerForm input.shake{ animation: shake .4s; border-color:var(--error); }
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-8px);}
-    40%{transform:translateX(8px);}
-    60%{transform:translateX(-5px);}
-    80%{transform:translateX(5px);}
-  }
+        .intro-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--muted);
+            margin: 0 0 10px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .intro-desc.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .intro-desc.last {
+            margin-bottom: 28px;
+        }
+        .intro-desc strong {
+            color: var(--text);
+            font-weight: 600;
+        }
 
-  .submit-btn{
-    width:100%;
-    background:linear-gradient(180deg, var(--brass-light), var(--brass));
-    color:#14171f;
-    border:none; border-radius:8px;
-    padding:15px;
-    font-family:'JetBrains Mono', monospace;
-    font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
-    cursor:pointer;
-    transition: transform .15s, filter .15s;
-  }
-  .submit-btn:active{ transform:scale(.97); }
-  .submit-btn:disabled{ opacity:.5; cursor:default; transform:none; }
+        .intro-stamp {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.42em;
+            color: var(--error);
+            border: 1px solid var(--error);
+            padding: 5px 18px;
+            margin-bottom: 32px;
+            opacity: 0;
+            transform: rotate(-2deg) scale(0.85);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .intro-stamp.show {
+            opacity: 0.75;
+            transform: rotate(0) scale(1);
+        }
 
-  .msg{
-    min-height:18px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:12px; letter-spacing:.05em;
-    text-align:center;
-  }
-  .msg.error{ color:var(--error); }
-  .msg.success{ color:var(--success); }
+        .intro-btn {
+            background: transparent;
+            border: 1.5px solid var(--brass-dim);
+            color: var(--brass);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.32em;
+            padding: 14px 52px;
+            cursor: pointer;
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .intro-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .intro-btn:hover {
+            background: var(--brass);
+            color: #0a0d14;
+            border-color: var(--brass);
+            box-shadow: 0 0 35px rgba(201, 162, 75, 0.25), 0 0 0 4px rgba(201, 162, 75, 0.08);
+        }
+        .intro-btn:active {
+            transform: scale(0.96);
+            transition: transform 0.08s ease;
+        }
+        .intro-btn:focus-visible {
+            outline: 2px solid var(--brass-light);
+            outline-offset: 4px;
+        }
 
-  .mode-tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size:10px; color:var(--muted); letter-spacing:.1em;
-    opacity:.7;
-  }
+        /* ===== LOGIN MODAL ===== */
+        #loginModal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(6, 9, 15, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #loginModal.hidden-initially {
+            display: none;
+        }
+        #loginModal.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
-  .done-screen{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .done-screen h2{ font-family:'JetBrains Mono', monospace; color:var(--brass-light); letter-spacing:.05em; margin:0; }
-  .done-screen p{ color:var(--muted); margin:0; font-size:14px; }
-</style>
+        .login-card {
+            background: linear-gradient(185deg, #151c27 0%, #0f151f 100%);
+            border: 1px solid var(--panel-edge);
+            border-radius: 16px;
+            padding: 36px 28px 30px;
+            max-width: 370px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 60px rgba(201, 162, 75, 0.06);
+            position: relative;
+            animation: modalIn 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.94);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(201, 162, 75, 0.15);
+            border-radius: 13px;
+            pointer-events: none;
+        }
+        .login-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.3), transparent);
+            pointer-events: none;
+        }
+
+        .login-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--brass-light);
+            margin: 0 0 10px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 8px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        .login-subtitle strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .login-divider {
+            width: 36px;
+            height: 1px;
+            background: var(--brass-dim);
+            margin: 16px auto 22px;
+            border-radius: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-btn {
+            display: inline-block;
+            width: 100%;
+            background: linear-gradient(180deg, #dbb854 0%, #b89234 50%, #9a7a2a 100%);
+            color: #0d0f14;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 12.5px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.12s ease, filter 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 162, 75, 0.2);
+            position: relative;
+            z-index: 1;
+            text-decoration: none;
+        }
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%);
+            pointer-events: none;
+            border-radius: 10px;
+        }
+        .login-btn:hover {
+            filter: brightness(1.08);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 162, 75, 0.35), 0 0 30px rgba(201, 162, 75, 0.2);
+        }
+        .login-btn:active {
+            transform: scale(0.96);
+            filter: brightness(0.95);
+            transition: transform 0.08s ease;
+        }
+        .login-btn:focus-visible {
+            outline: 2px solid var(--brass-light);
+            outline-offset: 3px;
+        }
+
+        .login-footer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 0.25em;
+            color: var(--muted);
+            opacity: 0.5;
+            margin-top: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 400px) {
+            .stage {
+                padding: 20px 14px 32px;
+                gap: 16px;
+            }
+            .plaque {
+                padding: 18px 14px;
+            }
+            .hint-text {
+                font-size: 15.5px;
+            }
+            input[type=text] {
+                font-size: 16px;
+                padding: 14px 12px;
+            }
+            .intro-inner {
+                padding: 0 16px;
+            }
+            .login-card {
+                padding: 28px 18px 24px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ===== LOGIN MODAL ===== -->
-<div id="loginModal" role="dialog" aria-label="Sign in required">
-  <div class="login-card">
-    <div class="login-icon">
-      <svg viewBox="0 0 64 64" fill="none">
-        <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c0463a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c0463a" stroke-width="2"/>
-        <circle cx="32" cy="38" r="3" fill="#c0463a" opacity=".5"/>
-        <rect x="30.5" y="40" width="3" height="6" rx="1" fill="#c0463a" opacity=".5"/>
-      </svg>
+    <!-- ===== INTRO OVERLAY (hidden until needed) ===== -->
+    <div id="intro" class="hidden-initially" role="dialog" aria-label="Welcome">
+        <div class="intro-inner">
+            <div class="intro-emblem" id="introEmblem">
+                <svg viewBox="0 0 64 64" fill="none">
+                    <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c9a24b" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c9a24b" stroke-width="2"/>
+                    <circle cx="32" cy="38" r="3.5" fill="#7a6633"/>
+                    <rect x="30.5" y="40" width="3" height="7" fill="#7a6633" rx="0.5"/>
+                </svg>
+            </div>
+            <p class="intro-greet" id="introGreet">Welcome, stranger.</p>
+            <p class="intro-title" id="introTitle">THE VAULT</p>
+            <div class="intro-line" id="introLine"></div>
+            <p class="intro-desc" id="introD1">This is a sealed puzzle. Each level hides a secret behind a clue — <strong>decode it and you advance</strong>.</p>
+            <p class="intro-desc last" id="introD2">Solve them all and the vault opens. Most won't. Let's see if you do.</p>
+            <div class="intro-stamp" id="introStamp">CLASSIFIED</div>
+            <button class="intro-btn" id="introBtn" aria-label="Enter the vault">ENTER THE VAULT</button>
+        </div>
     </div>
-    <p class="login-eyebrow">ACCESS DENIED</p>
-    <h2 class="login-heading">AUTHENTICATION REQUIRED</h2>
-    <p class="login-desc">You must be signed in to enter The Vault.<br>Authenticate below to proceed.</p>
-    <form id="loginForm" novalidate>
-      <input type="email" id="loginEmail" placeholder="Email address" required autocomplete="email">
-      <input type="password" id="loginPass" placeholder="Password" required autocomplete="current-password">
-      <button type="submit" id="loginBtn">SIGN IN</button>
-    </form>
-    <div class="login-msg" id="loginMsg"></div>
-    <p class="login-footer">
-      No account? <a href="#" id="toggleMode">Create one</a>
-    </p>
-  </div>
-</div>
 
-<!-- ===== INTRO SCREEN (starts hidden via .gone) ===== -->
-<div id="intro" class="gone" role="dialog" aria-label="Welcome">
-  <div class="intro-inner">
-    <div class="intro-emblem" id="introEmblem">
-      <svg viewBox="0 0 64 64" fill="none">
-        <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c9a24b" stroke-width="3" fill="none"/>
-        <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c9a24b" stroke-width="2"/>
-        <circle cx="32" cy="38" r="3.5" fill="#7a6633"/>
-        <rect x="30.5" y="40" width="3" height="7" fill="#7a6633"/>
-      </svg>
+    <!-- ===== LOGIN MODAL (hidden until needed) ===== -->
+    <div id="loginModal" class="hidden-initially" role="dialog" aria-label="Authentication required" aria-modal="true">
+        <div class="login-card">
+            <div class="login-icon">
+                <svg viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="28" stroke="#c9a24b" stroke-width="2" fill="none" opacity="0.5"/>
+                    <path d="M32 20 V36" stroke="#e8cc7a" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="32" cy="44" r="3" fill="#e8cc7a"/>
+                    <rect x="14" y="26" width="36" height="28" rx="6" fill="none" stroke="#c9a24b" stroke-width="2" opacity="0.4"/>
+                    <circle cx="32" cy="38" r="3" fill="#7a6633" opacity="0.6"/>
+                </svg>
+            </div>
+            <h2 class="login-title">RESTRICTED ACCESS</h2>
+            <p class="login-subtitle">This vault requires <strong>authentication</strong> to proceed. Sign in to continue your puzzle journey.</p>
+            <div class="login-divider"></div>
+            <button class="login-btn" id="loginBtn" aria-label="Sign in to access the vault">SIGN IN TO CONTINUE</button>
+            <p class="login-footer">SECURE VAULT · AUTHORIZED ACCESS ONLY</p>
+        </div>
     </div>
-    <p class="intro-greet" id="introGreet">Welcome, stranger.</p>
-    <p class="intro-title" id="introTitle">THE VAULT</p>
-    <div class="intro-line" id="introLine"></div>
-    <p class="intro-desc" id="introD1">This is a sealed puzzle. Each level hides a secret behind a clue — <strong>decode it and you advance</strong>.</p>
-    <p class="intro-desc last" id="introD2">Solve them all and the vault opens. Most won't. Let's see if you do.</p>
-    <div class="intro-stamp" id="introStamp">CLASSIFIED</div>
-    <button class="intro-btn" id="introBtn" aria-label="Enter the vault">ENTER THE VAULT</button>
-  </div>
-</div>
 
-<!-- ===== GAME STAGE ===== -->
-<div class="stage" id="stage">
-  <span class="eyebrow">The Vault</span>
-  <div class="lock-wrap" id="lockIcon">
-    <svg viewBox="0 0 64 64">
-      <path class="shackle-path" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
-      <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
-      <circle class="keyhole" cx="32" cy="38" r="3.5"/>
-      <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
-    </svg>
-  </div>
-  <div class="dots" id="dots"></div>
+    <!-- ===== GAME STAGE ===== -->
+    <div class="stage" id="stage">
+        <span class="eyebrow">The Vault</span>
+        <div class="lock-wrap" id="lockIcon">
+            <svg viewBox="0 0 64 64">
+                <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
+                <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
+                <circle class="keyhole" cx="32" cy="38" r="3.5"/>
+                <rect class="keyhole" x="30.5" y="40" width="3" height="7" rx="0.5"/>
+            </svg>
+        </div>
+        <div class="dots" id="dots"></div>
 
-  <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
-    <div class="plaque">
-      <span class="level-tag" id="levelTag">LEVEL —</span>
-      <p class="hint-text" id="hintText">Loading...</p>
+        <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
+            <div class="plaque">
+                <span class="level-tag" id="levelTag">LEVEL —</span>
+                <p class="hint-text" id="hintText">Initializing…</p>
+            </div>
+            <form id="answerForm">
+                <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters" disabled>
+                <button type="submit" id="submitBtn" disabled>Unlock</button>
+            </form>
+            <div class="msg" id="msg"></div>
+        </div>
+
+        <span class="mode-tag" id="modeTag">checking session…</span>
     </div>
-    <form id="answerForm">
-      <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
-      <button type="submit" class="submit-btn" id="submitBtn">Unlock</button>
-    </form>
-    <div class="msg" id="msg"></div>
-  </div>
 
-  <span class="mode-tag" id="modeTag">checking session…</span>
-</div>
+    <script>
+        // ===== Shared Supabase client =====
+        const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<!-- ===== SHARED SUPABASE CLIENT ===== -->
-<script>
-const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
+        const LOCAL_KEY = 'vault_puzzle_level';
+        const INTRO_SEEN_KEY = 'vault_intro_seen';
 
-<!-- ===== BOOT SEQUENCE + LOGIN MODAL + INTRO ===== -->
-<script>
-(function(){
-  var gameInitialized = false;
-  var isSignUpMode = false;
-  var introDismissed = false;
+        // ===== DOM refs =====
+        const introEl = document.getElementById('intro');
+        const introEmblem = document.getElementById('introEmblem');
+        const introGreet = document.getElementById('introGreet');
+        const introTitle = document.getElementById('introTitle');
+        const introLine = document.getElementById('introLine');
+        const introD1 = document.getElementById('introD1');
+        const introD2 = document.getElementById('introD2');
+        const introStamp = document.getElementById('introStamp');
+        const introBtn = document.getElementById('introBtn');
 
-  var loginModal  = document.getElementById('loginModal');
-  var loginForm   = document.getElementById('loginForm');
-  var loginEmail  = document.getElementById('loginEmail');
-  var loginPass   = document.getElementById('loginPass');
-  var loginBtn    = document.getElementById('loginBtn');
-  var loginMsg    = document.getElementById('loginMsg');
-  var toggleMode  = document.getElementById('toggleMode');
-  var intro       = document.getElementById('intro');
-  var introBtn    = document.getElementById('introBtn');
-  var introEmblem = document.getElementById('introEmblem');
-  var introGreet  = document.getElementById('introGreet');
-  var introTitle  = document.getElementById('introTitle');
-  var introLine   = document.getElementById('introLine');
-  var introD1     = document.getElementById('introD1');
-  var introD2     = document.getElementById('introD2');
-  var introStamp  = document.getElementById('introStamp');
+        const loginModal = document.getElementById('loginModal');
+        const loginBtn = document.getElementById('loginBtn');
 
-  /* ---------- Auth state listener ---------- */
-  sb.auth.onAuthStateChange(function(event, session) {
-    if (event === 'SIGNED_IN' && session) {
-      hideLoginModal();
-      handleAuthenticatedUser(session);
-    }
-  });
+        const elDots = document.getElementById('dots');
+        const elLevelTag = document.getElementById('levelTag');
+        const elHintText = document.getElementById('hintText');
+        const elForm = document.getElementById('answerForm');
+        const elInput = document.getElementById('answerInput');
+        const elSubmitBtn = document.getElementById('submitBtn');
+        const elMsg = document.getElementById('msg');
+        const elModeTag = document.getElementById('modeTag');
+        const elLockIcon = document.getElementById('lockIcon');
+        const elGameArea = document.getElementById('gameArea');
 
-  /* ---------- Boot ---------- */
-  async function boot() {
-    var result;
-    try {
-      result = await sb.auth.getSession();
-    } catch(e) {
-      showLoginModal();
-      return;
-    }
+        // ===== State =====
+        let state = {
+            userId: null,
+            currentLevel: 1,
+            totalLevels: 0,
+            levelRow: null,
+            gameReady: false,
+            session: null,
+        };
 
-    var session = result.data && result.data.session;
+        let introDismissed = false;
 
-    if (!session || !session.user) {
-      showLoginModal();
-      return;
-    }
+        // ===== BOOTSTRAP =====
+        async function bootstrap() {
+            const { data: { session } } = await sb.auth.getSession();
 
-    handleAuthenticatedUser(session);
-  }
+            if (!session || !session.user) {
+                // NOT LOGGED IN → show login modal
+                showLoginModal();
+                return;
+            }
 
-  /* ---------- Handle authenticated user ---------- */
-  function handleAuthenticatedUser(session) {
-    if (gameInitialized) return;
+            // LOGGED IN
+            state.session = session;
+            state.userId = session.user.id;
 
-    var introDone = localStorage.getItem('vault_intro_done');
+            const introSeen = localStorage.getItem(INTRO_SEEN_KEY);
 
-    if (introDone) {
-      /* Returning user — skip intro, go straight to game */
-      gameInitialized = true;
-      initGame();
-    } else {
-      /* First visit — show intro */
-      gameInitialized = true;
-      showIntro(session.user.email);
-    }
-  }
+            if (introSeen) {
+                // Returning user → skip intro, init game directly
+                hideIntroPermanently();
+                await initGame();
+                enableGameInputs();
+            } else {
+                // First-time visitor → show intro
+                personalizeIntro(session);
+                revealIntro();
+                playIntroAnimation();
+                // Game will init after intro dismissal
+                await initGameInBackground();
+            }
+        }
 
-  /* ---------- Show / hide login modal ---------- */
-  function showLoginModal() {
-    loginModal.classList.add('visible');
-    setTimeout(function(){ loginEmail.focus(); }, 500);
-  }
+        // ===== LOGIN MODAL =====
+        function showLoginModal() {
+            loginModal.classList.remove('hidden-initially');
+            // Hide intro and ensure game is not interactive
+            hideIntroPermanently();
+            disableGameInputs();
+            elModeTag.textContent = 'authentication required';
+        }
 
-  function hideLoginModal() {
-    loginModal.classList.remove('visible');
-    loginMsg.textContent = '';
-    loginMsg.className = 'login-msg';
-    loginForm.reset();
-  }
+        loginBtn.addEventListener('click', () => {
+            // Redirect to login page
+            window.location.href = '/index.html';
+        });
 
-  /* ---------- Login / Sign-up form ---------- */
-  loginForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    var email = loginEmail.value.trim();
-    var pass  = loginPass.value;
+        // ===== INTRO =====
+        function personalizeIntro(session) {
+            if (session && session.user && session.user.email) {
+                const name = session.user.email.split('@')[0];
+                introGreet.textContent = 'Welcome, ' + name + '.';
+            }
+        }
 
-    if (!email || !pass) {
-      loginMsg.textContent = 'Please fill in all fields.';
-      loginMsg.className = 'login-msg error';
-      return;
-    }
+        function revealIntro() {
+            introEl.classList.remove('hidden-initially');
+        }
 
-    loginBtn.disabled = true;
-    loginMsg.textContent = '';
-    loginMsg.className = 'login-msg';
+        function hideIntroPermanently() {
+            introEl.classList.add('hidden-initially');
+            introEl.classList.remove('gone');
+            // Reset animation classes
+            [introEmblem, introGreet, introTitle, introLine, introD1, introD2, introStamp, introBtn].forEach(el => {
+                if (el) el.classList.remove('show');
+            });
+        }
 
-    var result;
+        function playIntroAnimation() {
+            setTimeout(() => introEmblem.classList.add('show'), 300);
+            setTimeout(() => introGreet.classList.add('show'), 700);
+            setTimeout(() => introTitle.classList.add('show'), 1000);
+            setTimeout(() => introLine.classList.add('show'), 1350);
+            setTimeout(() => introD1.classList.add('show'), 1550);
+            setTimeout(() => introD2.classList.add('show'), 1800);
+            setTimeout(() => introStamp.classList.add('show'), 2100);
+            setTimeout(() => {
+                introBtn.classList.add('show');
+                introBtn.focus();
+            }, 2400);
+        }
 
-    if (isSignUpMode) {
-      result = await sb.auth.signUp({ email: email, password: pass });
-    } else {
-      result = await sb.auth.signInWithPassword({ email: email, password: pass });
-    }
+        function dismissIntro() {
+            if (introDismissed) return;
+            introDismissed = true;
 
-    loginBtn.disabled = false;
+            localStorage.setItem(INTRO_SEEN_KEY, '1');
+            introBtn.style.pointerEvents = 'none';
+            introEl.classList.add('gone');
 
-    if (result.error) {
-      var msg = result.error.message;
-      /* Clean up common Supabase messages */
-      if (msg.indexOf('Invalid login') !== -1 || msg.indexOf('Invalid credentials') !== -1) {
-        msg = 'Invalid email or password.';
-      } else if (msg.indexOf('already registered') !== -1) {
-        msg = 'This email is already registered. Try signing in.';
-      } else if (msg.indexOf('Password should be') !== -1) {
-        msg = 'Password must be at least 6 characters.';
-      }
-      loginMsg.textContent = msg;
-      loginMsg.className = 'login-msg error';
-      return;
-    }
+            setTimeout(() => {
+                hideIntroPermanently();
+                enableGameInputs();
+                if (elInput) elInput.focus();
+            }, 950);
+        }
 
-    /* Sign-up without immediate session = email confirmation required */
-    if (isSignUpMode && !result.data.session) {
-      loginMsg.textContent = 'Account created! Check your email to confirm, then sign in.';
-      loginMsg.className = 'login-msg info';
-      /* Switch back to sign-in mode */
-      isSignUpMode = false;
-      loginBtn.textContent = 'SIGN IN';
-      toggleMode.textContent = 'Create one';
-      loginForm.reset();
-      return;
-    }
+        introBtn.addEventListener('click', dismissIntro);
+        document.addEventListener('keydown', function introKeyHandler(e) {
+            if (
+                e.key === 'Enter' &&
+                introBtn.classList.contains('show') &&
+                !introEl.classList.contains('gone') &&
+                !introEl.classList.contains('hidden-initially')
+            ) {
+                dismissIntro();
+                document.removeEventListener('keydown', introKeyHandler);
+            }
+        });
 
-    /* Session established — onAuthStateChange will handle the rest */
-  });
+        // ===== GAME =====
+        async function initGameInBackground() {
+            // Pre-fetch total levels so dots render correctly even before intro dismissal
+            try {
+                const { count } = await sb
+                    .from('puzzle_levels_public')
+                    .select('*', { count: 'exact', head: true });
+                state.totalLevels = count || 0;
+            } catch (e) {
+                state.totalLevels = 0;
+            }
 
-  /* ---------- Toggle sign-in / sign-up ---------- */
-  toggleMode.addEventListener('click', function(e) {
-    e.preventDefault();
-    isSignUpMode = !isSignUpMode;
-    loginMsg.textContent = '';
-    loginMsg.className = 'login-msg';
-    if (isSignUpMode) {
-      loginBtn.textContent = 'CREATE ACCOUNT';
-      toggleMode.textContent = 'Sign in instead';
-      loginPass.setAttribute('autocomplete', 'new-password');
-    } else {
-      loginBtn.textContent = 'SIGN IN';
-      toggleMode.textContent = 'Create one';
-      loginPass.setAttribute('autocomplete', 'current-password');
-    }
-  });
+            // Fetch user progress
+            if (state.userId) {
+                const { data: progress } = await sb
+                    .from('puzzle_progress')
+                    .select('current_level')
+                    .eq('user_id', state.userId)
+                    .maybeSingle();
 
-  /* ---------- Show intro with animations ---------- */
-  function showIntro(email) {
-    var name = email.split('@')[0];
-    introGreet.textContent = 'Welcome, ' + name + '.';
+                if (!progress) {
+                    await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
+                    state.currentLevel = 1;
+                } else {
+                    state.currentLevel = progress.current_level;
+                }
+            }
 
-    /* Remove .gone to reveal intro (triggers fade-in transition) */
-    intro.classList.remove('gone');
+            renderDots();
+            await loadLevel();
+            state.gameReady = true;
+            elModeTag.textContent = 'signed in · progress synced';
+        }
 
-    /* Staggered animations */
-    setTimeout(function(){ introEmblem.classList.add('show'); }, 300);
-    setTimeout(function(){ introGreet.classList.add('show'); }, 700);
-    setTimeout(function(){ introTitle.classList.add('show'); }, 1000);
-    setTimeout(function(){ introLine.classList.add('show'); }, 1350);
-    setTimeout(function(){ introD1.classList.add('show'); }, 1550);
-    setTimeout(function(){ introD2.classList.add('show'); }, 1800);
-    setTimeout(function(){ introStamp.classList.add('show'); }, 2100);
-    setTimeout(function(){
-      introBtn.classList.add('show');
-      introBtn.focus();
-    }, 2400);
-  }
+        async function initGame() {
+            // Called for returning users (intro already skipped)
+            try {
+                const { count } = await sb
+                    .from('puzzle_levels_public')
+                    .select('*', { count: 'exact', head: true });
+                state.totalLevels = count || 0;
+            } catch (e) {
+                state.totalLevels = 0;
+            }
 
-  /* ---------- Dismiss intro ---------- */
-  function dismissIntro() {
-    if (introDismissed) return;
-    introDismissed = true;
-    introBtn.style.pointerEvents = 'none';
-    localStorage.setItem('vault_intro_done', '1');
-    intro.classList.add('gone');
-    initGame();
-    setTimeout(function(){
-      var inp = document.getElementById('answerInput');
-      if (inp) inp.focus();
-    }, 1000);
-  }
+            if (state.userId) {
+                const { data: progress } = await sb
+                    .from('puzzle_progress')
+                    .select('current_level')
+                    .eq('user_id', state.userId)
+                    .maybeSingle();
 
-  introBtn.addEventListener('click', dismissIntro);
+                if (!progress) {
+                    await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
+                    state.currentLevel = 1;
+                } else {
+                    state.currentLevel = progress.current_level;
+                }
+            }
 
-  document.addEventListener('keydown', function handler(e) {
-    if (e.key === 'Enter' && introBtn.classList.contains('show') && !intro.classList.contains('gone') && !introDismissed) {
-      dismissIntro();
-      document.removeEventListener('keydown', handler);
-    }
-  });
+            renderDots();
+            await loadLevel();
+            state.gameReady = true;
+            elModeTag.textContent = 'signed in · progress synced';
+        }
 
-  /* ---------- Start boot ---------- */
-  boot();
-})();
-</script>
+        function enableGameInputs() {
+            elInput.disabled = false;
+            elSubmitBtn.disabled = false;
+            if (state.gameReady && state.currentLevel <= state.totalLevels) {
+                elInput.focus();
+            }
+        }
 
-<!-- ===== GAME LOGIC (unchanged) ===== -->
-<script>
-var LOCAL_KEY = 'vault_puzzle_level';
+        function disableGameInputs() {
+            elInput.disabled = true;
+            elSubmitBtn.disabled = true;
+        }
 
-var state = {
-  userId: null,
-  isOffline: true,
-  currentLevel: 1,
-  totalLevels: 0,
-  levelRow: null,
-};
+        function renderDots() {
+            elDots.innerHTML = '';
+            const total = state.totalLevels || 0;
+            for (let i = 1; i <= total; i++) {
+                const d = document.createElement('div');
+                d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
+                elDots.appendChild(d);
+            }
+        }
 
-var el = {
-  dots: document.getElementById('dots'),
-  levelTag: document.getElementById('levelTag'),
-  hintText: document.getElementById('hintText'),
-  form: document.getElementById('answerForm'),
-  input: document.getElementById('answerInput'),
-  submitBtn: document.getElementById('submitBtn'),
-  msg: document.getElementById('msg'),
-  modeTag: document.getElementById('modeTag'),
-  lockIcon: document.getElementById('lockIcon'),
-  gameArea: document.getElementById('gameArea'),
-  stage: document.getElementById('stage'),
-};
+        async function loadLevel() {
+            if (state.currentLevel > state.totalLevels) {
+                showDoneScreen();
+                return;
+            }
+            const { data, error } = await sb
+                .from('puzzle_levels_public')
+                .select('id, level_number, hint')
+                .eq('level_number', state.currentLevel)
+                .single();
 
-async function initGame() {
-  var { count } = await sb
-    .from('puzzle_levels_public')
-    .select('*', { count: 'exact', head: true });
-  state.totalLevels = count || 0;
+            if (error || !data) {
+                elHintText.textContent = 'Could not load this level. Please try again later.';
+                elLevelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
+                return;
+            }
+            state.levelRow = data;
+            elLevelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
+            elHintText.textContent = data.hint;
+            elInput.value = '';
+            elMsg.textContent = '';
+            elMsg.className = 'msg';
+        }
 
-  var { data: { session } } = await sb.auth.getSession();
+        function showDoneScreen() {
+            elLockIcon.classList.add('open');
+            elGameArea.innerHTML = `
+            <div class="done-screen">
+              <h2>VAULT CLEARED</h2>
+              <p>You solved all ${state.totalLevels} levels. Nicely done.</p>
+            </div>`;
+        }
 
-  if (session && session.user) {
-    state.userId = session.user.id;
-    state.isOffline = false;
-    el.modeTag.textContent = 'signed in · progress synced';
+        elForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!state.gameReady || !state.userId) return;
 
-    var { data: progress } = await sb
-      .from('puzzle_progress')
-      .select('current_level')
-      .eq('user_id', state.userId)
-      .maybeSingle();
+            const guess = elInput.value.trim().toUpperCase();
+            if (!guess) return;
+            elSubmitBtn.disabled = true;
 
-    if (!progress) {
-      await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
-      state.currentLevel = 1;
-    } else {
-      state.currentLevel = progress.current_level;
-    }
-  } else {
-    state.isOffline = true;
-    el.modeTag.textContent = 'playing offline · progress saved on this device';
-    state.currentLevel = parseInt(localStorage.getItem(LOCAL_KEY) || '1', 10);
-  }
+            const { data: correct, error } = await sb
+                .rpc('check_puzzle_answer', {
+                    level_num: state.currentLevel,
+                    guess: guess
+                });
 
-  renderDots();
-  await loadLevel();
-}
+            if (error) {
+                elMsg.textContent = 'CONNECTION ERROR — TRY AGAIN';
+                elMsg.className = 'msg error';
+                elSubmitBtn.disabled = false;
+                return;
+            }
 
-function renderDots() {
-  el.dots.innerHTML = '';
-  for (var i = 1; i <= state.totalLevels; i++) {
-    var d = document.createElement('div');
-    d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
-    el.dots.appendChild(d);
-  }
-}
+            if (correct) {
+                elMsg.textContent = 'CORRECT';
+                elMsg.className = 'msg success';
+                elLockIcon.classList.add('open');
 
-async function loadLevel() {
-  if (state.currentLevel > state.totalLevels) {
-    showDoneScreen();
-    return;
-  }
-  var { data, error } = await sb
-    .from('puzzle_levels_public')
-    .select('id, level_number, hint')
-    .eq('level_number', state.currentLevel)
-    .single();
+                state.currentLevel += 1;
 
-  if (error || !data) {
-    el.hintText.textContent = 'Could not load this level. Check your Supabase config / table contents.';
-    return;
-  }
-  state.levelRow = data;
-  el.levelTag.textContent = 'LEVEL ' + state.currentLevel + ' / ' + state.totalLevels;
-  el.hintText.textContent = data.hint;
-  el.input.value = '';
-  el.msg.textContent = '';
-  el.msg.className = 'msg';
-}
+                // Persist progress
+                await sb
+                    .from('puzzle_progress')
+                    .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
+                    .eq('user_id', state.userId);
 
-function showDoneScreen() {
-  el.lockIcon.classList.add('open');
-  el.gameArea.innerHTML =
-    '<div class="done-screen">' +
-    '<h2>VAULT CLEARED</h2>' +
-    '<p>You solved all ' + state.totalLevels + ' levels. Nicely done.</p>' +
-    '</div>';
-}
+                setTimeout(async () => {
+                    elLockIcon.classList.remove('open');
+                    renderDots();
+                    await loadLevel();
+                    elSubmitBtn.disabled = false;
+                    if (state.currentLevel <= state.totalLevels && !elInput.disabled) {
+                        elInput.focus();
+                    }
+                }, 750);
+            } else {
+                elMsg.textContent = 'INCORRECT — TRY AGAIN';
+                elMsg.className = 'msg error';
+                elInput.classList.add('shake');
+                setTimeout(() => elInput.classList.remove('shake'), 450);
+                elSubmitBtn.disabled = false;
+            }
+        });
 
-el.form.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  var guess = el.input.value.trim().toUpperCase();
-  if (!guess) return;
-  el.submitBtn.disabled = true;
-
-  var { data: correct, error } = await sb
-    .rpc('check_puzzle_answer', {
-      level_num: state.currentLevel,
-      guess: guess
-    });
-
-  if (error) {
-    el.msg.textContent = 'CONNECTION ERROR — TRY AGAIN';
-    el.msg.className = 'msg error';
-    el.submitBtn.disabled = false;
-    return;
-  }
-
-  if (correct) {
-    el.msg.textContent = 'CORRECT';
-    el.msg.className = 'msg success';
-    el.lockIcon.classList.add('open');
-
-    state.currentLevel += 1;
-
-    if (state.isOffline) {
-      localStorage.setItem(LOCAL_KEY, state.currentLevel);
-    } else {
-      await sb
-        .from('puzzle_progress')
-        .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
-        .eq('user_id', state.userId);
-    }
-
-    setTimeout(async function() {
-      el.lockIcon.classList.remove('open');
-      renderDots();
-      await loadLevel();
-      el.submitBtn.disabled = false;
-    }, 750);
-  } else {
-    el.msg.textContent = 'INCORRECT — TRY AGAIN';
-    el.msg.className = 'msg error';
-    el.input.classList.add('shake');
-    setTimeout(function() { el.input.classList.remove('shake'); }, 400);
-    el.submitBtn.disabled = false;
-  }
-});
-</script>
+        // ===== START =====
+        bootstrap();
+    </script>
 </body>
 </html>
