@@ -8,7 +8,6 @@ const APP_SHELL = [
   'todo.html',
   'logo.png',
   'study_menu.html',
-  'vernier_calliper.html',
   'manifest.webmanifest',
   'pwa-register.js',
   'supabase-config.js',
