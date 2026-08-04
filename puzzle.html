@@ -1,348 +1,586 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>The Vault · Puzzle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root{
-    --bg: #14171f;
-    --panel: #1b2029;
-    --panel-edge: #262c38;
-    --brass: #c9a24b;
-    --brass-light: #e6c877;
-    --brass-dim: #7a6633;
-    --text: #ece7da;
-    --muted: #8b8f9b;
-    --error: #c0463a;
-    --success: #4c8c62;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-  html,body{
-    margin:0; padding:0; height:100%;
-    background:
-      radial-gradient(ellipse at 50% -10%, #232938 0%, var(--bg) 55%);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
-    display:flex; align-items:center; justify-content:center;
-    overflow-x:hidden;
-  }
-  .stage{
-    width:100%; max-width:420px;
-    padding:28px 20px 40px;
-    min-height:100dvh;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:22px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DECODE</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --fg: #00ff88;
+            --dim: #0d3d24;
+            --muted: #1a5a3a;
+            --accent: #ff2d2d;
+            --card: #080c0a;
+            --border: #143322;
+        }
 
-  /* Level dots */
-  .dots{ display:flex; gap:9px; }
-  .dot{
-    width:8px; height:8px; border-radius:50%;
-    background:var(--panel-edge);
-    border:1px solid var(--brass-dim);
-    transition: all .3s ease;
-  }
-  .dot.done{ background:var(--brass); border-color:var(--brass); box-shadow:0 0 8px rgba(201,162,75,.6); }
-  .dot.active{ background:var(--brass-light); border-color:var(--brass-light); box-shadow:0 0 10px rgba(230,200,119,.8); transform:scale(1.3); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* Lock icon */
-  .lock-wrap{ position:relative; width:64px; height:64px; }
-  .lock-wrap svg{ width:100%; height:100%; }
-  .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
-  .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
-  .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
-  .shackle{ fill:none; stroke:var(--brass); stroke-width:3; }
-  .keyhole{ fill:var(--brass-dim); }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            color: var(--fg);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
 
-  h1.eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; letter-spacing:.28em; text-transform:uppercase;
-    color:var(--brass); margin:0; font-weight:700;
-  }
+        #rain {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+        }
 
-  .plaque{
-    width:100%;
-    background:linear-gradient(180deg, var(--panel) 0%, #171b23 100%);
-    border:1px solid var(--panel-edge);
-    border-radius:10px;
-    padding:22px 20px;
-    position:relative;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 12px 28px rgba(0,0,0,.35);
-  }
-  .plaque::before{
-    content:'';
-    position:absolute; inset:6px;
-    border:1px solid var(--panel-edge);
-    border-radius:6px;
-    pointer-events:none;
-  }
-  .level-tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size:11px; color:var(--muted); letter-spacing:.12em;
-    margin-bottom:10px; display:block;
-  }
-  .hint-text{
-    font-family:'Inter', sans-serif;
-    font-size:17px; line-height:1.55; color:var(--text);
-    margin:0;
-  }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
 
-  form{ width:100%; display:flex; flex-direction:column; gap:12px; }
-  input[type=text]{
-    width:100%;
-    background:#10131a;
-    border:1px solid var(--panel-edge);
-    border-radius:8px;
-    padding:16px 14px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:18px; letter-spacing:.08em;
-    color:var(--brass-light);
-    text-transform:uppercase;
-    text-align:center;
-    outline:none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  input[type=text]::placeholder{ color:#4a4f5c; letter-spacing:.05em; text-transform:none; font-size:14px;}
-  input[type=text]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,75,.15); }
-  input.shake{ animation: shake .4s; border-color:var(--error); }
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-8px);}
-    40%{transform:translateX(8px);}
-    60%{transform:translateX(-5px);}
-    80%{transform:translateX(5px);}
-  }
+        .scanlines {
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+            );
+            z-index: 99;
+        }
 
-  button{
-    width:100%;
-    background:linear-gradient(180deg, var(--brass-light), var(--brass));
-    color:#14171f;
-    border:none; border-radius:8px;
-    padding:15px;
-    font-family:'JetBrains Mono', monospace;
-    font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
-    cursor:pointer;
-    transition: transform .15s, filter .15s;
-  }
-  button:active{ transform:scale(.97); }
-  button:disabled{ opacity:.5; cursor:default; }
+        .vignette {
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+            z-index: 98;
+        }
 
-  .msg{
-    min-height:18px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:12px; letter-spacing:.05em;
-    text-align:center;
-  }
-  .msg.error{ color:var(--error); }
-  .msg.success{ color:var(--success); }
+        /* ---- INTRO ---- */
+        #intro {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            transition: opacity 0.8s ease;
+        }
+        #intro.fade-out { opacity: 0; pointer-events: none; }
 
-  .mode-tag{
-    font-family:'JetBrains Mono', monospace;
-    font-size:10px; color:var(--muted); letter-spacing:.1em;
-    opacity:.7;
-  }
+        .intro-line { min-height: 1.5em; }
 
-  .done-screen{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .done-screen h2{ font-family:'JetBrains Mono', monospace; color:var(--brass-light); letter-spacing:.05em; margin:0; }
-  .done-screen p{ color:var(--muted); margin:0; font-size:14px; }
-</style>
+        .stamp {
+            display: inline-block;
+            color: var(--accent);
+            font-size: 0.6rem;
+            letter-spacing: 0.5em;
+            border: 1px solid var(--accent);
+            padding: 4px 18px;
+            opacity: 0;
+            transform: rotate(-3deg) scale(0.9);
+            transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        .stamp.show { opacity: 1; transform: rotate(0) scale(1); }
+
+        .btn-initiate {
+            background: transparent;
+            border: 1px solid var(--fg);
+            color: var(--fg);
+            font-family: inherit;
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            padding: 14px 48px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+        .btn-initiate.show { opacity: 1; transform: translateY(0); }
+        .btn-initiate:hover {
+            background: var(--fg);
+            color: var(--bg);
+            box-shadow: 0 0 40px rgba(0,255,136,0.25), inset 0 0 40px rgba(0,255,136,0.05);
+        }
+        .btn-initiate:active { transform: scale(0.97); }
+        .btn-initiate:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+
+        /* ---- GAME ---- */
+        #game {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            gap: 1.25rem;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        #game.show { opacity: 1; }
+
+        .label {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--dim);
+            text-transform: uppercase;
+        }
+
+        .cipher-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+            width: 100%;
+            max-width: 680px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cipher-box::before {
+            content: '>';
+            position: absolute;
+            top: 1.5rem; left: 1rem;
+            color: var(--fg);
+            opacity: 0.2;
+            font-size: 0.9rem;
+        }
+        .cipher-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.03), transparent);
+            animation: scanLine 4s linear infinite;
+        }
+        @keyframes scanLine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+
+        .cipher-text {
+            font-size: clamp(0.85rem,2.5vw,1.1rem);
+            letter-spacing: 0.18em;
+            line-height: 2.2;
+            word-break: break-all;
+            color: var(--fg);
+            text-shadow: 0 0 8px rgba(0,255,136,0.15);
+        }
+
+        .shift-row {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .btn-shift {
+            width: 42px; height: 42px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            font-family: inherit;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .btn-shift:hover { background: var(--border); }
+        .btn-shift:active { transform: scale(0.92); }
+        .btn-shift:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+        .shift-num {
+            font-size: 2.2rem;
+            font-weight: 800;
+            min-width: 50px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .decode-box {
+            background: rgba(0,255,136,0.02);
+            border: 1px dashed var(--border);
+            padding: 1.25rem 1.5rem;
+            width: 100%;
+            max-width: 680px;
+            min-height: 70px;
+        }
+
+        .decode-text {
+            font-size: clamp(0.8rem,2.2vw,1rem);
+            letter-spacing: 0.12em;
+            line-height: 2;
+            word-break: break-all;
+            color: #0d3322;
+            transition: color 0.4s;
+        }
+        .decode-text.lit {
+            color: var(--fg);
+            text-shadow: 0 0 6px rgba(0,255,136,0.2);
+        }
+
+        .btn-verify {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--fg);
+            font-family: inherit;
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            padding: 10px 32px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-verify:hover { border-color: var(--fg); box-shadow: 0 0 20px rgba(0,255,136,0.1); }
+        .btn-verify:active { transform: scale(0.97); }
+        .btn-verify:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+
+        .err-msg {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            height: 1em;
+        }
+        .err-msg.show { opacity: 1; }
+
+        .attempts {
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            color: #0a2a1a;
+        }
+
+        .hint {
+            font-size: 0.5rem;
+            letter-spacing: 0.15em;
+            color: #0a1f15;
+            margin-top: 0.25rem;
+        }
+
+        /* ---- FLASH ---- */
+        .flash-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .flash-layer.go-green { background: var(--fg); animation: flashAnim 0.25s ease-out forwards; }
+        .flash-layer.go-red   { background: var(--accent); animation: flashAnim 0.25s ease-out forwards; }
+        @keyframes flashAnim {
+            0%   { opacity: 0.35; }
+            100% { opacity: 0; }
+        }
+
+        /* ---- WIN ---- */
+        #win {
+            position: fixed;
+            inset: 0;
+            z-index: 55;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: var(--bg);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+        #win.show { opacity: 1; pointer-events: all; }
+
+        .win-msg-box {
+            padding: 2rem;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            text-align: center;
+            font-size: clamp(0.9rem,2.5vw,1.2rem);
+            letter-spacing: 0.15em;
+            line-height: 2.2;
+            word-break: break-all;
+            color: var(--fg);
+            text-shadow: 0 0 10px rgba(0,255,136,0.2);
+        }
+        .win-msg-box::before {
+            content: 'DECODED:';
+            display: block;
+            font-size: 0.55rem;
+            letter-spacing: 0.4em;
+            color: var(--dim);
+            margin-bottom: 1rem;
+        }
+
+        .glitch-text { animation: glitch 0.2s ease; }
+        @keyframes glitch {
+            0%   { transform: translate(0); filter: none; }
+            25%  { transform: translate(-3px,1px); filter: hue-rotate(90deg); }
+            50%  { transform: translate(2px,-2px); }
+            75%  { transform: translate(-1px,-1px); filter: hue-rotate(-90deg); }
+            100% { transform: translate(0); filter: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cipher-box, .decode-box { padding: 1rem 1rem 1rem 2rem; }
+            .shift-num { font-size: 1.8rem; }
+            .btn-initiate { padding: 12px 32px; font-size: 0.75rem; }
+        }
+    </style>
 </head>
 <body>
+    <!-- Background layers -->
+    <canvas id="rain" aria-hidden="true"></canvas>
+    <div class="overlay scanlines" aria-hidden="true"></div>
+    <div class="overlay vignette" aria-hidden="true"></div>
+    <div class="flash-layer" id="flash" aria-hidden="true"></div>
 
-<div class="stage" id="stage">
-  <span class="eyebrow">The Vault</span>
-  <div class="lock-wrap" id="lockIcon">
-    <svg viewBox="0 0 64 64">
-      <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
-      <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
-      <circle class="keyhole" cx="32" cy="38" r="3.5"/>
-      <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
-    </svg>
-  </div>
-  <div class="dots" id="dots"></div>
-
-  <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
-    <div class="plaque">
-      <span class="level-tag" id="levelTag">LEVEL —</span>
-      <p class="hint-text" id="hintText">Loading...</p>
+    <!-- INTRO SCREEN -->
+    <div id="intro" role="dialog" aria-label="Intro">
+        <div style="text-align:center; max-width:560px; padding:2rem;">
+            <div class="intro-line" id="t1" style="font-size:clamp(1.1rem,4vw,1.6rem); font-weight:800; letter-spacing:0.2em;"></div>
+            <div style="height:1.8rem;"></div>
+            <div class="stamp" id="stamp">CLASSIFIED // EYES ONLY</div>
+            <div style="height:2rem;"></div>
+            <div class="intro-line" id="t2" style="font-size:0.78rem; color:var(--muted); letter-spacing:0.08em;"></div>
+            <div style="height:0.6rem;"></div>
+            <div class="intro-line" id="t3" style="font-size:0.72rem; color:var(--dim); letter-spacing:0.06em;"></div>
+            <div style="height:2.5rem;"></div>
+            <button class="btn-initiate" id="btnStart" aria-label="Start the decode sequence">INITIATE</button>
+        </div>
     </div>
-    <form id="answerForm">
-      <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
-      <button type="submit" id="submitBtn">Unlock</button>
-    </form>
-    <div class="msg" id="msg"></div>
-  </div>
 
-  <span class="mode-tag" id="modeTag">checking session…</span>
-</div>
+    <!-- GAME SCREEN -->
+    <main id="game" role="main" aria-label="Decode game">
+        <div class="label">Encrypted Transmission</div>
+        <div class="cipher-box">
+            <div class="cipher-text" id="cipherText" aria-label="Encrypted text"></div>
+        </div>
+        <div class="shift-row">
+            <span class="label">Shift</span>
+            <button class="btn-shift" id="btnMinus" aria-label="Decrease shift">&minus;</button>
+            <span class="shift-num" id="shiftNum">00</span>
+            <button class="btn-shift" id="btnPlus" aria-label="Increase shift">+</button>
+            <span class="attempts" id="attempts"></span>
+        </div>
+        <div class="decode-box">
+            <div class="label" style="margin-bottom:0.6rem;">Decoded Output</div>
+            <div class="decode-text" id="decodeText" aria-live="polite"></div>
+        </div>
+        <button class="btn-verify" id="btnVerify">Verify Decode</button>
+        <div class="err-msg" id="errMsg">Decode failed // try again</div>
+        <div class="hint">Arrow keys or buttons to adjust shift &middot; Enter to verify</div>
+    </main>
 
-<script>
-// ====== CONFIG — fill these in with your Supabase project details ======
-const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
-// =========================================================================
+    <!-- WIN SCREEN -->
+    <div id="win" role="dialog" aria-label="Decoded successfully">
+        <div style="font-size:clamp(1.3rem,4vw,2rem); font-weight:800; letter-spacing:0.35em;">ACCESS GRANTED</div>
+        <div style="font-size:0.65rem; letter-spacing:0.25em; color:var(--muted);">TRANSMISSION DECODED SUCCESSFULLY</div>
+        <div class="win-msg-box" id="winMsg"></div>
+        <div style="font-size:0.6rem; letter-spacing:0.2em; color:var(--dim);">Transmission complete // connection terminated</div>
+    </div>
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script>
+        /* =============================================
+           MATRIX RAIN — subtle falling characters
+           ============================================= */
+        const canvas = document.getElementById('rain');
+        const ctx = canvas.getContext('2d');
+        let cols, drops;
 
-const LOCAL_KEY = 'vault_puzzle_level';
+        function initRain() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            cols = Math.floor(canvas.width / 14);
+            drops = Array.from({ length: cols }, () => Math.random() * -80);
+        }
+        initRain();
+        window.addEventListener('resize', initRain);
 
-let state = {
-  userId: null,
-  isOffline: true,
-  currentLevel: 1,
-  totalLevels: 0,
-  levelRow: null,   // contains only: id, level_number, hint — NO answer
-};
+        const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>{}[]';
 
-const el = {
-  dots: document.getElementById('dots'),
-  levelTag: document.getElementById('levelTag'),
-  hintText: document.getElementById('hintText'),
-  form: document.getElementById('answerForm'),
-  input: document.getElementById('answerInput'),
-  submitBtn: document.getElementById('submitBtn'),
-  msg: document.getElementById('msg'),
-  modeTag: document.getElementById('modeTag'),
-  lockIcon: document.getElementById('lockIcon'),
-  gameArea: document.getElementById('gameArea'),
-  stage: document.getElementById('stage'),
-};
+        function drawRain() {
+            ctx.fillStyle = 'rgba(5,5,5,0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '14px JetBrains Mono, monospace';
 
-async function init() {
-  // 1. Figure out how many levels exist
-  const { count } = await sb
-    .from('puzzle_levels_public')
-    .select('*', { count: 'exact', head: true });
-  state.totalLevels = count || 0;
+            for (let i = 0; i < cols; i++) {
+                if (drops[i] > 0) {
+                    const alpha = 0.03 + Math.random() * 0.06;
+                    ctx.fillStyle = `rgba(0,255,136,${alpha})`;
+                    ctx.fillText(glyphs[Math.floor(Math.random() * glyphs.length)], i * 14, drops[i] * 14);
+                }
+                if (drops[i] * 14 > canvas.height && Math.random() > 0.985) drops[i] = 0;
+                drops[i] += 0.4 + Math.random() * 0.2;
+            }
+            requestAnimationFrame(drawRain);
+        }
+        drawRain();
 
-  // 2. Check for a logged-in session (reuses your site's existing auth)
-  const { data: { session } } = await sb.auth.getSession();
+        /* =============================================
+           TYPING EFFECT — intro sequence
+           ============================================= */
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  if (session && session.user) {
-    state.userId = session.user.id;
-    state.isOffline = false;
-    el.modeTag.textContent = 'signed in · progress synced';
+        async function typeInto(el, text, speed = 55) {
+            for (let i = 0; i < text.length; i++) {
+                el.textContent += text[i];
+                await sleep(speed + Math.random() * 20);
+            }
+        }
 
-    // fetch or create progress row
-    let { data: progress } = await sb
-      .from('puzzle_progress')
-      .select('current_level')
-      .eq('user_id', state.userId)
-      .maybeSingle();
+        async function playIntro() {
+            const t1 = document.getElementById('t1');
+            const stamp = document.getElementById('stamp');
+            const t2 = document.getElementById('t2');
+            const t3 = document.getElementById('t3');
+            const btn = document.getElementById('btnStart');
 
-    if (!progress) {
-      await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
-      state.currentLevel = 1;
-    } else {
-      state.currentLevel = progress.current_level;
-    }
-  } else {
-    state.isOffline = true;
-    el.modeTag.textContent = 'playing offline · progress saved on this device';
-    state.currentLevel = parseInt(localStorage.getItem(LOCAL_KEY) || '1', 10);
-  }
+            await sleep(600);
+            await typeInto(t1, 'SIGNAL INTERCEPTED', 90);
 
-  renderDots();
-  await loadLevel();
-}
+            await sleep(700);
+            stamp.classList.add('show');
 
-function renderDots() {
-  el.dots.innerHTML = '';
-  for (let i = 1; i <= state.totalLevels; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
-    el.dots.appendChild(d);
-  }
-}
+            await sleep(900);
+            await typeInto(t2, "You found something that wasn't meant for you.", 38);
 
-async function loadLevel() {
-  if (state.currentLevel > state.totalLevels) {
-    showDoneScreen();
-    return;
-  }
-  const { data, error } = await sb
-    .from('puzzle_levels_public')
-    .select('id, level_number, hint')
-    .eq('level_number', state.currentLevel)
-    .single();
+            await sleep(500);
+            await typeInto(t3, 'Decode it. Or walk away.', 55);
 
-  if (error || !data) {
-    el.hintText.textContent = 'Could not load this level. Check your Supabase config / table contents.';
-    return;
-  }
-  state.levelRow = data;
-  el.levelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
-  el.hintText.textContent = data.hint;
-  el.input.value = '';
-  el.msg.textContent = '';
-  el.msg.className = 'msg';
-}
+            await sleep(700);
+            btn.classList.add('show');
+            btn.focus();
+        }
+        playIntro();
 
-function showDoneScreen() {
-  el.lockIcon.classList.add('open');
-  el.gameArea.innerHTML = `
-    <div class="done-screen">
-      <h2>VAULT CLEARED</h2>
-      <p>You solved all ${state.totalLevels} levels. Nicely done.</p>
-    </div>`;
-}
+        /* =============================================
+           CIPHER ENGINE — Caesar cipher
+           ============================================= */
+        const SECRET = 'THE TRUTH IS HIDDEN IN PLAIN SIGHT';
+        const ANSWER_SHIFT = 7;
+        let shift = 0;
+        let attempts = 0;
 
-el.form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const guess = el.input.value.trim().toUpperCase();
-  if (!guess) return;
-  el.submitBtn.disabled = true;
+        function caesar(text, s) {
+            return text.split('').map(c => {
+                if (/[a-z]/.test(c)) return String.fromCharCode(((c.charCodeAt(0) - 97 + s) % 26 + 26) % 26 + 97);
+                if (/[A-Z]/.test(c)) return String.fromCharCode(((c.charCodeAt(0) - 65 + s) % 26 + 26) % 26 + 65);
+                return c;
+            }).join('');
+        }
 
-  // Answer is checked server-side — the answer never comes to the browser.
-  const { data: correct, error } = await sb
-    .rpc('check_puzzle_answer', {
-      level_num: state.currentLevel,
-      guess: guess
-    });
+        const encrypted = caesar(SECRET, ANSWER_SHIFT);
 
-  if (error) {
-    el.msg.textContent = 'CONNECTION ERROR — TRY AGAIN';
-    el.msg.className = 'msg error';
-    el.submitBtn.disabled = false;
-    return;
-  }
+        /* =============================================
+           GAME STATE
+           ============================================= */
+        function randomStartShift() {
+            let s = Math.floor(Math.random() * 25) + 1;
+            if (s === ANSWER_SHIFT) s = (s % 25) + 1;
+            return s;
+        }
 
-  if (correct) {
-    el.msg.textContent = 'CORRECT';
-    el.msg.className = 'msg success';
-    el.lockIcon.classList.add('open');
+        function updateDisplay() {
+            document.getElementById('shiftNum').textContent = String(shift).padStart(2, '0');
+            const decoded = caesar(encrypted, 26 - shift);
+            const el = document.getElementById('decodeText');
+            el.textContent = decoded;
+            el.classList.toggle('lit', shift === ANSWER_SHIFT);
+            document.getElementById('errMsg').classList.remove('show');
+        }
 
-    state.currentLevel += 1;
+        function changeShift(d) {
+            shift = ((shift + d) % 26 + 26) % 26;
+            updateDisplay();
+            const el = document.getElementById('decodeText');
+            el.classList.remove('glitch-text');
+            void el.offsetWidth;
+            el.classList.add('glitch-text');
+        }
 
-    if (state.isOffline) {
-      localStorage.setItem(LOCAL_KEY, state.currentLevel);
-    } else {
-      await sb
-        .from('puzzle_progress')
-        .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
-        .eq('user_id', state.userId);
-    }
+        function flash(type) {
+            const f = document.getElementById('flash');
+            f.className = 'flash-layer';
+            void f.offsetWidth;
+            f.classList.add(type === 'green' ? 'go-green' : 'go-red');
+        }
 
-    setTimeout(async () => {
-      el.lockIcon.classList.remove('open');
-      renderDots();
-      await loadLevel();
-      el.submitBtn.disabled = false;
-    }, 750);
-  } else {
-    el.msg.textContent = 'INCORRECT — TRY AGAIN';
-    el.msg.className = 'msg error';
-    el.input.classList.add('shake');
-    setTimeout(() => el.input.classList.remove('shake'), 400);
-    el.submitBtn.disabled = false;
-  }
-});
+        function verify() {
+            attempts++;
+            document.getElementById('attempts').textContent = 'ATTEMPTS: ' + attempts;
 
-init();
-</script>
+            if (shift === ANSWER_SHIFT) {
+                flash('green');
+                setTimeout(() => {
+                    document.getElementById('game').classList.remove('show');
+                    setTimeout(() => {
+                        document.getElementById('winMsg').textContent = SECRET;
+                        document.getElementById('win').classList.add('show');
+                    }, 600);
+                }, 350);
+            } else {
+                flash('red');
+                document.getElementById('errMsg').classList.add('show');
+                const box = document.querySelector('.cipher-box');
+                box.style.animation = 'none';
+                void box.offsetWidth;
+                box.style.animation = 'glitch 0.25s ease';
+            }
+        }
+
+        /* =============================================
+           START GAME — transition from intro
+           ============================================= */
+        function startGame() {
+            const btn = document.getElementById('btnStart');
+            btn.textContent = 'INITIATING...';
+            btn.style.pointerEvents = 'none';
+            flash('green');
+
+            setTimeout(() => {
+                document.getElementById('intro').classList.add('fade-out');
+                shift = randomStartShift();
+                document.getElementById('cipherText').textContent = encrypted;
+                updateDisplay();
+
+                setTimeout(() => {
+                    document.getElementById('intro').style.display = 'none';
+                    const game = document.getElementById('game');
+                    game.style.display = 'flex';
+                    void game.offsetHeight;
+                    game.classList.add('show');
+                }, 800);
+            }, 400);
+        }
+
+        /* =============================================
+           EVENT LISTENERS
+           ============================================= */
+        document.getElementById('btnStart').addEventListener('click', startGame);
+        document.getElementById('btnMinus').addEventListener('click', () => changeShift(-1));
+        document.getElementById('btnPlus').addEventListener('click', () => changeShift(1));
+        document.getElementById('btnVerify').addEventListener('click', verify);
+
+        document.addEventListener('keydown', e => {
+            const game = document.getElementById('game');
+            // On intro screen — Enter starts game
+            if (!game.classList.contains('show')) {
+                if (e.key === 'Enter' && document.getElementById('btnStart').classList.contains('show')) {
+                    startGame();
+                }
+                return;
+            }
+            if (e.key === 'ArrowLeft')  { e.preventDefault(); changeShift(-1); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); changeShift(1); }
+            if (e.key === 'Enter')      { e.preventDefault(); verify(); }
+        });
+    </script>
 </body>
 </html>
