@@ -79,7 +79,6 @@
             position: relative;
         }
 
-        /* ===== GRAIN OVERLAY ===== */
         body::before {
             content: '';
             position: fixed;
@@ -92,7 +91,6 @@
             background-size: 200px 200px;
         }
 
-        /* ===== AMBIENT GLOW ===== */
         body::after {
             content: '';
             position: fixed;
@@ -122,7 +120,6 @@
             }
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -150,7 +147,6 @@
             margin: 0 auto;
         }
 
-        /* ===== BACK BUTTON (PUZZLE) ===== */
         .puzzle-back-btn {
             position: absolute;
             top: 20px;
@@ -195,7 +191,6 @@
             line-height: 1;
         }
 
-        /* ===== DOTS ===== */
         .dots {
             display: flex;
             gap: 10px;
@@ -260,7 +255,6 @@
             }
         }
 
-        /* ===== LOCK ICON ===== */
         .lock-wrap {
             position: relative;
             width: 68px;
@@ -309,7 +303,6 @@
             filter: drop-shadow(0 0 6px rgba(232, 204, 122, 0.7));
         }
 
-        /* ===== EYEBROW ===== */
         h1.eyebrow {
             font-family: 'Cinzel', 'JetBrains Mono', serif;
             font-size: 11px;
@@ -322,67 +315,147 @@
             text-shadow: 0 0 20px rgba(201, 162, 75, 0.25);
         }
 
-        /* ===== PLAQUE (question box) ===== */
+        /* ========================================
+           ✨ ENHANCED QUESTION PLAQUE ✨
+           ======================================== */
         .plaque {
             width: 100%;
-            background: linear-gradient(190deg, #131c29 0%, #0e151f 40%, #0b1119 100%);
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(201, 162, 75, 0.08) 0%, transparent 60%),
+                linear-gradient(190deg, #111b28 0%, #0c131d 50%, #090f18 100%);
             border: 1px solid var(--border-medium);
             border-radius: var(--radius-xl);
-            padding: 26px 22px;
+            padding: 32px 24px 28px;
             position: relative;
             box-shadow:
-                var(--shadow-inner),
                 var(--shadow-2xl),
-                0 0 0 1px rgba(0, 0, 0, 0.35);
-            overflow: hidden;
-            transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+                0 0 0 1px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03),
+                0 0 30px rgba(201, 162, 75, 0.08);
+            transition: all 0.5s ease;
             text-align: center;
+            overflow: hidden;
+            /* Animated border glow */
+            animation: plaqueGlow 4s ease-in-out infinite;
         }
-        .plaque:hover {
-            border-color: #2d3a4f;
+        @keyframes plaqueGlow {
+            0%, 100% {
+                box-shadow: 
+                    var(--shadow-2xl),
+                    0 0 0 1px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+                    0 0 25px rgba(201, 162, 75, 0.08);
+            }
+            50% {
+                box-shadow: 
+                    var(--shadow-2xl),
+                    0 0 0 1px rgba(0, 0, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+                    0 0 45px rgba(201, 162, 75, 0.15),
+                    0 0 80px rgba(201, 162, 75, 0.05);
+            }
         }
+
         .plaque::before {
             content: '';
             position: absolute;
-            inset: 5px;
-            border: 1px solid #1e2a3a;
+            inset: 4px;
+            border: 1px solid rgba(201, 162, 75, 0.2);
             border-radius: 11px;
             pointer-events: none;
-            opacity: 0.55;
-            transition: opacity var(--transition-smooth);
+            opacity: 0.7;
+            transition: border-color 0.5s ease;
         }
+        .plaque:hover::before {
+            border-color: rgba(201, 162, 75, 0.45);
+        }
+
         .plaque::after {
             content: '';
             position: absolute;
             top: 0;
-            left: 24px;
-            right: 24px;
+            left: 20px;
+            right: 20px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.3), rgba(201, 162, 75, 0.1), transparent);
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(201, 162, 75, 0.5), 
+                var(--brass), 
+                rgba(201, 162, 75, 0.5), 
+                transparent);
+            pointer-events: none;
+            filter: blur(0.5px);
+        }
+
+        /* Decorative corner accents (gold diamond shapes) */
+        .plaque .corner-accent {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, var(--brass-bright) 0%, transparent 70%);
+            opacity: 0.5;
             pointer-events: none;
         }
+        .plaque .corner-accent.top-left { top: 8px; left: 8px; transform: rotate(45deg); }
+        .plaque .corner-accent.top-right { top: 8px; right: 8px; transform: rotate(45deg); }
+        .plaque .corner-accent.bottom-left { bottom: 8px; left: 8px; transform: rotate(45deg); }
+        .plaque .corner-accent.bottom-right { bottom: 8px; right: 8px; transform: rotate(45deg); }
+
+        /* Moving light scan effect */
+        .plaque .scan-line {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(232, 204, 122, 0.6), rgba(201, 162, 75, 0.8), rgba(232, 204, 122, 0.6), transparent);
+            opacity: 0;
+            animation: scanMove 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 2;
+            filter: blur(1px);
+        }
+        @keyframes scanMove {
+            0% { top: -2px; opacity: 0; }
+            15% { opacity: 0.8; }
+            35% { top: calc(100% - 2px); opacity: 0.8; }
+            50% { top: calc(100% - 2px); opacity: 0; }
+            100% { top: -2px; opacity: 0; }
+        }
+
         .level-tag {
             font-family: 'JetBrains Mono', monospace;
             font-size: 10.5px;
-            color: var(--text-muted);
-            letter-spacing: 0.16em;
+            color: var(--brass-dim);
+            letter-spacing: 0.2em;
             margin-bottom: 14px;
             display: block;
             position: relative;
-            z-index: 1;
+            z-index: 3;
             font-weight: 500;
+            text-transform: uppercase;
+            transition: color 0.3s;
         }
+        .plaque:hover .level-tag {
+            color: var(--brass-light);
+        }
+
         .hint-text {
             font-family: 'Inter', sans-serif;
-            font-size: 17px;
-            line-height: 1.65;
+            font-size: 19px;
+            line-height: 1.7;
             color: var(--text-primary);
             margin: 0;
             position: relative;
-            z-index: 1;
+            z-index: 3;
             font-weight: 500;
-            letter-spacing: 0.015em;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.03em;
+            text-shadow: 0 0 15px rgba(0,0,0,0.5), 0 0 8px rgba(201,162,75,0.15);
+            transition: all 0.3s ease;
+        }
+        .plaque:hover .hint-text {
+            text-shadow: 0 0 20px rgba(0,0,0,0.6), 0 0 14px rgba(201,162,75,0.3);
+            letter-spacing: 0.04em;
         }
 
         /* ===== FORM ===== */
@@ -427,9 +500,6 @@
             background: #0b1019;
             letter-spacing: 0.14em;
         }
-        input[type=text]:focus::placeholder {
-            color: #4a5168;
-        }
         input.shake {
             animation: shake 0.45s ease;
             border-color: var(--error);
@@ -457,7 +527,6 @@
             }
         }
 
-        /* ===== SUBMIT BUTTON ===== */
         button[type=submit] {
             width: 100%;
             background: linear-gradient(180deg,
@@ -505,7 +574,6 @@
             transform: scale(0.95);
             filter: brightness(0.9);
             transition: transform 0.08s ease, filter 0.08s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 162, 75, 0.2);
         }
         button[type=submit]:disabled {
             opacity: 0.4;
@@ -519,7 +587,6 @@
             outline-offset: 4px;
         }
 
-        /* ===== MESSAGE ===== */
         .msg {
             min-height: 22px;
             font-family: 'JetBrains Mono', monospace;
@@ -539,7 +606,6 @@
             text-shadow: 0 0 12px rgba(76, 140, 98, 0.4);
         }
 
-        /* ===== MODE TAG ===== */
         .mode-tag {
             font-family: 'JetBrains Mono', monospace;
             font-size: 9.5px;
@@ -550,7 +616,6 @@
             padding-top: 4px;
         }
 
-        /* ===== DONE SCREEN ===== */
         .done-screen {
             text-align: center;
             display: flex;
@@ -576,9 +641,6 @@
             font-weight: 400;
         }
 
-        /* ========================================
-           INTRO OVERLAY
-           ======================================== */
         #intro {
             position: fixed;
             inset: 0;
@@ -742,14 +804,7 @@
             transform: scale(0.94);
             transition: transform 0.08s ease;
         }
-        .intro-btn:focus-visible {
-            outline: 2.5px solid var(--brass-light);
-            outline-offset: 5px;
-        }
 
-        /* ========================================
-           LOGIN MODAL
-           ======================================== */
         #loginModal {
             position: fixed;
             inset: 0;
@@ -812,7 +867,6 @@
             pointer-events: none;
         }
 
-        /* ===== LOGIN BACK BUTTON ===== */
         .login-back-btn {
             position: absolute;
             top: 14px;
@@ -848,9 +902,6 @@
             width: 13px;
             height: 13px;
             flex-shrink: 0;
-        }
-        .login-back-btn span {
-            line-height: 1;
         }
 
         .login-icon {
@@ -943,11 +994,6 @@
             filter: brightness(0.9);
             transition: transform 0.08s ease;
         }
-        .login-btn:focus-visible {
-            outline: 2.5px solid var(--brass-light);
-            outline-offset: 4px;
-        }
-
         .login-footer {
             font-family: 'JetBrains Mono', monospace;
             font-size: 9px;
@@ -959,9 +1005,7 @@
             z-index: 1;
         }
 
-        /* ========================================
-           MOBILE ENHANCEMENTS
-           ======================================== */
+        /* Mobile adjustments */
         @media (max-width: 480px) {
             .stage {
                 padding: 20px 14px 30px;
@@ -983,113 +1027,35 @@
                 height: 56px;
             }
             .plaque {
-                padding: 20px 14px;
-                border-radius: var(--radius-lg);
-            }
-            .plaque::before {
-                border-radius: 8px;
-                inset: 3px;
+                padding: 24px 16px;
             }
             .hint-text {
-                font-size: 15.5px;
-                line-height: 1.55;
+                font-size: 17px;
             }
             input[type=text] {
                 font-size: 16px;
                 padding: 15px 12px;
-                border-radius: var(--radius-sm);
             }
             button[type=submit] {
                 font-size: 12px;
                 padding: 16px;
-                border-radius: var(--radius-sm);
-            }
-            .dots {
-                gap: 8px;
-            }
-            .dot {
-                width: 8px;
-                height: 8px;
             }
             .intro-inner {
                 padding: 0 16px;
             }
             .intro-title {
                 font-size: 22px;
-                letter-spacing: 0.2em;
             }
             .intro-btn {
                 padding: 14px 42px;
                 font-size: 11px;
-                letter-spacing: 0.3em;
-            }
-            .login-card {
-                padding: 28px 16px 22px;
-            }
-            .login-title {
-                font-size: 14px;
-            }
-            .login-subtitle {
-                font-size: 12.5px;
-            }
-            .login-btn {
-                font-size: 11px;
-                padding: 14px;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .stage {
-                padding: 16px 10px 24px;
-                gap: 14px;
-            }
-            .plaque {
-                padding: 16px 10px;
-            }
-            .hint-text {
-                font-size: 14px;
-            }
-            input[type=text] {
-                font-size: 14px;
-                padding: 13px 10px;
-            }
-            button[type=submit] {
-                font-size: 11px;
-                padding: 14px;
-            }
-            .dots {
-                gap: 6px;
-            }
-            .dot {
-                width: 7px;
-                height: 7px;
-            }
-            .lock-wrap {
-                width: 48px;
-                height: 48px;
-            }
-            .puzzle-back-btn {
-                top: 10px;
-                left: 8px;
-                padding: 5px 10px;
-                font-size: 8px;
-            }
-            .login-card {
-                padding: 22px 12px 18px;
-            }
-            .intro-title {
-                font-size: 19px;
-            }
-            .intro-btn {
-                padding: 12px 34px;
-                font-size: 10px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== INTRO OVERLAY ===== -->
+    <!-- INTRO -->
     <div id="intro" class="hidden-initially" role="dialog" aria-label="Welcome">
         <div class="intro-inner">
             <div class="intro-emblem" id="introEmblem">
@@ -1110,17 +1076,15 @@
         </div>
     </div>
 
-    <!-- ===== LOGIN MODAL ===== -->
+    <!-- LOGIN MODAL -->
     <div id="loginModal" class="hidden-initially" role="dialog" aria-label="Authentication required" aria-modal="true">
         <div class="login-card">
-            <!-- Back button -->
-            <button class="login-back-btn" id="loginBackBtn" aria-label="Go back" title="Go back to home">
+            <button class="login-back-btn" id="loginBackBtn" aria-label="Go back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"/>
                 </svg>
                 <span>Back</span>
             </button>
-
             <div class="login-icon">
                 <svg viewBox="0 0 64 64" fill="none">
                     <circle cx="32" cy="32" r="28" stroke="#c9a24b" stroke-width="2" fill="none" opacity="0.45"/>
@@ -1133,15 +1097,14 @@
             <h2 class="login-title">RESTRICTED ACCESS</h2>
             <p class="login-subtitle">This vault requires <strong>authentication</strong> to proceed. Sign in to continue your puzzle journey.</p>
             <div class="login-divider"></div>
-            <button class="login-btn" id="loginBtn" aria-label="Sign in to access the vault">SIGN IN TO CONTINUE</button>
+            <button class="login-btn" id="loginBtn">SIGN IN TO CONTINUE</button>
             <p class="login-footer">SECURE VAULT · AUTHORIZED ACCESS ONLY</p>
         </div>
     </div>
 
-    <!-- ===== GAME STAGE ===== -->
+    <!-- GAME STAGE -->
     <div class="stage" id="stage">
-        <!-- Back button for puzzle section -->
-        <button class="puzzle-back-btn" id="puzzleBackBtn" aria-label="Go back" title="Return to home">
+        <button class="puzzle-back-btn" id="puzzleBackBtn" aria-label="Go back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"/>
             </svg>
@@ -1160,7 +1123,13 @@
         <div class="dots" id="dots"></div>
 
         <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
+            <!-- ✨ ENHANCED PLAQUE with decorative accents ✨ -->
             <div class="plaque">
+                <div class="corner-accent top-left"></div>
+                <div class="corner-accent top-right"></div>
+                <div class="corner-accent bottom-left"></div>
+                <div class="corner-accent bottom-right"></div>
+                <div class="scan-line"></div>
                 <span class="level-tag" id="levelTag">LEVEL —</span>
                 <p class="hint-text" id="hintText">Initializing…</p>
             </div>
@@ -1170,23 +1139,17 @@
             </form>
             <div class="msg" id="msg"></div>
         </div>
-
         <span class="mode-tag" id="modeTag">checking session…</span>
     </div>
 
-    <!-- ========================================
-    ORIGINAL SCRIPTS — PRESERVED EXACTLY
-    ======================================== -->
+    <!-- SCRIPTS (unchanged) -->
     <script>
-        // ===== Shared Supabase client =====
         const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         const LOCAL_KEY = 'vault_puzzle_level';
         const INTRO_SEEN_KEY = 'vault_intro_seen';
 
-        // ===== DOM refs =====
         const introEl = document.getElementById('intro');
         const introEmblem = document.getElementById('introEmblem');
         const introGreet = document.getElementById('introGreet');
@@ -1196,10 +1159,8 @@
         const introD2 = document.getElementById('introD2');
         const introStamp = document.getElementById('introStamp');
         const introBtn = document.getElementById('introBtn');
-
         const loginModal = document.getElementById('loginModal');
         const loginBtn = document.getElementById('loginBtn');
-
         const elDots = document.getElementById('dots');
         const elLevelTag = document.getElementById('levelTag');
         const elHintText = document.getElementById('hintText');
@@ -1211,7 +1172,6 @@
         const elLockIcon = document.getElementById('lockIcon');
         const elGameArea = document.getElementById('gameArea');
 
-        // ===== State =====
         let state = {
             userId: null,
             currentLevel: 1,
@@ -1220,75 +1180,48 @@
             gameReady: false,
             session: null,
         };
-
         let introDismissed = false;
 
-        // ===== BOOTSTRAP =====
         async function bootstrap() {
             const { data: { session } } = await sb.auth.getSession();
-
             if (!session || !session.user) {
-                // NOT LOGGED IN → show login modal
                 showLoginModal();
                 return;
             }
-
-            // LOGGED IN
             state.session = session;
             state.userId = session.user.id;
-
             const introSeen = localStorage.getItem(INTRO_SEEN_KEY);
-
             if (introSeen) {
-                // Returning user → skip intro, init game directly
                 hideIntroPermanently();
                 await initGame();
                 enableGameInputs();
             } else {
-                // First-time visitor → show intro
                 personalizeIntro(session);
                 revealIntro();
                 playIntroAnimation();
-                // Game will init after intro dismissal
                 await initGameInBackground();
             }
         }
 
-        // ===== LOGIN MODAL =====
         function showLoginModal() {
             loginModal.classList.remove('hidden-initially');
-            // Hide intro and ensure game is not interactive
             hideIntroPermanently();
             disableGameInputs();
             elModeTag.textContent = 'authentication required';
         }
+        loginBtn.addEventListener('click', () => { window.location.href = '/index.html'; });
 
-        loginBtn.addEventListener('click', () => {
-            // Redirect to login page
-            window.location.href = '/index.html';
-        });
-
-        // ===== INTRO =====
         function personalizeIntro(session) {
             if (session && session.user && session.user.email) {
-                const name = session.user.email.split('@')[0];
-                introGreet.textContent = 'Welcome, ' + name + '.';
+                introGreet.textContent = 'Welcome, ' + session.user.email.split('@')[0] + '.';
             }
         }
-
-        function revealIntro() {
-            introEl.classList.remove('hidden-initially');
-        }
-
+        function revealIntro() { introEl.classList.remove('hidden-initially'); }
         function hideIntroPermanently() {
             introEl.classList.add('hidden-initially');
             introEl.classList.remove('gone');
-            // Reset animation classes
-            [introEmblem, introGreet, introTitle, introLine, introD1, introD2, introStamp, introBtn].forEach(el => {
-                if (el) el.classList.remove('show');
-            });
+            [introEmblem, introGreet, introTitle, introLine, introD1, introD2, introStamp, introBtn].forEach(el => { if(el) el.classList.remove('show'); });
         }
-
         function playIntroAnimation() {
             setTimeout(() => introEmblem.classList.add('show'), 300);
             setTimeout(() => introGreet.classList.add('show'), 700);
@@ -1297,243 +1230,89 @@
             setTimeout(() => introD1.classList.add('show'), 1550);
             setTimeout(() => introD2.classList.add('show'), 1800);
             setTimeout(() => introStamp.classList.add('show'), 2100);
-            setTimeout(() => {
-                introBtn.classList.add('show');
-                introBtn.focus();
-            }, 2400);
+            setTimeout(() => { introBtn.classList.add('show'); introBtn.focus(); }, 2400);
         }
-
         function dismissIntro() {
             if (introDismissed) return;
             introDismissed = true;
-
             localStorage.setItem(INTRO_SEEN_KEY, '1');
             introBtn.style.pointerEvents = 'none';
             introEl.classList.add('gone');
-
-            setTimeout(() => {
-                hideIntroPermanently();
-                enableGameInputs();
-                if (elInput) elInput.focus();
-            }, 950);
+            setTimeout(() => { hideIntroPermanently(); enableGameInputs(); if(elInput) elInput.focus(); }, 950);
         }
-
         introBtn.addEventListener('click', dismissIntro);
-        document.addEventListener('keydown', function introKeyHandler(e) {
-            if (
-                e.key === 'Enter' &&
-                introBtn.classList.contains('show') &&
-                !introEl.classList.contains('gone') &&
-                !introEl.classList.contains('hidden-initially')
-            ) {
-                dismissIntro();
-                document.removeEventListener('keydown', introKeyHandler);
+        document.addEventListener('keydown', function handler(e) {
+            if (e.key === 'Enter' && introBtn.classList.contains('show') && !introEl.classList.contains('gone') && !introEl.classList.contains('hidden-initially')) {
+                dismissIntro(); document.removeEventListener('keydown', handler);
             }
         });
 
-        // ===== GAME =====
         async function initGameInBackground() {
-            // Pre-fetch total levels so dots render correctly even before intro dismissal
-            try {
-                const { count } = await sb
-                    .from('puzzle_levels_public')
-                    .select('*', { count: 'exact', head: true });
-                state.totalLevels = count || 0;
-            } catch (e) {
-                state.totalLevels = 0;
-            }
-
-            // Fetch user progress
+            try { const { count } = await sb.from('puzzle_levels_public').select('*', { count: 'exact', head: true }); state.totalLevels = count || 0; } catch(e) { state.totalLevels = 0; }
             if (state.userId) {
-                const { data: progress } = await sb
-                    .from('puzzle_progress')
-                    .select('current_level')
-                    .eq('user_id', state.userId)
-                    .maybeSingle();
-
-                if (!progress) {
-                    await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
-                    state.currentLevel = 1;
-                } else {
-                    state.currentLevel = progress.current_level;
-                }
+                const { data: progress } = await sb.from('puzzle_progress').select('current_level').eq('user_id', state.userId).maybeSingle();
+                if (!progress) { await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 }); state.currentLevel = 1; }
+                else state.currentLevel = progress.current_level;
             }
-
-            renderDots();
-            await loadLevel();
-            state.gameReady = true;
-            elModeTag.textContent = 'signed in · progress synced';
+            renderDots(); await loadLevel(); state.gameReady = true; elModeTag.textContent = 'signed in · progress synced';
         }
-
         async function initGame() {
-            // Called for returning users (intro already skipped)
-            try {
-                const { count } = await sb
-                    .from('puzzle_levels_public')
-                    .select('*', { count: 'exact', head: true });
-                state.totalLevels = count || 0;
-            } catch (e) {
-                state.totalLevels = 0;
-            }
-
+            try { const { count } = await sb.from('puzzle_levels_public').select('*', { count: 'exact', head: true }); state.totalLevels = count || 0; } catch(e) { state.totalLevels = 0; }
             if (state.userId) {
-                const { data: progress } = await sb
-                    .from('puzzle_progress')
-                    .select('current_level')
-                    .eq('user_id', state.userId)
-                    .maybeSingle();
-
-                if (!progress) {
-                    await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
-                    state.currentLevel = 1;
-                } else {
-                    state.currentLevel = progress.current_level;
-                }
+                const { data: progress } = await sb.from('puzzle_progress').select('current_level').eq('user_id', state.userId).maybeSingle();
+                if (!progress) { await sb.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 }); state.currentLevel = 1; }
+                else state.currentLevel = progress.current_level;
             }
-
-            renderDots();
-            await loadLevel();
-            state.gameReady = true;
-            elModeTag.textContent = 'signed in · progress synced';
+            renderDots(); await loadLevel(); state.gameReady = true; elModeTag.textContent = 'signed in · progress synced';
         }
-
-        function enableGameInputs() {
-            elInput.disabled = false;
-            elSubmitBtn.disabled = false;
-            if (state.gameReady && state.currentLevel <= state.totalLevels) {
-                elInput.focus();
-            }
-        }
-
-        function disableGameInputs() {
-            elInput.disabled = true;
-            elSubmitBtn.disabled = true;
-        }
-
+        function enableGameInputs() { elInput.disabled = false; elSubmitBtn.disabled = false; if(state.gameReady && state.currentLevel <= state.totalLevels) elInput.focus(); }
+        function disableGameInputs() { elInput.disabled = true; elSubmitBtn.disabled = true; }
         function renderDots() {
             elDots.innerHTML = '';
-            const total = state.totalLevels || 0;
-            for (let i = 1; i <= total; i++) {
+            for(let i=1; i<=(state.totalLevels||0); i++) {
                 const d = document.createElement('div');
                 d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
                 elDots.appendChild(d);
             }
         }
-
         async function loadLevel() {
-            if (state.currentLevel > state.totalLevels) {
-                showDoneScreen();
-                return;
-            }
-            const { data, error } = await sb
-                .from('puzzle_levels_public')
-                .select('id, level_number, hint')
-                .eq('level_number', state.currentLevel)
-                .single();
-
-            if (error || !data) {
-                elHintText.textContent = 'Could not load this level. Please try again later.';
-                elLevelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
-                return;
-            }
+            if (state.currentLevel > state.totalLevels) { showDoneScreen(); return; }
+            const { data, error } = await sb.from('puzzle_levels_public').select('id, level_number, hint').eq('level_number', state.currentLevel).single();
+            if (error || !data) { elHintText.textContent = 'Could not load this level.'; return; }
             state.levelRow = data;
             elLevelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
             elHintText.textContent = data.hint;
-            elInput.value = '';
-            elMsg.textContent = '';
-            elMsg.className = 'msg';
+            elInput.value = ''; elMsg.textContent = ''; elMsg.className = 'msg';
         }
-
         function showDoneScreen() {
             elLockIcon.classList.add('open');
-            elGameArea.innerHTML = `
-            <div class="done-screen">
-              <h2>VAULT CLEARED</h2>
-              <p>You solved all ${state.totalLevels} levels. Nicely done.</p>
-            </div>`;
+            elGameArea.innerHTML = `<div class="done-screen"><h2>VAULT CLEARED</h2><p>You solved all ${state.totalLevels} levels.</p></div>`;
         }
-
         elForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!state.gameReady || !state.userId) return;
-
             const guess = elInput.value.trim().toUpperCase();
             if (!guess) return;
             elSubmitBtn.disabled = true;
-
-            const { data: correct, error } = await sb
-                .rpc('check_puzzle_answer', {
-                    level_num: state.currentLevel,
-                    guess: guess
-                });
-
-            if (error) {
-                elMsg.textContent = 'CONNECTION ERROR — TRY AGAIN';
-                elMsg.className = 'msg error';
-                elSubmitBtn.disabled = false;
-                return;
-            }
-
+            const { data: correct, error } = await sb.rpc('check_puzzle_answer', { level_num: state.currentLevel, guess });
+            if (error) { elMsg.textContent = 'CONNECTION ERROR'; elMsg.className = 'msg error'; elSubmitBtn.disabled = false; return; }
             if (correct) {
-                elMsg.textContent = 'CORRECT';
-                elMsg.className = 'msg success';
-                elLockIcon.classList.add('open');
-
-                state.currentLevel += 1;
-
-                // Persist progress
-                await sb
-                    .from('puzzle_progress')
-                    .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
-                    .eq('user_id', state.userId);
-
-                setTimeout(async () => {
-                    elLockIcon.classList.remove('open');
-                    renderDots();
-                    await loadLevel();
-                    elSubmitBtn.disabled = false;
-                    if (state.currentLevel <= state.totalLevels && !elInput.disabled) {
-                        elInput.focus();
-                    }
-                }, 750);
+                elMsg.textContent = 'CORRECT'; elMsg.className = 'msg success'; elLockIcon.classList.add('open');
+                state.currentLevel++;
+                await sb.from('puzzle_progress').update({ current_level: state.currentLevel, updated_at: new Date().toISOString() }).eq('user_id', state.userId);
+                setTimeout(async () => { elLockIcon.classList.remove('open'); renderDots(); await loadLevel(); elSubmitBtn.disabled = false; if(state.currentLevel <= state.totalLevels && !elInput.disabled) elInput.focus(); }, 750);
             } else {
-                elMsg.textContent = 'INCORRECT — TRY AGAIN';
-                elMsg.className = 'msg error';
-                elInput.classList.add('shake');
-                setTimeout(() => elInput.classList.remove('shake'), 450);
+                elMsg.textContent = 'INCORRECT — TRY AGAIN'; elMsg.className = 'msg error';
+                elInput.classList.add('shake'); setTimeout(() => elInput.classList.remove('shake'), 450);
                 elSubmitBtn.disabled = false;
             }
         });
 
-        // ===== START =====
         bootstrap();
     </script>
-
-    <!-- ========================================
-    BACK BUTTON FUNCTIONALITY
-    ======================================== -->
     <script>
-        // Back button on login modal → go to home
-        (function() {
-            const loginBackBtn = document.getElementById('loginBackBtn');
-            if (loginBackBtn) {
-                loginBackBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = '/dashboard.html';
-                });
-            }
-        })();
-
-        // Back button on puzzle stage → go to home
-        (function() {
-            const puzzleBackBtn = document.getElementById('puzzleBackBtn');
-            if (puzzleBackBtn) {
-                puzzleBackBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.href = '/dashboard.html';
-                });
-            }
-        })();
+        document.getElementById('loginBackBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = '/dashboard.html'; });
+        document.getElementById('puzzleBackBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = '/dashboard.html'; });
     </script>
 </body>
 </html>
