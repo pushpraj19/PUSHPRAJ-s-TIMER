@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <script src="pwa-register.js" defer></script>
+  
 <style>
   :root{
     --bg: #14171f;
@@ -326,34 +332,35 @@
 </div>
 
 <script>
-// ===== INTRO — checks session and greets by email =====
+// ===== Single Supabase client — shared by intro AND game =====
+const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+// ===== INTRO — uses the shared `sb` client, no duplicates =====
 (function(){
-  const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
-
   const greetEl = document.getElementById('introGreet');
-  const emblem = document.getElementById('introEmblem');
-  const title  = document.getElementById('introTitle');
-  const line   = document.getElementById('introLine');
-  const d1     = document.getElementById('introD1');
-  const d2     = document.getElementById('introD2');
-  const stamp  = document.getElementById('introStamp');
-  const btn    = document.getElementById('introBtn');
-  const intro  = document.getElementById('intro');
+  const emblem  = document.getElementById('introEmblem');
+  const title   = document.getElementById('introTitle');
+  const line    = document.getElementById('introLine');
+  const d1      = document.getElementById('introD1');
+  const d2      = document.getElementById('introD2');
+  const stamp   = document.getElementById('introStamp');
+  const btn     = document.getElementById('introBtn');
+  const intro   = document.getElementById('intro');
 
-  // Kick off session check immediately — it'll resolve well before greeting appears
-  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    .auth.getSession()
-    .then(({ data: { session } }) => {
-      if (session && session.user && session.user.email) {
-        // Show just the name part before @, e.g. "alex" from "alex@gmail.com"
-        const name = session.user.email.split('@')[0];
-        greetEl.textContent = 'Welcome, ' + name + '.';
-      }
-    });
+  // Check session using the shared client — no second createClient
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session && session.user && session.user.email) {
+      const name = session.user.email.split('@')[0];
+      greetEl.textContent = 'Welcome, ' + name + '.';
+    }
+  });
 
   setTimeout(() => emblem.classList.add('show'), 300);
-  setTimeout(() => greet.classList.add('show'), 700);
+  setTimeout(() => greetEl.classList.add('show'), 700);
   setTimeout(() => title.classList.add('show'), 1000);
   setTimeout(() => line.classList.add('show'), 1350);
   setTimeout(() => d1.classList.add('show'), 1550);
@@ -381,13 +388,7 @@
 </script>
 
 <script>
-// ====== CONFIG — fill these in with your Supabase project details ======
-const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
-// =========================================================================
-
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+// ===== GAME — uses the same shared `sb` client =====
 const LOCAL_KEY = 'vault_puzzle_level';
 
 let state = {
