@@ -191,10 +191,9 @@
             line-height: 1;
         }
 
-        /* ===== DOTS (increased gap) ===== */
         .dots {
             display: flex;
-            gap: 16px;  /* increased from 10px */
+            gap: 10px;
             padding: 4px 0;
         }
         .dot {
@@ -316,7 +315,9 @@
             text-shadow: 0 0 20px rgba(201, 162, 75, 0.25);
         }
 
-        /* ===== ENHANCED QUESTION PLAQUE ===== */
+        /* ========================================
+           ✨ ENHANCED QUESTION PLAQUE ✨
+           ======================================== */
         .plaque {
             width: 100%;
             background: 
@@ -334,6 +335,7 @@
             transition: all 0.5s ease;
             text-align: center;
             overflow: hidden;
+            /* Animated border glow */
             animation: plaqueGlow 4s ease-in-out infinite;
         }
         @keyframes plaqueGlow {
@@ -353,22 +355,7 @@
                     0 0 80px rgba(201, 162, 75, 0.05);
             }
         }
-        /* Success animation for correct answer */
-        .plaque.correct-flash {
-            animation: correctPulse 0.7s ease-out forwards;
-            border-color: var(--success);
-            box-shadow:
-                0 0 0 1px rgba(0, 0, 0, 0.4),
-                inset 0 0 20px rgba(76, 140, 98, 0.15),
-                0 0 40px rgba(76, 140, 98, 0.3),
-                0 0 80px rgba(76, 140, 98, 0.15);
-        }
-        @keyframes correctPulse {
-            0% { transform: scale(1); }
-            40% { transform: scale(1.02); }
-            70% { transform: scale(0.99); }
-            100% { transform: scale(1); }
-        }
+
         .plaque::before {
             content: '';
             position: absolute;
@@ -382,6 +369,7 @@
         .plaque:hover::before {
             border-color: rgba(201, 162, 75, 0.45);
         }
+
         .plaque::after {
             content: '';
             position: absolute;
@@ -398,6 +386,8 @@
             pointer-events: none;
             filter: blur(0.5px);
         }
+
+        /* Decorative corner accents (gold diamond shapes) */
         .plaque .corner-accent {
             position: absolute;
             width: 18px;
@@ -410,6 +400,8 @@
         .plaque .corner-accent.top-right { top: 8px; right: 8px; transform: rotate(45deg); }
         .plaque .corner-accent.bottom-left { bottom: 8px; left: 8px; transform: rotate(45deg); }
         .plaque .corner-accent.bottom-right { bottom: 8px; right: 8px; transform: rotate(45deg); }
+
+        /* Moving light scan effect */
         .plaque .scan-line {
             position: absolute;
             top: -2px;
@@ -430,6 +422,7 @@
             50% { top: calc(100% - 2px); opacity: 0; }
             100% { top: -2px; opacity: 0; }
         }
+
         .level-tag {
             font-family: 'JetBrains Mono', monospace;
             font-size: 10.5px;
@@ -446,6 +439,7 @@
         .plaque:hover .level-tag {
             color: var(--brass-light);
         }
+
         .hint-text {
             font-family: 'Inter', sans-serif;
             font-size: 19px;
@@ -647,7 +641,6 @@
             font-weight: 400;
         }
 
-        /* Intro & Login styles unchanged */
         #intro {
             position: fixed;
             inset: 0;
@@ -668,11 +661,13 @@
         #intro.hidden-initially {
             display: none;
         }
+
         .intro-inner {
             text-align: center;
             max-width: 400px;
             padding: 0 24px;
         }
+
         .intro-emblem {
             width: 60px;
             height: 60px;
@@ -682,8 +677,15 @@
             transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
             filter: drop-shadow(0 6px 16px rgba(201, 162, 75, 0.35));
         }
-        .intro-emblem.show { opacity: 1; transform: scale(1); }
-        .intro-emblem svg { width: 100%; height: 100%; }
+        .intro-emblem.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .intro-emblem svg {
+            width: 100%;
+            height: 100%;
+        }
+
         .intro-greet {
             font-family: 'Inter', sans-serif;
             font-size: 14px;
@@ -695,7 +697,11 @@
             transform: translateY(8px);
             transition: opacity 0.7s ease, transform 0.7s ease;
         }
-        .intro-greet.show { opacity: 1; transform: translateY(0); }
+        .intro-greet.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .intro-title {
             font-family: 'Cinzel', 'JetBrains Mono', serif;
             font-size: clamp(24px, 6vw, 30px);
@@ -708,7 +714,11 @@
             transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s;
             text-shadow: 0 0 50px rgba(201, 162, 75, 0.35), 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        .intro-title.show { opacity: 1; transform: translateY(0); }
+        .intro-title.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .intro-line {
             width: 48px;
             height: 2px;
@@ -718,7 +728,10 @@
             border-radius: 1px;
             transition: opacity 0.6s ease;
         }
-        .intro-line.show { opacity: 1; }
+        .intro-line.show {
+            opacity: 1;
+        }
+
         .intro-desc {
             font-size: 14px;
             line-height: 1.85;
@@ -728,9 +741,18 @@
             transform: translateY(6px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
-        .intro-desc.show { opacity: 1; transform: translateY(0); }
-        .intro-desc.last { margin-bottom: 30px; }
-        .intro-desc strong { color: var(--text-primary); font-weight: 600; }
+        .intro-desc.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .intro-desc.last {
+            margin-bottom: 30px;
+        }
+        .intro-desc strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
         .intro-stamp {
             display: inline-block;
             font-family: 'JetBrains Mono', monospace;
@@ -745,7 +767,11 @@
             transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: 2px;
         }
-        .intro-stamp.show { opacity: 0.7; transform: rotate(0) scale(1); }
+        .intro-stamp.show {
+            opacity: 0.7;
+            transform: rotate(0) scale(1);
+        }
+
         .intro-btn {
             background: transparent;
             border: 2px solid var(--brass-dim);
@@ -763,7 +789,10 @@
             position: relative;
             text-transform: uppercase;
         }
-        .intro-btn.show { opacity: 1; transform: translateY(0); }
+        .intro-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
         .intro-btn:hover {
             background: var(--brass);
             color: #070a10;
@@ -771,8 +800,10 @@
             box-shadow: 0 0 45px rgba(201, 162, 75, 0.3), 0 0 0 6px rgba(201, 162, 75, 0.06);
             letter-spacing: 0.4em;
         }
-        .intro-btn:active { transform: scale(0.94); transition: transform 0.08s ease; }
-        .intro-btn:focus-visible { outline: 2.5px solid var(--brass-light); outline-offset: 5px; }
+        .intro-btn:active {
+            transform: scale(0.94);
+            transition: transform 0.08s ease;
+        }
 
         #loginModal {
             position: fixed;
@@ -786,8 +817,15 @@
             -webkit-backdrop-filter: blur(14px);
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        #loginModal.hidden-initially { display: none; }
-        #loginModal.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        #loginModal.hidden-initially {
+            display: none;
+        }
+        #loginModal.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
         .login-card {
             background: linear-gradient(190deg, #151e2d 0%, #0f1722 40%, #0b1119 100%);
             border: 1px solid var(--border-medium);
@@ -801,8 +839,14 @@
             animation: modalSlideIn 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
         }
         @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(24px) scale(0.92); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         .login-card::before {
             content: '';
@@ -822,6 +866,7 @@
             background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.35), rgba(201, 162, 75, 0.08), transparent);
             pointer-events: none;
         }
+
         .login-back-btn {
             position: absolute;
             top: 14px;
@@ -849,8 +894,16 @@
             border-color: var(--border-subtle);
             background: rgba(15, 21, 30, 0.7);
         }
-        .login-back-btn:active { transform: scale(0.93); transition: transform 0.1s ease; }
-        .login-back-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+        .login-back-btn:active {
+            transform: scale(0.93);
+            transition: transform 0.1s ease;
+        }
+        .login-back-btn svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+        }
+
         .login-icon {
             width: 52px;
             height: 52px;
@@ -859,7 +912,11 @@
             z-index: 1;
             filter: drop-shadow(0 4px 12px rgba(201, 162, 75, 0.25));
         }
-        .login-icon svg { width: 100%; height: 100%; }
+        .login-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
         .login-title {
             font-family: 'Cinzel', 'JetBrains Mono', serif;
             font-size: 16px;
@@ -881,7 +938,10 @@
             z-index: 1;
             font-weight: 400;
         }
-        .login-subtitle strong { color: var(--text-primary); font-weight: 600; }
+        .login-subtitle strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
         .login-divider {
             width: 40px;
             height: 1.5px;
@@ -929,7 +989,11 @@
             box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 162, 75, 0.4), 0 0 40px rgba(201, 162, 75, 0.2);
             transform: translateY(-1px);
         }
-        .login-btn:active { transform: scale(0.95); filter: brightness(0.9); transition: transform 0.08s ease; }
+        .login-btn:active {
+            transform: scale(0.95);
+            filter: brightness(0.9);
+            transition: transform 0.08s ease;
+        }
         .login-footer {
             font-family: 'JetBrains Mono', monospace;
             font-size: 9px;
@@ -941,18 +1005,51 @@
             z-index: 1;
         }
 
+        /* Mobile adjustments */
         @media (max-width: 480px) {
-            .stage { padding: 20px 14px 30px; gap: 16px; }
-            .puzzle-back-btn { top: 14px; left: 12px; padding: 7px 12px; font-size: 9px; gap: 5px; }
-            .puzzle-back-btn svg { width: 12px; height: 12px; }
-            .lock-wrap { width: 56px; height: 56px; }
-            .plaque { padding: 24px 16px; }
-            .hint-text { font-size: 17px; }
-            input[type=text] { font-size: 16px; padding: 15px 12px; }
-            button[type=submit] { font-size: 12px; padding: 16px; }
-            .intro-inner { padding: 0 16px; }
-            .intro-title { font-size: 22px; }
-            .intro-btn { padding: 14px 42px; font-size: 11px; }
+            .stage {
+                padding: 20px 14px 30px;
+                gap: 16px;
+            }
+            .puzzle-back-btn {
+                top: 14px;
+                left: 12px;
+                padding: 7px 12px;
+                font-size: 9px;
+                gap: 5px;
+            }
+            .puzzle-back-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            .lock-wrap {
+                width: 56px;
+                height: 56px;
+            }
+            .plaque {
+                padding: 24px 16px;
+            }
+            .hint-text {
+                font-size: 17px;
+            }
+            input[type=text] {
+                font-size: 16px;
+                padding: 15px 12px;
+            }
+            button[type=submit] {
+                font-size: 12px;
+                padding: 16px;
+            }
+            .intro-inner {
+                padding: 0 16px;
+            }
+            .intro-title {
+                font-size: 22px;
+            }
+            .intro-btn {
+                padding: 14px 42px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -1026,7 +1123,8 @@
         <div class="dots" id="dots"></div>
 
         <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
-            <div class="plaque" id="questionPlaque">
+            <!-- ✨ ENHANCED PLAQUE with decorative accents ✨ -->
+            <div class="plaque">
                 <div class="corner-accent top-left"></div>
                 <div class="corner-accent top-right"></div>
                 <div class="corner-accent bottom-left"></div>
@@ -1044,7 +1142,7 @@
         <span class="mode-tag" id="modeTag">checking session…</span>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- SCRIPTS (unchanged) -->
     <script>
         const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_t2pqsg2pXxC0YlPcsayc1A_EpvjMGjx';
@@ -1073,7 +1171,6 @@
         const elModeTag = document.getElementById('modeTag');
         const elLockIcon = document.getElementById('lockIcon');
         const elGameArea = document.getElementById('gameArea');
-        const plaque = document.getElementById('questionPlaque'); // for success flash
 
         let state = {
             userId: null,
@@ -1112,7 +1209,7 @@
             disableGameInputs();
             elModeTag.textContent = 'authentication required';
         }
-        loginBtn.addEventListener('click', () => { window.location.href = '/index.html'; }); // login page remains index.html
+        loginBtn.addEventListener('click', () => { window.location.href = '/index.html'; });
 
         function personalizeIntro(session) {
             if (session && session.user && session.user.email) {
@@ -1186,8 +1283,6 @@
             elLevelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
             elHintText.textContent = data.hint;
             elInput.value = ''; elMsg.textContent = ''; elMsg.className = 'msg';
-            // Remove any leftover success flash from plaque
-            plaque.classList.remove('correct-flash');
         }
         function showDoneScreen() {
             elLockIcon.classList.add('open');
@@ -1202,38 +1297,22 @@
             const { data: correct, error } = await sb.rpc('check_puzzle_answer', { level_num: state.currentLevel, guess });
             if (error) { elMsg.textContent = 'CONNECTION ERROR'; elMsg.className = 'msg error'; elSubmitBtn.disabled = false; return; }
             if (correct) {
-                // Success indication
-                elMsg.textContent = 'CORRECT'; 
-                elMsg.className = 'msg success';
-                elLockIcon.classList.add('open');
-                // Flash the plaque green
-                plaque.classList.add('correct-flash');
-                setTimeout(() => plaque.classList.remove('correct-flash'), 700);
-
+                elMsg.textContent = 'CORRECT'; elMsg.className = 'msg success'; elLockIcon.classList.add('open');
                 state.currentLevel++;
                 await sb.from('puzzle_progress').update({ current_level: state.currentLevel, updated_at: new Date().toISOString() }).eq('user_id', state.userId);
-                setTimeout(async () => { 
-                    elLockIcon.classList.remove('open'); 
-                    renderDots(); 
-                    await loadLevel(); 
-                    elSubmitBtn.disabled = false; 
-                    if(state.currentLevel <= state.totalLevels && !elInput.disabled) elInput.focus(); 
-                }, 750);
+                setTimeout(async () => { elLockIcon.classList.remove('open'); renderDots(); await loadLevel(); elSubmitBtn.disabled = false; if(state.currentLevel <= state.totalLevels && !elInput.disabled) elInput.focus(); }, 750);
             } else {
-                elMsg.textContent = 'INCORRECT — TRY AGAIN'; 
-                elMsg.className = 'msg error';
-                elInput.classList.add('shake'); 
-                setTimeout(() => elInput.classList.remove('shake'), 450);
+                elMsg.textContent = 'INCORRECT — TRY AGAIN'; elMsg.className = 'msg error';
+                elInput.classList.add('shake'); setTimeout(() => elInput.classList.remove('shake'), 450);
                 elSubmitBtn.disabled = false;
             }
         });
 
         bootstrap();
     </script>
-    <!-- Back buttons now go to dashboard.html -->
     <script>
         document.getElementById('loginBackBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = '/dashboard.html'; });
         document.getElementById('puzzleBackBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = '/dashboard.html'; });
     </script>
 </body>
-</html>s
+</html>
