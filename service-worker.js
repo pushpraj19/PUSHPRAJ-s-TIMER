@@ -1,73 +1,99 @@
-const CACHE_NAME = 'focus-v3';
+const CACHE_NAME = "focus16-v1";
 
-const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/dashboard.html',
-  '/timer.html',
-  '/time_history.html',
-  '/todo.html',
-  '/logo.png',
-  '/study_menu.html',
-  '/vernier_calliper.html',
-  '/manifest.webmanifest',
-  '/pwa-register.js',
-  '/supabase-config.js',
-  '/supabase-db.js'
+const urlsToCache = [
+  "/",
+  "/index.html",
+  "/dashboard.html",
+  "/timer.html",
+  "/time_history.html",
+  "/todo.html",
+  "/study_menu.html",
+  "/logo.png",
+  "/manifest.webmanifest",
+  "/pwa-register.js",
+  "/supabase-config.js",
+  "/supabase-db.js"
+  // ❌ Removed vernier_calliper.html (fix later if needed)
 ];
 
-const FALLBACK_PAGE = '/index.html';
+// INSTALL
+self.addEventListener("install", (event) => {
+  console.log("🚀 Service Worker Installing...");
 
-
-// 🔹 INSTALL
-self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      for (const url of APP_SHELL) {
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const url of urlsToCache) {
         try {
-          await cache.add(url);
-          console.log('✅ Cached:', url);
+          const response = await fetch(url, { redirect: "follow" });
+
+          if (!response.ok) throw new Error("Bad response");
+
+          await cache.put(url, response.clone());
+          console.log("✅ Cached:", url);
+
         } catch (err) {
-          console.error('❌ Failed to cache:', url);
+          console.warn("❌ Skipped caching:", url);
         }
       }
     })
   );
+
   self.skipWaiting();
 });
 
+// ACTIVATE
+self.addEventListener("activate", (event) => {
+  console.log("⚡ Service Worker Activated");
 
-// 🔹 ACTIVATE (clean old caches)
-self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            console.log('🗑️ Deleting old cache:', key);
-            return caches.delete(key);
+    caches.keys().then((names) => {
+      return Promise.all(
+        names.map((name) => {
+          if (name !== CACHE_NAME) {
+            console.log("🗑️ Deleting old cache:", name);
+            return caches.delete(name);
           }
         })
-      )
-    )
+      );
+    })
   );
+
   self.clients.claim();
 });
 
-
-// 🔹 FETCH (offline support)
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
+// FETCH
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-      return fetch(event.request).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match(FALLBACK_PAGE);
-        }
-      });
+      return fetch(event.request)
+        .then((response) => {
+          // Only cache valid responses
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type !== "basic"
+          ) {
+            return response;
+          }
+
+          const responseClone = response.clone();
+
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+
+          return response;
+        })
+        .catch(() => {
+          // 🔥 Offline fallback
+          if (event.request.mode === "navigate") {
+            return caches.match("/index.html");
+          }
+        });
     })
   );
 });
