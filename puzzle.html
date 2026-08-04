@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>The Vault · Puzzle</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <link rel="icon" type="image/png" href="logo.png" />
     <link rel="apple-touch-icon" href="logo.png" />
     <link rel="manifest" href="manifest.webmanifest" />
     <script src="pwa-register.js" defer></script>
 
     <style>
+        /* ─────────── ROOT ─────────── */
         :root {
             --bg-deep: #06090f;
             --bg-surface: #0b1019;
@@ -50,11 +51,11 @@
             --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* ─────────── RESET ─────────── */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
-
         html,
         body {
             margin: 0;
@@ -79,7 +80,7 @@
             position: relative;
         }
 
-        /* ===== GRAIN OVERLAY ===== */
+        /* grain overlay */
         body::before {
             content: '';
             position: fixed;
@@ -92,7 +93,7 @@
             background-size: 200px 200px;
         }
 
-        /* ===== AMBIENT GLOW ===== */
+        /* ambient glow */
         body::after {
             content: '';
             position: fixed;
@@ -122,7 +123,7 @@
             }
         }
 
-        /* ===== SCROLLBAR ===== */
+        /* scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -134,7 +135,7 @@
             border-radius: 4px;
         }
 
-        /* ===== STAGE ===== */
+        /* ─────────── STAGE ─────────── */
         .stage {
             width: 100%;
             max-width: 430px;
@@ -150,7 +151,7 @@
             margin: 0 auto;
         }
 
-        /* ===== BACK BUTTON (PUZZLE) ===== */
+        /* ─────────── BACK BUTTON ─────────── */
         .puzzle-back-btn {
             position: absolute;
             top: 20px;
@@ -195,7 +196,7 @@
             line-height: 1;
         }
 
-        /* ===== DOTS ===== */
+        /* ─────────── DOTS ─────────── */
         .dots {
             display: flex;
             gap: 10px;
@@ -260,7 +261,7 @@
             }
         }
 
-        /* ===== LOCK ICON ===== */
+        /* ─────────── LOCK ICON ─────────── */
         .lock-wrap {
             position: relative;
             width: 68px;
@@ -309,8 +310,8 @@
             filter: drop-shadow(0 0 6px rgba(232, 204, 122, 0.7));
         }
 
-        /* ===== EYEBROW ===== */
-        h1.eyebrow {
+        /* ─────────── EYEBROW ─────────── */
+        .eyebrow {
             font-family: 'Cinzel', 'JetBrains Mono', serif;
             font-size: 11px;
             letter-spacing: 0.35em;
@@ -322,77 +323,199 @@
             text-shadow: 0 0 20px rgba(201, 162, 75, 0.25);
         }
 
-        /* ===== PLAQUE (question box) ===== */
+        /* ════════════════════════════════════════
+               NEW & IMPROVED PLAQUE
+               ════════════════════════════════════════ */
         .plaque {
             width: 100%;
-            background: linear-gradient(190deg, #131c29 0%, #0e151f 40%, #0b1119 100%);
-            border: 1px solid var(--border-medium);
+            background: linear-gradient(165deg,
+                    #141e2e 0%,
+                    #0e1624 35%,
+                    #0b111a 70%,
+                    #080d14 100%);
+            border: 1px solid #2a374d;
             border-radius: var(--radius-xl);
-            padding: 26px 22px;
+            padding: 0;
             position: relative;
             box-shadow:
                 var(--shadow-inner),
                 var(--shadow-2xl),
-                0 0 0 1px rgba(0, 0, 0, 0.35);
+                0 0 0 1px rgba(0, 0, 0, 0.45),
+                0 0 60px rgba(201, 162, 75, 0.04);
             overflow: hidden;
             transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
-            text-align: center;
         }
         .plaque:hover {
-            border-color: #2d3a4f;
+            border-color: #3d4d68;
+            box-shadow: var(--shadow-inner), var(--shadow-2xl), 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 70px rgba(201, 162, 75, 0.07);
         }
+
+        /* — top brass inlay line — */
         .plaque::before {
             content: '';
             position: absolute;
-            inset: 5px;
-            border: 1px solid #1e2a3a;
-            border-radius: 11px;
+            top: 0;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(201, 162, 75, 0.25) 20%,
+                    rgba(201, 162, 75, 0.6) 50%,
+                    rgba(201, 162, 75, 0.25) 80%,
+                    transparent);
             pointer-events: none;
-            opacity: 0.55;
-            transition: opacity var(--transition-smooth);
+            z-index: 2;
+            border-radius: 0 0 2px 2px;
         }
+
+        /* — inner border glow — */
         .plaque::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 24px;
-            right: 24px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.3), rgba(201, 162, 75, 0.1), transparent);
+            inset: 4px;
+            border: 1px solid rgba(201, 162, 75, 0.08);
+            border-radius: calc(var(--radius-xl) - 4px);
             pointer-events: none;
-        }
-        .level-tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10.5px;
-            color: var(--text-muted);
-            letter-spacing: 0.16em;
-            margin-bottom: 14px;
-            display: block;
-            position: relative;
             z-index: 1;
-            font-weight: 500;
+            transition: border-color var(--transition-smooth);
         }
-        .hint-text {
-            font-family: 'Inter', sans-serif;
-            font-size: 17px;
-            line-height: 1.65;
-            color: var(--text-primary);
-            margin: 0;
-            position: relative;
-            z-index: 1;
-            font-weight: 500;
-            letter-spacing: 0.015em;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        .plaque:hover::after {
+            border-color: rgba(201, 162, 75, 0.16);
         }
 
-        /* ===== FORM ===== */
+        /* — subtle radial highlight — */
+        .plaque-glow {
+            position: absolute;
+            top: -40%;
+            left: 50%;
+            width: 140%;
+            height: 80%;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse at center, rgba(201, 162, 75, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* — inner content wrapper — */
+        .plaque-inner {
+            position: relative;
+            z-index: 2;
+            padding: 28px 24px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* — level tag — */
+        .level-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--brass-dim);
+            background: rgba(201, 162, 75, 0.06);
+            padding: 4px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(201, 162, 75, 0.08);
+            display: inline-block;
+            margin-bottom: 10px;
+            transition: all var(--transition-smooth);
+        }
+        .plaque:hover .level-tag {
+            color: var(--brass);
+            border-color: rgba(201, 162, 75, 0.2);
+            background: rgba(201, 162, 75, 0.08);
+        }
+
+        /* — hint text — */
+        .hint-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin: 0;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            max-width: 95%;
+            transition: color var(--transition-smooth);
+        }
+        .hint-text .highlight {
+            color: var(--brass-light);
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(201, 162, 75, 0.2);
+        }
+
+        /* — decorative divider under hint — */
+        .hint-divider {
+            width: 48px;
+            height: 1.5px;
+            margin: 12px auto 0;
+            background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.25), transparent);
+            border-radius: 2px;
+            transition: width var(--transition-smooth), opacity var(--transition-smooth);
+        }
+        .plaque:hover .hint-divider {
+            width: 72px;
+            opacity: 0.8;
+        }
+
+        /* — small corner accents — */
+        .corner-accent {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: rgba(201, 162, 75, 0.12);
+            border-style: solid;
+            border-width: 0;
+            pointer-events: none;
+            z-index: 2;
+            transition: border-color var(--transition-smooth);
+        }
+        .plaque:hover .corner-accent {
+            border-color: rgba(201, 162, 75, 0.25);
+        }
+        .corner-accent.tl {
+            top: 8px;
+            left: 8px;
+            border-top-width: 1.5px;
+            border-left-width: 1.5px;
+            border-radius: 2px 0 0 0;
+        }
+        .corner-accent.tr {
+            top: 8px;
+            right: 8px;
+            border-top-width: 1.5px;
+            border-right-width: 1.5px;
+            border-radius: 0 2px 0 0;
+        }
+        .corner-accent.bl {
+            bottom: 8px;
+            left: 8px;
+            border-bottom-width: 1.5px;
+            border-left-width: 1.5px;
+            border-radius: 0 0 0 2px;
+        }
+        .corner-accent.br {
+            bottom: 8px;
+            right: 8px;
+            border-bottom-width: 1.5px;
+            border-right-width: 1.5px;
+            border-radius: 0 0 2px 0;
+        }
+
+        /* ─────────── FORM ─────────── */
         form {
             width: 100%;
             display: flex;
             flex-direction: column;
             gap: 13px;
         }
-        input[type=text] {
+        input[type="text"] {
             width: 100%;
             background: #080d14;
             border: 1.5px solid var(--border-medium);
@@ -409,7 +532,7 @@
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.015);
             caret-color: var(--brass-light);
         }
-        input[type=text]::placeholder {
+        input[type="text"]::placeholder {
             color: #3a4052;
             letter-spacing: 0.06em;
             text-transform: none;
@@ -417,7 +540,7 @@
             font-family: 'Inter', sans-serif;
             font-weight: 400;
         }
-        input[type=text]:focus {
+        input[type="text"]:focus {
             border-color: var(--brass);
             box-shadow:
                 0 0 0 5px rgba(201, 162, 75, 0.07),
@@ -427,7 +550,7 @@
             background: #0b1019;
             letter-spacing: 0.14em;
         }
-        input[type=text]:focus::placeholder {
+        input[type="text"]:focus::placeholder {
             color: #4a5168;
         }
         input.shake {
@@ -457,8 +580,8 @@
             }
         }
 
-        /* ===== SUBMIT BUTTON ===== */
-        button[type=submit] {
+        /* ─────────── SUBMIT BUTTON ─────────── */
+        button[type="submit"] {
             width: 100%;
             background: linear-gradient(180deg,
                     #e0be5e 0%, #c9a545 8%, #b89234 40%, #a07d28 70%, #8e6e20 100%);
@@ -481,7 +604,7 @@
             overflow: hidden;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
-        button[type=submit]::after {
+        button[type="submit"]::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -492,7 +615,7 @@
             pointer-events: none;
             border-radius: var(--radius-md);
         }
-        button[type=submit]:hover {
+        button[type="submit"]:hover {
             filter: brightness(1.1);
             box-shadow:
                 0 8px 28px rgba(0, 0, 0, 0.5),
@@ -501,25 +624,25 @@
                 0 1px 0 rgba(255, 255, 255, 0.08) inset;
             transform: translateY(-1px);
         }
-        button[type=submit]:active {
+        button[type="submit"]:active {
             transform: scale(0.95);
             filter: brightness(0.9);
             transition: transform 0.08s ease, filter 0.08s ease;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 162, 75, 0.2);
         }
-        button[type=submit]:disabled {
+        button[type="submit"]:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             filter: grayscale(0.35) brightness(0.7);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 162, 75, 0.1);
             transform: none;
         }
-        button[type=submit]:focus-visible {
+        button[type="submit"]:focus-visible {
             outline: 2.5px solid var(--brass-light);
             outline-offset: 4px;
         }
 
-        /* ===== MESSAGE ===== */
+        /* ─────────── MESSAGE ─────────── */
         .msg {
             min-height: 22px;
             font-family: 'JetBrains Mono', monospace;
@@ -539,7 +662,7 @@
             text-shadow: 0 0 12px rgba(76, 140, 98, 0.4);
         }
 
-        /* ===== MODE TAG ===== */
+        /* ─────────── MODE TAG ─────────── */
         .mode-tag {
             font-family: 'JetBrains Mono', monospace;
             font-size: 9.5px;
@@ -550,7 +673,7 @@
             padding-top: 4px;
         }
 
-        /* ===== DONE SCREEN ===== */
+        /* ─────────── DONE SCREEN ─────────── */
         .done-screen {
             text-align: center;
             display: flex;
@@ -576,9 +699,9 @@
             font-weight: 400;
         }
 
-        /* ========================================
-           INTRO OVERLAY
-           ======================================== */
+        /* ════════════════════════════════════════
+               INTRO OVERLAY
+               ════════════════════════════════════════ */
         #intro {
             position: fixed;
             inset: 0;
@@ -747,9 +870,9 @@
             outline-offset: 5px;
         }
 
-        /* ========================================
-           LOGIN MODAL
-           ======================================== */
+        /* ════════════════════════════════════════
+               LOGIN MODAL
+               ════════════════════════════════════════ */
         #loginModal {
             position: fixed;
             inset: 0;
@@ -812,7 +935,6 @@
             pointer-events: none;
         }
 
-        /* ===== LOGIN BACK BUTTON ===== */
         .login-back-btn {
             position: absolute;
             top: 14px;
@@ -959,9 +1081,7 @@
             z-index: 1;
         }
 
-        /* ========================================
-           MOBILE ENHANCEMENTS
-           ======================================== */
+        /* ─────────── MOBILE ─────────── */
         @media (max-width: 480px) {
             .stage {
                 padding: 20px 14px 30px;
@@ -982,24 +1102,45 @@
                 width: 56px;
                 height: 56px;
             }
-            .plaque {
-                padding: 20px 14px;
-                border-radius: var(--radius-lg);
-            }
-            .plaque::before {
-                border-radius: 8px;
-                inset: 3px;
+
+            .plaque-inner {
+                padding: 22px 16px 24px;
             }
             .hint-text {
-                font-size: 15.5px;
-                line-height: 1.55;
+                font-size: 16px;
+                line-height: 1.6;
             }
-            input[type=text] {
+            .level-tag {
+                font-size: 9px;
+                padding: 3px 12px;
+            }
+            .corner-accent {
+                width: 9px;
+                height: 9px;
+            }
+            .corner-accent.tl,
+            .corner-accent.bl {
+                left: 5px;
+            }
+            .corner-accent.tr,
+            .corner-accent.br {
+                right: 5px;
+            }
+            .corner-accent.tl,
+            .corner-accent.tr {
+                top: 5px;
+            }
+            .corner-accent.bl,
+            .corner-accent.br {
+                bottom: 5px;
+            }
+
+            input[type="text"] {
                 font-size: 16px;
                 padding: 15px 12px;
                 border-radius: var(--radius-sm);
             }
-            button[type=submit] {
+            button[type="submit"] {
                 font-size: 12px;
                 padding: 16px;
                 border-radius: var(--radius-sm);
@@ -1043,17 +1184,21 @@
                 padding: 16px 10px 24px;
                 gap: 14px;
             }
-            .plaque {
-                padding: 16px 10px;
+            .plaque-inner {
+                padding: 18px 12px 20px;
             }
             .hint-text {
                 font-size: 14px;
             }
-            input[type=text] {
+            .level-tag {
+                font-size: 8px;
+                padding: 2px 10px;
+            }
+            input[type="text"] {
                 font-size: 14px;
                 padding: 13px 10px;
             }
-            button[type=submit] {
+            button[type="submit"] {
                 font-size: 11px;
                 padding: 14px;
             }
@@ -1087,17 +1232,18 @@
         }
     </style>
 </head>
+
 <body>
 
-    <!-- ===== INTRO OVERLAY ===== -->
+    <!-- ═══════ INTRO OVERLAY ═══════ -->
     <div id="intro" class="hidden-initially" role="dialog" aria-label="Welcome">
         <div class="intro-inner">
             <div class="intro-emblem" id="introEmblem">
                 <svg viewBox="0 0 64 64" fill="none">
-                    <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c9a24b" stroke-width="3" fill="none" stroke-linecap="round"/>
-                    <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c9a24b" stroke-width="2"/>
-                    <circle cx="32" cy="38" r="3.5" fill="#7a6633"/>
-                    <rect x="30.5" y="40" width="3" height="7" fill="#7a6633" rx="0.5"/>
+                    <path d="M20 26 V18 a12 12 0 0 1 24 0 V26" stroke="#c9a24b" stroke-width="3" fill="none" stroke-linecap="round" />
+                    <rect x="14" y="26" width="36" height="28" rx="6" fill="#1b2029" stroke="#c9a24b" stroke-width="2" />
+                    <circle cx="32" cy="38" r="3.5" fill="#7a6633" />
+                    <rect x="30.5" y="40" width="3" height="7" fill="#7a6633" rx="0.5" />
                 </svg>
             </div>
             <p class="intro-greet" id="introGreet">Welcome, stranger.</p>
@@ -1110,24 +1256,22 @@
         </div>
     </div>
 
-    <!-- ===== LOGIN MODAL ===== -->
+    <!-- ═══════ LOGIN MODAL ═══════ -->
     <div id="loginModal" class="hidden-initially" role="dialog" aria-label="Authentication required" aria-modal="true">
         <div class="login-card">
-            <!-- Back button -->
             <button class="login-back-btn" id="loginBackBtn" aria-label="Go back" title="Go back to home">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
+                    <polyline points="15 18 9 12 15 6" />
                 </svg>
                 <span>Back</span>
             </button>
-
             <div class="login-icon">
                 <svg viewBox="0 0 64 64" fill="none">
-                    <circle cx="32" cy="32" r="28" stroke="#c9a24b" stroke-width="2" fill="none" opacity="0.45"/>
-                    <path d="M32 20 V36" stroke="#e8cc7a" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="32" cy="44" r="3.5" fill="#e8cc7a"/>
-                    <rect x="14" y="26" width="36" height="28" rx="6" fill="none" stroke="#c9a24b" stroke-width="2" opacity="0.35"/>
-                    <circle cx="32" cy="38" r="3" fill="#7a6633" opacity="0.55"/>
+                    <circle cx="32" cy="32" r="28" stroke="#c9a24b" stroke-width="2" fill="none" opacity="0.45" />
+                    <path d="M32 20 V36" stroke="#e8cc7a" stroke-width="3" stroke-linecap="round" />
+                    <circle cx="32" cy="44" r="3.5" fill="#e8cc7a" />
+                    <rect x="14" y="26" width="36" height="28" rx="6" fill="none" stroke="#c9a24b" stroke-width="2" opacity="0.35" />
+                    <circle cx="32" cy="38" r="3" fill="#7a6633" opacity="0.55" />
                 </svg>
             </div>
             <h2 class="login-title">RESTRICTED ACCESS</h2>
@@ -1138,34 +1282,50 @@
         </div>
     </div>
 
-    <!-- ===== GAME STAGE ===== -->
+    <!-- ═══════ GAME STAGE ═══════ -->
     <div class="stage" id="stage">
-        <!-- Back button for puzzle section -->
+
         <button class="puzzle-back-btn" id="puzzleBackBtn" aria-label="Go back" title="Return to home">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
+                <polyline points="15 18 9 12 15 6" />
             </svg>
             <span>Back</span>
         </button>
 
         <span class="eyebrow">The Vault</span>
+
         <div class="lock-wrap" id="lockIcon">
             <svg viewBox="0 0 64 64">
                 <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
-                <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
-                <circle class="keyhole" cx="32" cy="38" r="3.5"/>
-                <rect class="keyhole" x="30.5" y="40" width="3" height="7" rx="0.5"/>
+                <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6" />
+                <circle class="keyhole" cx="32" cy="38" r="3.5" />
+                <rect class="keyhole" x="30.5" y="40" width="3" height="7" rx="0.5" />
             </svg>
         </div>
+
         <div class="dots" id="dots"></div>
 
         <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
+
+            <!-- ═══ NEW PLAQUE ═══ -->
             <div class="plaque">
-                <span class="level-tag" id="levelTag">LEVEL —</span>
-                <p class="hint-text" id="hintText">Initializing…</p>
+                <div class="plaque-glow"></div>
+
+                <!-- corner accents -->
+                <span class="corner-accent tl"></span>
+                <span class="corner-accent tr"></span>
+                <span class="corner-accent bl"></span>
+                <span class="corner-accent br"></span>
+
+                <div class="plaque-inner">
+                    <span class="level-tag" id="levelTag">LEVEL —</span>
+                    <p class="hint-text" id="hintText">Initializing…</p>
+                    <div class="hint-divider"></div>
+                </div>
             </div>
+
             <form id="answerForm">
-                <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters" disabled>
+                <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters" disabled />
                 <button type="submit" id="submitBtn" disabled>Unlock</button>
             </form>
             <div class="msg" id="msg"></div>
@@ -1174,9 +1334,9 @@
         <span class="mode-tag" id="modeTag">checking session…</span>
     </div>
 
-    <!-- ========================================
-    ORIGINAL SCRIPTS — PRESERVED EXACTLY
-    ======================================== -->
+    <!-- ════════════════════════════════════════
+    SCRIPTS — PRESERVED & UNCHANGED
+    ════════════════════════════════════════ -->
     <script>
         // ===== Shared Supabase client =====
         const SUPABASE_URL = 'https://omxfdzmagxoidbgcajqq.supabase.co';
@@ -1228,28 +1388,23 @@
             const { data: { session } } = await sb.auth.getSession();
 
             if (!session || !session.user) {
-                // NOT LOGGED IN → show login modal
                 showLoginModal();
                 return;
             }
 
-            // LOGGED IN
             state.session = session;
             state.userId = session.user.id;
 
             const introSeen = localStorage.getItem(INTRO_SEEN_KEY);
 
             if (introSeen) {
-                // Returning user → skip intro, init game directly
                 hideIntroPermanently();
                 await initGame();
                 enableGameInputs();
             } else {
-                // First-time visitor → show intro
                 personalizeIntro(session);
                 revealIntro();
                 playIntroAnimation();
-                // Game will init after intro dismissal
                 await initGameInBackground();
             }
         }
@@ -1257,14 +1412,12 @@
         // ===== LOGIN MODAL =====
         function showLoginModal() {
             loginModal.classList.remove('hidden-initially');
-            // Hide intro and ensure game is not interactive
             hideIntroPermanently();
             disableGameInputs();
             elModeTag.textContent = 'authentication required';
         }
 
         loginBtn.addEventListener('click', () => {
-            // Redirect to login page
             window.location.href = '/index.html';
         });
 
@@ -1283,7 +1436,6 @@
         function hideIntroPermanently() {
             introEl.classList.add('hidden-initially');
             introEl.classList.remove('gone');
-            // Reset animation classes
             [introEmblem, introGreet, introTitle, introLine, introD1, introD2, introStamp, introBtn].forEach(el => {
                 if (el) el.classList.remove('show');
             });
@@ -1333,7 +1485,6 @@
 
         // ===== GAME =====
         async function initGameInBackground() {
-            // Pre-fetch total levels so dots render correctly even before intro dismissal
             try {
                 const { count } = await sb
                     .from('puzzle_levels_public')
@@ -1343,7 +1494,6 @@
                 state.totalLevels = 0;
             }
 
-            // Fetch user progress
             if (state.userId) {
                 const { data: progress } = await sb
                     .from('puzzle_progress')
@@ -1366,7 +1516,6 @@
         }
 
         async function initGame() {
-            // Called for returning users (intro already skipped)
             try {
                 const { count } = await sb
                     .from('puzzle_levels_public')
@@ -1481,7 +1630,6 @@
 
                 state.currentLevel += 1;
 
-                // Persist progress
                 await sb
                     .from('puzzle_progress')
                     .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
@@ -1507,13 +1655,8 @@
 
         // ===== START =====
         bootstrap();
-    </script>
 
-    <!-- ========================================
-    BACK BUTTON FUNCTIONALITY
-    ======================================== -->
-    <script>
-        // Back button on login modal → go to home
+        // ===== BACK BUTTONS =====
         (function() {
             const loginBackBtn = document.getElementById('loginBackBtn');
             if (loginBackBtn) {
@@ -1524,7 +1667,6 @@
             }
         })();
 
-        // Back button on puzzle stage → go to home
         (function() {
             const puzzleBackBtn = document.getElementById('puzzleBackBtn');
             if (puzzleBackBtn) {
