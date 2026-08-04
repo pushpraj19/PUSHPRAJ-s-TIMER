@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Vault · Puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg: #14171f;
+    --panel: #1b2029;
+    --panel-edge: #262c38;
+    --brass: #c9a24b;
+    --brass-light: #e6c877;
+    --brass-dim: #7a6633;
+    --text: #ece7da;
+    --muted: #8b8f9b;
+    --error: #c0463a;
+    --success: #4c8c62;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #232938 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    overflow-x:hidden;
+  }
+  .stage{
+    width:100%; max-width:420px;
+    padding:28px 20px 40px;
+    min-height:100dvh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:22px;
+  }
+
+  /* Level dots */
+  .dots{ display:flex; gap:9px; }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--panel-edge);
+    border:1px solid var(--brass-dim);
+    transition: all .3s ease;
+  }
+  .dot.done{ background:var(--brass); border-color:var(--brass); box-shadow:0 0 8px rgba(201,162,75,.6); }
+  .dot.active{ background:var(--brass-light); border-color:var(--brass-light); box-shadow:0 0 10px rgba(230,200,119,.8); transform:scale(1.3); }
+
+  /* Lock icon */
+  .lock-wrap{ position:relative; width:64px; height:64px; }
+  .lock-wrap svg{ width:100%; height:100%; }
+  .shackle{ transform-origin: 32px 24px; transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
+  .lock-wrap.open .shackle{ transform: translateY(-6px) rotate(-25deg); }
+  .lock-body{ fill:var(--panel); stroke:var(--brass); stroke-width:2; }
+  .shackle{ fill:none; stroke:var(--brass); stroke-width:3; }
+  .keyhole{ fill:var(--brass-dim); }
+
+  h1.eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:.28em; text-transform:uppercase;
+    color:var(--brass); margin:0; font-weight:700;
+  }
+
+  .plaque{
+    width:100%;
+    background:linear-gradient(180deg, var(--panel) 0%, #171b23 100%);
+    border:1px solid var(--panel-edge);
+    border-radius:10px;
+    padding:22px 20px;
+    position:relative;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 12px 28px rgba(0,0,0,.35);
+  }
+  .plaque::before{
+    content:'';
+    position:absolute; inset:6px;
+    border:1px solid var(--panel-edge);
+    border-radius:6px;
+    pointer-events:none;
+  }
+  .level-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; color:var(--muted); letter-spacing:.12em;
+    margin-bottom:10px; display:block;
+  }
+  .hint-text{
+    font-family:'Inter', sans-serif;
+    font-size:17px; line-height:1.55; color:var(--text);
+    margin:0;
+  }
+
+  form{ width:100%; display:flex; flex-direction:column; gap:12px; }
+  input[type=text]{
+    width:100%;
+    background:#10131a;
+    border:1px solid var(--panel-edge);
+    border-radius:8px;
+    padding:16px 14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:18px; letter-spacing:.08em;
+    color:var(--brass-light);
+    text-transform:uppercase;
+    text-align:center;
+    outline:none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input[type=text]::placeholder{ color:#4a4f5c; letter-spacing:.05em; text-transform:none; font-size:14px;}
+  input[type=text]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,162,75,.15); }
+  input.shake{ animation: shake .4s; border-color:var(--error); }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
+  }
+
+  button{
+    width:100%;
+    background:linear-gradient(180deg, var(--brass-light), var(--brass));
+    color:#14171f;
+    border:none; border-radius:8px;
+    padding:15px;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    cursor:pointer;
+    transition: transform .15s, filter .15s;
+  }
+  button:active{ transform:scale(.97); }
+  button:disabled{ opacity:.5; cursor:default; }
+
+  .msg{
+    min-height:18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.05em;
+    text-align:center;
+  }
+  .msg.error{ color:var(--error); }
+  .msg.success{ color:var(--success); }
+
+  .mode-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px; color:var(--muted); letter-spacing:.1em;
+    opacity:.7;
+  }
+
+  .done-screen{ text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .done-screen h2{ font-family:'JetBrains Mono', monospace; color:var(--brass-light); letter-spacing:.05em; margin:0; }
+  .done-screen p{ color:var(--muted); margin:0; font-size:14px; }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <span class="eyebrow">The Vault</span>
+  <div class="lock-wrap" id="lockIcon">
+    <svg viewBox="0 0 64 64">
+      <path class="shackle" d="M20 26 V18 a12 12 0 0 1 24 0 V26" />
+      <rect class="lock-body" x="14" y="26" width="36" height="28" rx="6"/>
+      <circle class="keyhole" cx="32" cy="38" r="3.5"/>
+      <rect class="keyhole" x="30.5" y="40" width="3" height="7"/>
+    </svg>
+  </div>
+  <div class="dots" id="dots"></div>
+
+  <div id="gameArea" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:18px;">
+    <div class="plaque">
+      <span class="level-tag" id="levelTag">LEVEL —</span>
+      <p class="hint-text" id="hintText">Loading...</p>
+    </div>
+    <form id="answerForm">
+      <input type="text" id="answerInput" placeholder="Enter the code" autocomplete="off" autocapitalize="characters">
+      <button type="submit" id="submitBtn">Unlock</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <span class="mode-tag" id="modeTag">checking session…</span>
+</div>
+
+<script>
+// ====== CONFIG — fill these in with your Supabase project details ======
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+// =========================================================================
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const LOCAL_KEY = 'vault_puzzle_level';
+
+let state = {
+  userId: null,
+  isOffline: true,
+  currentLevel: 1,
+  totalLevels: 0,
+  levelRow: null,
+};
+
+const el = {
+  dots: document.getElementById('dots'),
+  levelTag: document.getElementById('levelTag'),
+  hintText: document.getElementById('hintText'),
+  form: document.getElementById('answerForm'),
+  input: document.getElementById('answerInput'),
+  submitBtn: document.getElementById('submitBtn'),
+  msg: document.getElementById('msg'),
+  modeTag: document.getElementById('modeTag'),
+  lockIcon: document.getElementById('lockIcon'),
+  gameArea: document.getElementById('gameArea'),
+  stage: document.getElementById('stage'),
+};
+
+async function init() {
+  // 1. Figure out how many levels exist
+  const { count } = await supabase
+    .from('puzzle_levels')
+    .select('*', { count: 'exact', head: true });
+  state.totalLevels = count || 0;
+
+  // 2. Check for a logged-in session (reuses your site's existing auth)
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session && session.user) {
+    state.userId = session.user.id;
+    state.isOffline = false;
+    el.modeTag.textContent = 'signed in · progress synced';
+
+    // fetch or create progress row
+    let { data: progress } = await supabase
+      .from('puzzle_progress')
+      .select('current_level')
+      .eq('user_id', state.userId)
+      .maybeSingle();
+
+    if (!progress) {
+      await supabase.from('puzzle_progress').insert({ user_id: state.userId, current_level: 1 });
+      state.currentLevel = 1;
+    } else {
+      state.currentLevel = progress.current_level;
+    }
+  } else {
+    state.isOffline = true;
+    el.modeTag.textContent = 'playing offline · progress saved on this device';
+    state.currentLevel = parseInt(localStorage.getItem(LOCAL_KEY) || '1', 10);
+  }
+
+  renderDots();
+  await loadLevel();
+}
+
+function renderDots() {
+  el.dots.innerHTML = '';
+  for (let i = 1; i <= state.totalLevels; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.currentLevel ? ' done' : i === state.currentLevel ? ' active' : '');
+    el.dots.appendChild(d);
+  }
+}
+
+async function loadLevel() {
+  if (state.currentLevel > state.totalLevels) {
+    showDoneScreen();
+    return;
+  }
+  const { data, error } = await supabase
+    .from('puzzle_levels')
+    .select('*')
+    .eq('level_number', state.currentLevel)
+    .single();
+
+  if (error || !data) {
+    el.hintText.textContent = 'Could not load this level. Check your Supabase config / table contents.';
+    return;
+  }
+  state.levelRow = data;
+  el.levelTag.textContent = `LEVEL ${state.currentLevel} / ${state.totalLevels}`;
+  el.hintText.textContent = data.hint;
+  el.input.value = '';
+  el.msg.textContent = '';
+  el.msg.className = 'msg';
+}
+
+function showDoneScreen() {
+  el.lockIcon.classList.add('open');
+  el.gameArea.innerHTML = `
+    <div class="done-screen">
+      <h2>VAULT CLEARED</h2>
+      <p>You solved all ${state.totalLevels} levels. Nicely done.</p>
+    </div>`;
+}
+
+el.form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const guess = el.input.value.trim().toUpperCase();
+  const correctAnswer = (state.levelRow.answer || '').trim().toUpperCase();
+
+  if (!guess) return;
+  el.submitBtn.disabled = true;
+
+  if (guess === correctAnswer) {
+    el.msg.textContent = 'CORRECT';
+    el.msg.className = 'msg success';
+    el.lockIcon.classList.add('open');
+
+    state.currentLevel += 1;
+
+    if (state.isOffline) {
+      localStorage.setItem(LOCAL_KEY, state.currentLevel);
+    } else {
+      await supabase
+        .from('puzzle_progress')
+        .update({ current_level: state.currentLevel, updated_at: new Date().toISOString() })
+        .eq('user_id', state.userId);
+    }
+
+    setTimeout(async () => {
+      el.lockIcon.classList.remove('open');
+      renderDots();
+      await loadLevel();
+      el.submitBtn.disabled = false;
+    }, 750);
+  } else {
+    el.msg.textContent = 'INCORRECT — TRY AGAIN';
+    el.msg.className = 'msg error';
+    el.input.classList.add('shake');
+    setTimeout(() => el.input.classList.remove('shake'), 400);
+    el.submitBtn.disabled = false;
+  }
+});
+
+init();
+</script>
+</body>
+</html>
