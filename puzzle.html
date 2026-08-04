@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Vault · Puzzle</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -76,6 +76,7 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             letter-spacing: 0.01em;
+            position: relative;
         }
 
         /* ===== GRAIN OVERLAY ===== */
@@ -137,22 +138,23 @@
         .stage {
             width: 100%;
             max-width: 430px;
-            padding: 24px 18px 40px;
+            padding: 28px 20px 40px;
             min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 22px;
             position: relative;
             z-index: 1;
+            margin: 0 auto;
         }
 
         /* ===== BACK BUTTON (PUZZLE) ===== */
         .puzzle-back-btn {
             position: absolute;
-            top: 18px;
-            left: 18px;
+            top: 20px;
+            left: 20px;
             z-index: 10;
             display: flex;
             align-items: center;
@@ -172,6 +174,7 @@
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             background: rgba(11, 16, 25, 0.7);
+            line-height: 1;
         }
         .puzzle-back-btn:hover {
             color: var(--brass-light);
@@ -191,25 +194,12 @@
         .puzzle-back-btn span {
             line-height: 1;
         }
-        @media (max-width: 400px) {
-            .puzzle-back-btn {
-                top: 12px;
-                left: 10px;
-                padding: 7px 11px;
-                font-size: 9px;
-                gap: 5px;
-            }
-            .puzzle-back-btn svg {
-                width: 12px;
-                height: 12px;
-            }
-        }
 
         /* ===== DOTS ===== */
         .dots {
             display: flex;
             gap: 10px;
-            padding: 6px 0;
+            padding: 4px 0;
         }
         .dot {
             width: 9px;
@@ -277,6 +267,7 @@
             height: 68px;
             transition: transform 0.35s ease;
             filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));
+            flex-shrink: 0;
         }
         .lock-wrap svg {
             width: 100%;
@@ -331,7 +322,7 @@
             text-shadow: 0 0 20px rgba(201, 162, 75, 0.25);
         }
 
-        /* ===== PLAQUE ===== */
+        /* ===== PLAQUE (question box) ===== */
         .plaque {
             width: 100%;
             background: linear-gradient(190deg, #131c29 0%, #0e151f 40%, #0b1119 100%);
@@ -345,6 +336,7 @@
                 0 0 0 1px rgba(0, 0, 0, 0.35);
             overflow: hidden;
             transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+            text-align: center;
         }
         .plaque:hover {
             border-color: #2d3a4f;
@@ -414,7 +406,6 @@
             text-align: center;
             outline: none;
             transition: all var(--transition-smooth);
-            position: relative;
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.015);
             caret-color: var(--brass-light);
         }
@@ -842,6 +833,7 @@
             cursor: pointer;
             transition: all var(--transition-smooth);
             text-decoration: none;
+            line-height: 1;
         }
         .login-back-btn:hover {
             color: var(--brass-light);
@@ -968,15 +960,30 @@
         }
 
         /* ========================================
-           RESPONSIVE
+           MOBILE ENHANCEMENTS
            ======================================== */
-        @media (max-width: 420px) {
+        @media (max-width: 480px) {
             .stage {
-                padding: 20px 12px 32px;
-                gap: 15px;
+                padding: 20px 14px 30px;
+                gap: 16px;
+            }
+            .puzzle-back-btn {
+                top: 14px;
+                left: 12px;
+                padding: 7px 12px;
+                font-size: 9px;
+                gap: 5px;
+            }
+            .puzzle-back-btn svg {
+                width: 12px;
+                height: 12px;
+            }
+            .lock-wrap {
+                width: 56px;
+                height: 56px;
             }
             .plaque {
-                padding: 18px 14px;
+                padding: 20px 14px;
                 border-radius: var(--radius-lg);
             }
             .plaque::before {
@@ -989,67 +996,93 @@
             }
             input[type=text] {
                 font-size: 16px;
-                padding: 14px 12px;
+                padding: 15px 12px;
                 border-radius: var(--radius-sm);
             }
             button[type=submit] {
-                font-size: 11.5px;
-                padding: 14px;
+                font-size: 12px;
+                padding: 16px;
                 border-radius: var(--radius-sm);
-                letter-spacing: 0.14em;
+            }
+            .dots {
+                gap: 8px;
+            }
+            .dot {
+                width: 8px;
+                height: 8px;
             }
             .intro-inner {
-                padding: 0 14px;
+                padding: 0 16px;
             }
             .intro-title {
                 font-size: 22px;
                 letter-spacing: 0.2em;
             }
             .intro-btn {
-                padding: 13px 40px;
+                padding: 14px 42px;
                 font-size: 11px;
-                letter-spacing: 0.28em;
+                letter-spacing: 0.3em;
             }
             .login-card {
                 padding: 28px 16px 22px;
-                border-radius: var(--radius-lg);
             }
-            .login-back-btn {
-                top: 10px;
-                left: 8px;
-                padding: 6px 10px;
-                font-size: 9px;
+            .login-title {
+                font-size: 14px;
             }
-            .puzzle-back-btn {
-                top: 10px;
-                left: 8px;
-                padding: 7px 10px;
-                font-size: 9px;
+            .login-subtitle {
+                font-size: 12.5px;
+            }
+            .login-btn {
+                font-size: 11px;
+                padding: 14px;
             }
         }
-        @media (max-width: 350px) {
+
+        @media (max-width: 380px) {
             .stage {
-                padding: 14px 8px 24px;
-                gap: 12px;
+                padding: 16px 10px 24px;
+                gap: 14px;
             }
             .plaque {
-                padding: 14px 10px;
+                padding: 16px 10px;
             }
             .hint-text {
                 font-size: 14px;
             }
             input[type=text] {
                 font-size: 14px;
-                padding: 12px 10px;
+                padding: 13px 10px;
             }
-            .intro-inner {
-                padding: 0 10px;
+            button[type=submit] {
+                font-size: 11px;
+                padding: 14px;
+            }
+            .dots {
+                gap: 6px;
+            }
+            .dot {
+                width: 7px;
+                height: 7px;
+            }
+            .lock-wrap {
+                width: 48px;
+                height: 48px;
+            }
+            .puzzle-back-btn {
+                top: 10px;
+                left: 8px;
+                padding: 5px 10px;
+                font-size: 8px;
+            }
+            .login-card {
+                padding: 22px 12px 18px;
             }
             .intro-title {
                 font-size: 19px;
             }
-            .login-card {
-                padding: 22px 12px 18px;
+            .intro-btn {
+                padding: 12px 34px;
+                font-size: 10px;
             }
         }
     </style>
@@ -1477,7 +1510,7 @@
     </script>
 
     <!-- ========================================
-    NEW SCRIPTS — Back button functionality
+    BACK BUTTON FUNCTIONALITY
     ======================================== -->
     <script>
         // Back button on login modal → go to home
